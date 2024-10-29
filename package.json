@@ -7,7 +7,17 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lint-fix": "eslint --fix ./src",
+    "format:write": "prettier --write \"**/*.{js,jsx,ts,tsx,mdx}\" --cache",
+    "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,mdx}\" --cache",
+    "deploy:stg": "npm run lint-fix && npm run build && firebase deploy --only hosting:stg",
+    "deploy:stg:skipchecks": "npm run build && firebase deploy --only hosting:stg",
+    "deploy:prd": "npm run lint-fix && npm run build && firebase deploy --only hosting:prd",
+    "deploy:prd:skipchecks": "npm run build && firebase deploy --only hosting:prd",
+    "check-updates": "npx npm-check-updates -i",
+    "docs": "jsdoc -c jsdoc.conf.json",
+    "npm-check": "npm-check"
   },
   "dependencies": {
     "@andypf/json-viewer": "^2.1.5",

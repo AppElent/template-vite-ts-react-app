@@ -1,14 +1,15 @@
 import React, { createContext, useState, useEffect, useCallback, ReactNode } from 'react';
 
 // Define types for the data source and context
-interface DataSource {
+export interface DataSource {
   key: string;
   dataSource: {
     getAll: (filter: object) => Promise<any>;
+    get: (id?: string) => Promise<any>;
     subscribe: (callback: (newData: any) => void) => () => void;
     add: (item: any) => Promise<any>;
-    update: (id: string, data: any) => Promise<void>;
-    delete: (id: string) => Promise<void>;
+    update: (id: string, data?: any) => Promise<void>;
+    delete: (id?: string) => Promise<void>;
   };
 }
 
@@ -49,14 +50,9 @@ const DataProvider: React.FC<DataProviderProps> = ({ dataSources, children }) =>
     [setDataSourcesState]
   );
 
-  const setDataSource = useCallback(
-    (key: string, dataSource: DataSource['dataSource']) => {
-      setDataSourcesState((prev) =>
-        prev.map((ds) => (ds.key === key ? { ...ds, dataSource } : ds))
-      );
-    },
-    []
-  );
+  const setDataSource = useCallback((key: string, dataSource: DataSource['dataSource']) => {
+    setDataSourcesState((prev) => prev.map((ds) => (ds.key === key ? { ...ds, dataSource } : ds)));
+  }, []);
 
   const fetchData = useCallback(
     async (key: string, filter: object = {}) => {

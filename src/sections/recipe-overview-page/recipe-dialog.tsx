@@ -1,29 +1,137 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
-  TextField,
   Button,
   IconButton,
   Box,
   Typography,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemSecondaryAction,
   useTheme,
   useMediaQuery,
 } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
-import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import useFormFields from '@/hooks/use-form-fields';
+import Recipe from '@/types/recipe';
 
-function RecipeDialog({ open, onClose, onSave, recipeData }) {
+function RecipeDialog({
+  open,
+  onClose,
+  onSave,
+  recipeData,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onSave: (id: string | undefined, data: Recipe) => void;
+  recipeData?: Recipe;
+}) {
   const [isEditing, setIsEditing] = useState(!recipeData); // If no recipe data is provided, default to editing mode
   const [image, setImage] = useState(recipeData?.image || null);
+
+  const defaultValues = {
+    name: '',
+    url: '',
+    ingredients: [''],
+    instructions: [''],
+    score: 0,
+    comments: '',
+    cookingTime: 0,
+    nutrition: 0,
+    category: '',
+    keywords: [''],
+    dateAdded: '',
+    numberOfServings: 2,
+  };
+
+  const { formFields, formik } = useFormFields(
+    [
+      {
+        name: 'name',
+        label: 'Name',
+        type: 'text',
+        validation: Yup.string().required('Recipe name is required').min(3, 'Minimum 3 characters'),
+        props: { fullWidth: true, variant: 'outlined' },
+      },
+      {
+        name: 'ingredients',
+        label: 'Ingredients',
+        type: 'list',
+        initialValue: [recipeData?.ingredients || ['']],
+        validation: Yup.array().of(Yup.string()),
+      },
+      {
+        name: 'instructions',
+        label: 'Instructions',
+        type: 'list',
+        initialValue: [recipeData?.instructions || ['']],
+        validation: Yup.array().of(Yup.string()),
+      },
+      {
+        name: 'cookingTime',
+        label: 'Cooking Time',
+        type: 'text',
+        props: { fullWidth: true, variant: 'outlined' },
+      },
+      {
+        name: 'comments',
+        label: 'Comments',
+        type: 'text',
+        props: { fullWidth: true, variant: 'outlined' },
+      },
+      {
+        name: 'score',
+        label: 'Score',
+        type: 'text',
+        props: { fullWidth: true, variant: 'outlined' },
+      },
+      {
+        name: 'url',
+        label: 'URL',
+        type: 'text',
+        props: { fullWidth: true, variant: 'outlined' },
+      },
+      {
+        name: 'nutrition',
+        label: 'Nutrition info',
+        type: 'text',
+        props: { fullWidth: true, variant: 'outlined' },
+      },
+      {
+        name: 'numberOfServings',
+        label: 'Number of Servings',
+        type: 'text',
+        props: { fullWidth: true, variant: 'outlined' },
+      },
+      {
+        name: 'dateAdded',
+        label: 'Date added',
+        type: 'text',
+        props: { fullWidth: true, variant: 'outlined', type: 'date' },
+      },
+      {
+        name: 'keywords',
+        label: 'Keywords',
+        type: 'list',
+        initialValue: [recipeData?.keywords || ['']],
+        validation: Yup.array().of(Yup.string()),
+      },
+    ],
+    isEditing,
+    {
+      initialValues: defaultValues,
+      onSubmit: (values: Recipe) => {
+        console.log('Updated Recipe:', values);
+        onSave(recipeData?.id, values);
+        setIsEditing(false);
+        onClose();
+      },
+    }
+  );
+
+  console.log(formik, formFields);
 
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
@@ -31,13 +139,8 @@ function RecipeDialog({ open, onClose, onSave, recipeData }) {
   useEffect(() => {
     if (recipeData) {
       formik.setValues({
-        name: recipeData.name || '',
-        url: recipeData.url || '',
-        ingredients: recipeData.ingredients || [''],
-        instructions: recipeData.instructions || [''],
-        score: recipeData.score || '',
-        comments: recipeData.comments || '',
-        cookingTime: recipeData.cookingTime || '',
+        ...defaultValues,
+        ...recipeData,
       });
       setImage(recipeData.image || null);
     } else {
@@ -46,44 +149,15 @@ function RecipeDialog({ open, onClose, onSave, recipeData }) {
     }
   }, [recipeData]);
 
-  const formik = useFormik({
-    initialValues: {
-      name: recipeData?.name || '',
-      url: recipeData?.url || '',
-      ingredients: recipeData?.ingredients || [''],
-      instructions: recipeData?.instructions || [''],
-      score: recipeData?.score || '',
-      comments: recipeData?.comments || '',
-      cookingTime: recipeData?.cookingTime || '',
-    },
-    onSubmit: (values) => {
-      console.log('Updated Recipe:', values);
-      onSave(recipeData?.id, values);
-      setIsEditing(false);
-      onClose();
-    },
-  });
-
   // Toggle between viewing and editing mode
   const toggleEditMode = () => setIsEditing(!isEditing);
 
   // Handle image upload
-  const handleImageUpload = (event) => {
+  const handleImageUpload = (event: any) => {
     const file = event.target.files[0];
     if (file) {
       setImage(URL.createObjectURL(file));
     }
-  };
-
-  // Helper functions to manage ingredient and instruction arrays
-  const addLine = (field) => {
-    formik.setFieldValue(field, [...formik.values[field], '']);
-  };
-
-  const deleteLine = (field, index) => {
-    const newLines = [...formik.values[field]];
-    newLines.splice(index, 1);
-    formik.setFieldValue(field, newLines);
   };
 
   return (
@@ -106,7 +180,7 @@ function RecipeDialog({ open, onClose, onSave, recipeData }) {
         </DialogTitle>
         <form onSubmit={formik.handleSubmit}>
           <DialogContent dividers>
-            {isEditing ? (
+            {/* {isEditing ? (
               <TextField
                 label="Recipe Name"
                 fullWidth
@@ -122,8 +196,9 @@ function RecipeDialog({ open, onClose, onSave, recipeData }) {
               >
                 {formik.values.name}
               </Typography>
-            )}
-            {isEditing ? (
+            )} */}
+            {formFields['name']}
+            {/* {isEditing ? (
               <TextField
                 label="Recipe URL"
                 fullWidth
@@ -139,14 +214,15 @@ function RecipeDialog({ open, onClose, onSave, recipeData }) {
               >
                 {formik.values.url}
               </Typography>
-            )}
+            )} */}
+            {formFields['url']}
             <Typography
               variant="h6"
               sx={{ mt: 2 }}
             >
               Ingredients
             </Typography>
-            <List dense>
+            {/* <List dense>
               {formik.values.ingredients.map((ingredient, index) => (
                 <ListItem key={index}>
                   <ListItemText>
@@ -177,8 +253,8 @@ function RecipeDialog({ open, onClose, onSave, recipeData }) {
                   )}
                 </ListItem>
               ))}
-            </List>
-            {isEditing && (
+            </List> */}
+            {/* {isEditing && (
               <Button
                 onClick={() => addLine('ingredients')}
                 fullWidth
@@ -187,16 +263,16 @@ function RecipeDialog({ open, onClose, onSave, recipeData }) {
               >
                 Add Ingredient
               </Button>
-            )}
-
+            )} */}
+            {formFields['ingredients']}
             <Typography
               variant="h6"
               sx={{ mt: 2 }}
             >
               Instructions
             </Typography>
-            <List dense>
-              {formik.values.instructions.map((instruction, index) => (
+            {/* <List dense>
+              {formik.values.instructions.map((instruction: any, index: number) => (
                 <ListItem key={index}>
                   <ListItemText>
                     {isEditing ? (
@@ -236,9 +312,9 @@ function RecipeDialog({ open, onClose, onSave, recipeData }) {
               >
                 Add Instruction
               </Button>
-            )}
-
-            {isEditing ? (
+            )} */}
+            {formFields['instructions']}
+            {/* {isEditing ? (
               <TextField
                 label="Score (out of 10)"
                 type="number"
@@ -255,8 +331,9 @@ function RecipeDialog({ open, onClose, onSave, recipeData }) {
               >
                 {formik.values.score}
               </Typography>
-            )}
-            {isEditing ? (
+            )} */}
+            {formFields['score']}
+            {/* {isEditing ? (
               <TextField
                 label="Comments"
                 fullWidth
@@ -274,8 +351,9 @@ function RecipeDialog({ open, onClose, onSave, recipeData }) {
               >
                 {formik.values.comments}
               </Typography>
-            )}
-            {isEditing ? (
+            )} */}
+            {formFields['comments']}
+            {/* {isEditing ? (
               <TextField
                 label="Cooking Time (in minutes)"
                 type="number"
@@ -292,8 +370,136 @@ function RecipeDialog({ open, onClose, onSave, recipeData }) {
               >
                 {formik.values.cookingTime} minutes
               </Typography>
-            )}
+            )} */}
+            {formFields['cookingTime']}
+            {/* {isEditing ? (
+              <TextField
+                label="Nutrition"
+                type="number"
+                fullWidth
+                margin="normal"
+                name="nutrition"
+                value={formik.values.nutrition}
+                onChange={formik.handleChange}
+              />
+            ) : (
+              <Typography
+                variant="body1"
+                margin="normal"
+              >
+                {formik.values.nutrition}
+              </Typography>
+            )} */}
+            {formFields['nutrition']}
+            {/* {isEditing ? (
+              <TextField
+                label="Category"
+                fullWidth
+                margin="normal"
+                name="category"
+                value={formik.values.category}
+                onChange={formik.handleChange}
+              />
+            ) : (
+              <Typography
+                variant="body1"
+                margin="normal"
+              >
+                {formik.values.category}
+              </Typography>
+            )} */}
+            {formFields['category']}
+            <Typography
+              variant="h6"
+              sx={{ mt: 2 }}
+            >
+              Keywords
+            </Typography>
+            {/* <List dense>
+              {formik.values.keywords.map((keyword, index) => (
+                <ListItem key={index}>
+                  <ListItemText>
+                    {isEditing ? (
+                      <TextField
+                        fullWidth
+                        margin="dense"
+                        value={keyword}
+                        onChange={(e) => {
+                          const newKeywords = [...formik.values.keywords];
+                          newKeywords[index] = e.target.value;
+                          formik.setFieldValue('keywords', newKeywords);
+                        }}
+                      />
+                    ) : (
+                      <Typography variant="body2">{keyword}</Typography>
+                    )}
+                  </ListItemText>
+                  {isEditing && (
+                    <ListItemSecondaryAction>
+                      <IconButton
+                        edge="end"
+                        onClick={() => deleteLine('keywords', index)}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </ListItemSecondaryAction>
+                  )}
+                </ListItem>
+              ))}
+            </List>
+            {isEditing && (
+              <Button
+                onClick={() => addLine('keywords')}
+                fullWidth
+                variant="outlined"
+                style={{ marginBottom: '10px' }}
+              >
+                Add Keyword
+              </Button>
+            )} */}
+            {formFields['keywords']}
+            {/* {isEditing ? (
+              <TextField
+                label="Date Added"
+                type="date"
+                fullWidth
+                margin="normal"
+                name="dateAdded"
+                value={formik.values.dateAdded}
+                onChange={formik.handleChange}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+              />
+            ) : (
+              <Typography
+                variant="body1"
+                margin="normal"
+              >
+                {formik.values.dateAdded}
+              </Typography>
+            )} */}
+            {formFields['dateAdded']}
 
+            {/* {isEditing ? (
+              <TextField
+                label="Number of Servings"
+                type="number"
+                fullWidth
+                margin="normal"
+                name="numberOfServings"
+                value={formik.values.numberOfServings}
+                onChange={formik.handleChange}
+              />
+            ) : (
+              <Typography
+                variant="body1"
+                margin="normal"
+              >
+                {formik.values.numberOfServings}
+              </Typography>
+            )} */}
+            {formFields['numberOfServings']}
             {image && (
               <Box
                 display="flex"

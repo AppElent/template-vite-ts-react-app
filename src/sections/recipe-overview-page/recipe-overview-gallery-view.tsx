@@ -1,6 +1,13 @@
 import { Card, CardContent, CardMedia, Grid, Typography } from '@mui/material';
+import Recipe from '@/types/recipe';
 
-const RecipeOverviewGalleryView = ({ recipes, handleRecipeClick }) => {
+const RecipeOverviewGalleryView = ({
+  recipes,
+  handleRecipeClick,
+}: {
+  recipes: Recipe[];
+  handleRecipeClick: (recipe: Recipe) => void;
+}) => {
   return (
     <Grid
       container

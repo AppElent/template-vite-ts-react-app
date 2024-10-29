@@ -1,27 +1,13 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
-  Grid,
-  Card,
-  CardContent,
-  CardMedia,
-  Typography,
   Button,
   ToggleButton,
   ToggleButtonGroup,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Container,
   Stack,
   TextField,
   MenuItem,
   OutlinedInput,
   InputAdornment,
-  SvgIcon,
   IconButton,
 } from '@mui/material';
 import ViewModuleIcon from '@mui/icons-material/ViewModule';
@@ -34,6 +20,7 @@ import RecipeDialog from './recipe-dialog';
 import RecipeOverviewGalleryView from './recipe-overview-gallery-view';
 import RecipeOverviewListView from './recipe-overview-list-view';
 import useFilter from '@/hooks/use-filter';
+import Recipe from '@/types/recipe';
 
 // const recipes = [
 //   {
@@ -53,7 +40,17 @@ import useFilter from '@/hooks/use-filter';
 //   // Add more recipes as needed
 // ];
 
-function RecipeOverview({ recipes = [], addRecipe, updateRecipe, deleteRecipe }) {
+function RecipeOverview({
+  recipes = [],
+  addRecipe,
+  updateRecipe,
+  //deleteRecipe,
+}: {
+  recipes: Recipe[];
+  addRecipe: (item: Recipe) => void;
+  updateRecipe: (id: string, item: Recipe) => void;
+  deleteRecipe: (id: string) => void;
+}) {
   const [view, setView] = useState('gallery');
   const dialog = useDialog();
 
@@ -66,20 +63,20 @@ function RecipeOverview({ recipes = [], addRecipe, updateRecipe, deleteRecipe })
     //searchableFields: ['name'],
   });
 
-  const handleViewChange = (event, nextView) => {
+  const handleViewChange = (_event: any, nextView: any) => {
     if (nextView !== null) {
       setView(nextView);
     }
   };
 
-  const handleRecipeClick = (recipe) => {
+  const handleRecipeClick = (recipe: Recipe) => {
     console.log(recipe);
     dialog.setData(recipe);
     dialog.open();
   };
 
   const handleAddRecipe = () => {
-    dialog.setData(null); // Clear dialog data for new recipe
+    dialog.setData(undefined); // Clear dialog data for new recipe
     dialog.open();
   };
 
@@ -104,11 +101,11 @@ function RecipeOverview({ recipes = [], addRecipe, updateRecipe, deleteRecipe })
       >
         <OutlinedInput
           placeholder={`Search recipes`}
-          startAdornment={
-            <InputAdornment position="start">
-              <SvgIcon>{/* <SearchMdIcon /> */}</SvgIcon>
-            </InputAdornment>
-          }
+          // startAdornment={
+          //   <InputAdornment position="start">
+          //     <SvgIcon>{/* <SearchMdIcon /> */}</SvgIcon>
+          //   </InputAdornment>
+          // }
           endAdornment={
             <InputAdornment position="end">
               <IconButton

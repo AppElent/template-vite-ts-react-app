@@ -15,12 +15,13 @@ import { SplashScreen } from '@/components/default/splash-screen';
 import IssueDialog from '@/components/default/issue-dialog';
 import useDialog from '@/hooks/use-dialog';
 import { DataProvider } from './libs/data-sources';
+import { DataSource } from './libs/data-sources/DataProvider';
 
 interface DashboardProps {
   theme: Theme;
   routes?: any[];
   authProvider?: any;
-  dataSources?: any[];
+  dataSources?: DataSource[];
 }
 
 const Dashboard: FC<DashboardProps> = ({ theme, routes, authProvider, dataSources }) => {
@@ -47,7 +48,7 @@ const Dashboard: FC<DashboardProps> = ({ theme, routes, authProvider, dataSource
 
   // Set HTML page title suffix
   if (config?.meta?.title) setPageTitleSuffix(config?.meta?.title);
-
+  console.log(123);
   return (
     <>
       <ThemeProvider theme={theme}>
@@ -60,7 +61,7 @@ const Dashboard: FC<DashboardProps> = ({ theme, routes, authProvider, dataSource
 
               return (
                 <>
-                  <DataProvider dataSources={dataSources}>
+                  <DataProvider dataSources={dataSources || []}>
                     <QueryParamProvider adapter={ReactRouter6Adapter}>
                       <ConfirmProvider>
                         <Seo />

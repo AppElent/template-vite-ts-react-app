@@ -1,39 +1,8 @@
 import PropTypes from 'prop-types';
-import { createContext, useEffect, useReducer, useContext, ReactNode, Dispatch } from 'react';
+import { createContext, useEffect, useReducer, useContext } from 'react';
 import useRouter from '@/hooks/use-router';
 
-// Define types for the state and actions
-interface AuthState {
-  isAuthenticated: boolean;
-  isInitialized: boolean;
-  user: any;
-  raw: any;
-  paths: { login: string | null };
-  provider: any;
-}
-
-interface AuthAction {
-  type: 'AUTH_STATE_CHANGED';
-  payload: {
-    isAuthenticated: boolean;
-    user: any;
-  };
-}
-
-interface AuthContextType extends AuthState {
-  issuer: string;
-  createUserWithEmailAndPassword: () => Promise<void>;
-  signInWithEmailAndPassword: () => Promise<void>;
-  signInWithGoogle: () => Promise<void>;
-  signOut: () => Promise<void>;
-}
-
-interface AuthProviderProps {
-  provider: any;
-  children: ReactNode;
-}
-
-export const initialState: AuthState = {
+export const initialState = {
   isAuthenticated: false,
   isInitialized: false,
   user: null,
@@ -42,7 +11,7 @@ export const initialState: AuthState = {
   provider: null,
 };
 
-const AuthContext = createContext<AuthContextType>({
+const AuthContext = createContext({
   ...initialState,
   issuer: 'FIREBASE',
   createUserWithEmailAndPassword: () => Promise.resolve(),
@@ -55,7 +24,7 @@ export const AuthConsumer = AuthContext.Consumer;
 
 export const useAuth = () => useContext(AuthContext);
 
-const reducer = (state: AuthState, action: AuthAction): AuthState => {
+const reducer = (state: any, action: any) => {
   if (action.type === 'AUTH_STATE_CHANGED') {
     const { isAuthenticated, user } = action.payload;
 
@@ -70,14 +39,16 @@ const reducer = (state: AuthState, action: AuthAction): AuthState => {
   return state;
 };
 
-export const AuthProvider: React.FC<AuthProviderProps> = (props) => {
+export const AuthProvider = (props: any) => {
   const { provider, children } = props;
-  const [state, dispatch] = useReducer<Dispatch<AuthAction>>(reducer, initialState);
+  const [state, dispatch] = useReducer(reducer, initialState);
   const router = useRouter();
 
   const handleAuthStateChanged = async (user: any) => {
     console.log('User authentication changed', { user, provider });
     if (user) {
+      // Here you should extract the complete user profile to make it available in your entire app.
+      // The auth state only provides basic information.
       dispatch({
         type: 'AUTH_STATE_CHANGED',
         payload: {

@@ -75,7 +75,7 @@ function useFilter(initialData: any[] = [], options: Options = {}): UseFilterRet
    * @param {string} key - The key identifying the filter.
    * @param {Function|any} filterFunctionOrValue - The filter function or value to be applied.
    */
-  const addFilter = (key, filterFunctionOrValue) => {
+  const addFilter = (key: string, filterFunctionOrValue: string | (() => void)) => {
     setFilters((prevFilters) => ({
       ...prevFilters,
       [key]: filterFunctionOrValue,
@@ -86,7 +86,7 @@ function useFilter(initialData: any[] = [], options: Options = {}): UseFilterRet
    * Removes a filter.
    * @param {string} key - The key identifying the filter to be removed.
    */
-  const removeFilter = (key) => {
+  const removeFilter = (key: string) => {
     setFilters((prevFilters) => {
       const newFilters = { ...prevFilters };
       delete newFilters[key];
@@ -99,7 +99,7 @@ function useFilter(initialData: any[] = [], options: Options = {}): UseFilterRet
    * @param {Array} data - The dataset to be sorted.
    * @returns {Array} The sorted dataset.
    */
-  const applySort = (data) => {
+  const applySort = (data: any[]) => {
     if (!sortField) return data;
 
     return [...data].sort((a, b) => {
@@ -114,8 +114,8 @@ function useFilter(initialData: any[] = [], options: Options = {}): UseFilterRet
    * @param {Array} data - The dataset to be filtered.
    * @returns {Array} The filtered dataset.
    */
-  const applyFilters = (data) => {
-    return data.filter((item) => {
+  const applyFilters = (data: any[]) => {
+    return data.filter((item: any) => {
       return Object.keys(filters).every((key) => {
         const filter = filters[key];
         if (typeof filter === 'function') {
@@ -131,7 +131,7 @@ function useFilter(initialData: any[] = [], options: Options = {}): UseFilterRet
    * @param {Array} data - The dataset to be searched.
    * @returns {Array} The filtered dataset that matches the search query.
    */
-  const applyTextSearch = (data) => {
+  const applyTextSearch = (data: any[]) => {
     if (!searchQuery) return data; // If no search query, return data unchanged
 
     const lowerCaseQuery = searchQuery.toLowerCase();
@@ -156,7 +156,7 @@ function useFilter(initialData: any[] = [], options: Options = {}): UseFilterRet
    * @param {Array} data - The dataset to be paginated.
    * @returns {Array} The paginated dataset.
    */
-  const applyPagination = (data) => {
+  const applyPagination = (data: any[]) => {
     const startIndex = page * rowsPerPage; // Start index for the current page (0-based)
     const endIndex = Math.min(startIndex + rowsPerPage, limit); // Ensure no more than `limit` items are returned
     return data.slice(startIndex, endIndex);
@@ -194,7 +194,7 @@ function useFilter(initialData: any[] = [], options: Options = {}): UseFilterRet
    * Sets the number of rows per page and resets the page to 0.
    * @param {number} newRowsPerPage - The new number of rows per page.
    */
-  const updateRowsPerPage = (newRowsPerPage) => {
+  const updateRowsPerPage = (newRowsPerPage: number) => {
     setRowsPerPage(newRowsPerPage);
     setPage(0); // Reset to page 0 when changing rows per page
   };

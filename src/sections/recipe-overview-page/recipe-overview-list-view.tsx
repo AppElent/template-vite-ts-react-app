@@ -1,3 +1,4 @@
+import Recipe from '@/types/recipe';
 import {
   Paper,
   Table,
@@ -8,7 +9,13 @@ import {
   TableRow,
 } from '@mui/material';
 
-const RecipeOverviewListView = ({ recipes, handleRecipeClick }) => {
+const RecipeOverviewListView = ({
+  recipes,
+  handleRecipeClick,
+}: {
+  recipes: Recipe[];
+  handleRecipeClick: (recipe: Recipe) => void;
+}) => {
   return (
     <TableContainer component={Paper}>
       <Table>
@@ -21,7 +28,7 @@ const RecipeOverviewListView = ({ recipes, handleRecipeClick }) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {recipes.map((recipe) => (
+          {recipes.map((recipe: Recipe) => (
             <TableRow
               key={recipe.id}
               onClick={() => handleRecipeClick(recipe)}
@@ -36,7 +43,7 @@ const RecipeOverviewListView = ({ recipes, handleRecipeClick }) => {
               </TableCell>
               <TableCell>{recipe.name}</TableCell>
               <TableCell>{recipe.cookingTime} mins</TableCell>
-              <TableCell>{recipe.ingredients.join(', ')}</TableCell>
+              <TableCell>{recipe.ingredients?.join(', ')}</TableCell>
             </TableRow>
           ))}
         </TableBody>

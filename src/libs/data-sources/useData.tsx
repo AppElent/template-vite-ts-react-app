@@ -1,7 +1,8 @@
 import { useContext, useEffect, useMemo } from 'react';
 import { DataContext } from './DataProvider';
 
-const useData = (key: string, options = {}, newDataSource: any) => {
+const useData = (key: string, options = {}, newDataSource?: any) => {
+  if (key === 'false') console.log(options);
   const context = useContext(DataContext);
   if (!context) {
     throw new Error('useData must be used within a DataProvider');
@@ -16,7 +17,7 @@ const useData = (key: string, options = {}, newDataSource: any) => {
   //   }else{
   //     throw new Error(`Data source with key "${key}" not found`);
   //   }
-    
+
   // }
 
   //const { shouldSubscribe = true } = options;
@@ -25,7 +26,18 @@ const useData = (key: string, options = {}, newDataSource: any) => {
     [key, context]
   );
 
-  const { subscribeToData, subscriptions, data, loading, error, add, update, remove, addDataSource, setDataSource } = context;
+  const {
+    subscribeToData,
+    subscriptions,
+    data,
+    loading,
+    error,
+    add,
+    update,
+    remove,
+    addDataSource,
+    setDataSource,
+  } = context;
 
   useEffect(() => {
     if (dataSource && typeof dataSource?.subscribe === 'function' && !subscriptions[key]) {
@@ -37,9 +49,12 @@ const useData = (key: string, options = {}, newDataSource: any) => {
   }, [key, dataSource, subscribeToData, subscriptions, context.dataSources]);
 
   useEffect(() => {
-    if (newDataSource && !context.dataSources.find((ds) => ds.key === key) ){
-      console.log(newDataSource, context.dataSources.find((ds) => ds.key === key))
-      addDataSource({key, dataSource: newDataSource});
+    if (newDataSource && !context.dataSources.find((ds) => ds.key === key)) {
+      console.log(
+        newDataSource,
+        context.dataSources.find((ds) => ds.key === key)
+      );
+      addDataSource({ key, dataSource: newDataSource });
     }
   }, [newDataSource, key, addDataSource, context.dataSources]);
 
@@ -47,12 +62,12 @@ const useData = (key: string, options = {}, newDataSource: any) => {
     data: data[key],
     loading: loading[key],
     error: error[key],
-    fetchData: (filter) => context.fetchData(key, filter),
-    get: (id) => dataSource.get(id),
-    getAll: (filter) => dataSource.getAll(filter),
-    add: (item) => add(key, item),
-    update: (id, data) => update(key, id, data),
-    delete: (id) => remove(key, id),
+    fetchData: (filter: any) => context.fetchData(key, filter),
+    get: (id?: string) => dataSource?.get(id),
+    getAll: (filter: any) => dataSource?.getAll(filter),
+    add: (item: any) => add(key, item),
+    update: (id: string, data: any) => update(key, id, data),
+    delete: (id: string) => remove(key, id),
     dataSource,
     addDataSource,
     setDataSource,
