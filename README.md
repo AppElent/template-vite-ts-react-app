@@ -32,6 +32,7 @@ npm create vite@latest
   - @andypf/json-viewer
   - material-ui-confirm
   - use-query-params
+  - react-easy-crop
 - Devpackages:
   - prettier
 

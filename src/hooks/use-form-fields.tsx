@@ -10,6 +10,9 @@ export interface FieldConfig {
   initialValue?: any;
   validation?: any;
   props?: any;
+  customOptions?: {
+    [key: string]: any;
+  };
 }
 
 const useFormFields = (fieldsConfig: FieldConfig[], editMode?: boolean, formikProps?: any): any => {
@@ -35,8 +38,6 @@ const useFormFields = (fieldsConfig: FieldConfig[], editMode?: boolean, formikPr
     },
     ...formikProps,
   });
-
-  console.log(formik);
 
   const formFields = fieldsConfig.reduce((acc: any, field: FieldConfig) => {
     const key = field.id || field.name;

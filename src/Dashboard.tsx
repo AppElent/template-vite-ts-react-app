@@ -48,7 +48,6 @@ const Dashboard: FC<DashboardProps> = ({ theme, routes, authProvider, dataSource
 
   // Set HTML page title suffix
   if (config?.meta?.title) setPageTitleSuffix(config?.meta?.title);
-  console.log(123);
   return (
     <>
       <ThemeProvider theme={theme}>

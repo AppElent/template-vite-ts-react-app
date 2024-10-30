@@ -10,12 +10,19 @@ import {
   Typography,
   useTheme,
   useMediaQuery,
+  Stack,
+  ImageList,
+  ImageListItem,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
 import * as Yup from 'yup';
 import useFormFields from '@/hooks/use-form-fields';
 import Recipe from '@/types/recipe';
+import useFetch from '@/hooks/use-fetch';
+import FirebaseStorageProvider from '@/libs/storage-providers/providers/FirebaseStorageProvider';
+import { createGuid } from '@/libs/create-guid';
+import ImageUploader from '@/libs/file-uploader';
 
 function RecipeDialog({
   open,
@@ -28,14 +35,29 @@ function RecipeDialog({
   onSave: (id: string | undefined, data: Recipe) => void;
   recipeData?: Recipe;
 }) {
-  const [isEditing, setIsEditing] = useState(!recipeData); // If no recipe data is provided, default to editing mode
-  const [image, setImage] = useState(recipeData?.image || null);
+  const [isEditing, setIsEditing] = useState(false); // If no recipe data is provided, default to editing mode
+
+  const [, setImage] = useState(recipeData?.image || null);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [uploadFileName] = useState<string | null>(createGuid());
+
+  const handleImageClick = (src: string) => {
+    setSelectedImage(src);
+  };
+
+  const handleCloseFullImage = () => {
+    setSelectedImage(null);
+  };
 
   const defaultValues = {
     name: '',
+    description: '',
     url: '',
     ingredients: [''],
     instructions: [''],
+    image: '',
+    images: [],
+    cuisine: [''],
     score: 0,
     comments: '',
     cookingTime: 0,
@@ -54,6 +76,21 @@ function RecipeDialog({
         type: 'text',
         validation: Yup.string().required('Recipe name is required').min(3, 'Minimum 3 characters'),
         props: { fullWidth: true, variant: 'outlined' },
+        customOptions: {
+          editMode: isEditing,
+        },
+      },
+      {
+        name: 'description',
+        label: 'Description',
+        type: 'text',
+        props: { fullWidth: true, variant: 'outlined' },
+      },
+      {
+        name: 'cuisine',
+        label: 'Cuisine',
+        type: 'list',
+        validation: Yup.array().of(Yup.string()),
       },
       {
         name: 'ingredients',
@@ -68,6 +105,9 @@ function RecipeDialog({
         type: 'list',
         initialValue: [recipeData?.instructions || ['']],
         validation: Yup.array().of(Yup.string()),
+        customOptions: {
+          numbered: true,
+        },
       },
       {
         name: 'cookingTime',
@@ -123,7 +163,10 @@ function RecipeDialog({
     {
       initialValues: defaultValues,
       onSubmit: (values: Recipe) => {
-        console.log('Updated Recipe:', values);
+        if (!values.id) {
+          values.createdAt = new Date().toISOString();
+        }
+        values.updatedAt = new Date().toISOString();
         onSave(recipeData?.id, values);
         setIsEditing(false);
         onClose();
@@ -131,7 +174,40 @@ function RecipeDialog({
     }
   );
 
-  console.log(formik, formFields);
+  // // Set editing mode to true if no recipe data is provided
+  // useEffect(() => {
+  //   if (!formik.values?.id && !isEditing) {
+  //     setIsEditing(true);
+  //   }
+  // }, [formik.values, isEditing]);
+
+  // Fetch recipe data from api
+  const {
+    data: externalRecipeData,
+    loading,
+    error,
+    fetchData,
+  } = useFetch<any>(`https://api.appelent.site/recipes?url=${formik.values.url}`, {
+    autoFetch: false,
+  });
+
+  console.log(error);
+
+  useEffect(() => {
+    if (externalRecipeData) {
+      formik.setValues({
+        ...formik.values,
+        name: externalRecipeData.name || '',
+        description: externalRecipeData.description || '',
+        image: externalRecipeData.image?.[0] ? externalRecipeData.image[0] : null,
+        images: externalRecipeData.image || [],
+        ingredients: externalRecipeData.recipeIngredient || [],
+        instructions: externalRecipeData.recipeInstructions?.map((i: any) => i.text) || [],
+        cuisine: externalRecipeData.recipeCuisine || [],
+      });
+      //formik.handleSubmit();
+    }
+  }, [externalRecipeData]);
 
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
@@ -197,7 +273,22 @@ function RecipeDialog({
                 {formik.values.name}
               </Typography>
             )} */}
+            {formik.values?.image && (
+              <Box
+                display="flex"
+                justifyContent="center"
+                mt={2}
+              >
+                <img
+                  src={formik.values.image}
+                  alt="Recipe"
+                  width="100%"
+                  style={{ borderRadius: '8px' }}
+                />
+              </Box>
+            )}
             {formFields['name']}
+            {formFields['description']}
             {/* {isEditing ? (
               <TextField
                 label="Recipe URL"
@@ -215,7 +306,33 @@ function RecipeDialog({
                 {formik.values.url}
               </Typography>
             )} */}
-            {formFields['url']}
+            <Stack
+              spacing={2}
+              direction="row"
+            >
+              <Box>{formFields['url']}</Box>
+              {formik.values.url && (
+                <Box>
+                  <Button
+                    variant="contained"
+                    disabled={loading}
+                    //href="#" //{formik.values.url}
+                    onClick={() => {
+                      fetchData();
+                    }}
+                  >
+                    Get recipe information
+                  </Button>
+                </Box>
+              )}
+            </Stack>
+            <Typography
+              variant="h6"
+              sx={{ mt: 2 }}
+            >
+              Cuisine
+            </Typography>
+            {formFields['cuisine']}
             <Typography
               variant="h6"
               sx={{ mt: 2 }}
@@ -500,20 +617,7 @@ function RecipeDialog({
               </Typography>
             )} */}
             {formFields['numberOfServings']}
-            {image && (
-              <Box
-                display="flex"
-                justifyContent="center"
-                mt={2}
-              >
-                <img
-                  src={image}
-                  alt="Recipe"
-                  width="100%"
-                  style={{ maxWidth: '200px', borderRadius: '8px' }}
-                />
-              </Box>
-            )}
+
             {isEditing && (
               <Button
                 variant="contained"
@@ -530,6 +634,58 @@ function RecipeDialog({
                 />
               </Button>
             )}
+            {formik.values.images && formik.values.images.length > 0 && (
+              <ImageList
+                cols={formik.values.images?.length}
+                gap={8}
+                rowHeight={160}
+              >
+                {formik.values.images.map((src: string, index: number) => (
+                  <ImageListItem key={index}>
+                    <img
+                      src={src}
+                      alt={`Image ${index + 1}`}
+                      loading="lazy"
+                      onClick={() => handleImageClick(src)}
+                      style={{
+                        width: 150,
+                        height: 150,
+                        objectFit: 'cover',
+                        cursor: 'pointer',
+                      }}
+                    />
+                  </ImageListItem>
+                ))}
+              </ImageList>
+            )}
+            <ImageUploader
+              originalFileName={`/uploads/recipes/${recipeData?.id || createGuid()}/${uploadFileName}.jpg`}
+              crop={{
+                uploadFile: async (file) => {
+                  const filepath = `/uploads/recipes/${recipeData?.id || createGuid()}/${uploadFileName}-cropped.jpg`;
+                  // Save the original file to storage
+                  const storageClass = new FirebaseStorageProvider({} as any, { instance: {} });
+                  const originalFileUrl = await storageClass.uploadFile(file, filepath);
+                  //console.log('Original file uploaded:', originalFileUrl);
+                  // update state with the type url
+                  //setImageUrl((prev: any) => ({ ...prev, [type]: originalFileUrl }));
+                  formik.setFieldValue('image', originalFileUrl);
+                  return originalFileUrl;
+                },
+                path: `/uploads/recipes/${recipeData?.id || createGuid()}/${uploadFileName}-cropped.jpg`,
+                aspect: 16 / 9,
+              }}
+              uploadFile={async (file) => {
+                const filepath = `/uploads/recipes/${recipeData?.id || createGuid()}/${uploadFileName}.jpg`;
+                // Save the original file to storage
+                const storageClass = new FirebaseStorageProvider({} as any, { instance: {} });
+                const originalFileUrl = await storageClass.uploadFile(file, filepath);
+                //console.log('Original file uploaded:', originalFileUrl);
+                // update state with the type url
+                //setImageUrl((prev: any) => ({ ...prev, [type]: originalFileUrl }));
+                return originalFileUrl;
+              }}
+            />
           </DialogContent>
           <DialogActions>
             <Button
@@ -548,6 +704,33 @@ function RecipeDialog({
             )}
           </DialogActions>
         </form>
+      </Dialog>
+      {/* Full Image Dialog */}
+      <Dialog
+        open={Boolean(selectedImage)}
+        onClose={handleCloseFullImage}
+        maxWidth="md"
+      >
+        <DialogContent>
+          {selectedImage && (
+            <img
+              src={selectedImage}
+              alt="Full size"
+              style={{ width: '100%', height: 'auto' }}
+            />
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              formik.setValues({ ...formik.values, image: selectedImage });
+              setSelectedImage(null);
+            }}
+            color="primary"
+          >
+            Set as main image
+          </Button>
+        </DialogActions>
       </Dialog>
     </>
   );

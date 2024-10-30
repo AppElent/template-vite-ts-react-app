@@ -31,6 +31,11 @@ if (!menu.find((item) => item.id === 'Test pages') && import.meta.env.DEV)
         icon: <PeopleIcon />,
         href: '/app/test/data-sources',
       },
+      {
+        id: 'File uploads',
+        icon: <PeopleIcon />,
+        href: '/app/test/file-uploads',
+      },
     ],
   });
 

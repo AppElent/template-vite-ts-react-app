@@ -3,10 +3,11 @@ export default interface Recipe {
   name: string;
   cookingTime?: number;
   image?: string;
+  images?: string[];
   ingredients?: string[];
   instructions?: string[];
   comments?: string;
-  images?: string[];
+
   score?: number;
   url?: string;
   // new
@@ -15,4 +16,9 @@ export default interface Recipe {
   keywords?: string[];
   dateAdded: string;
   numberOfServings?: number;
+  description?: string;
+  cuisine: string[];
+  // date fields
+  createdAt?: string;
+  updatedAt?: string;
 }

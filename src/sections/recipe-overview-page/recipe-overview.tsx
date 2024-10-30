@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import {
-  Button,
   ToggleButton,
   ToggleButtonGroup,
   Stack,
@@ -9,6 +8,7 @@ import {
   OutlinedInput,
   InputAdornment,
   IconButton,
+  Fab,
 } from '@mui/material';
 import ViewModuleIcon from '@mui/icons-material/ViewModule';
 import ViewListIcon from '@mui/icons-material/ViewList';
@@ -78,6 +78,12 @@ function RecipeOverview({
   const handleAddRecipe = () => {
     dialog.setData(undefined); // Clear dialog data for new recipe
     dialog.open();
+  };
+
+  const fabStyle: React.CSSProperties = {
+    position: 'fixed',
+    bottom: 16,
+    right: 16,
   };
 
   return (
@@ -175,7 +181,7 @@ function RecipeOverview({
             <ViewListIcon /> List
           </ToggleButton>
         </ToggleButtonGroup>
-        <Button
+        {/* <Button
           variant="contained"
           color="primary"
           startIcon={<AddIcon />}
@@ -184,7 +190,7 @@ function RecipeOverview({
           style={{ alignSelf: 'center' }}
         >
           Add Recipe
-        </Button>
+        </Button> */}
       </Stack>
 
       {/* Gallery View */}
@@ -202,6 +208,14 @@ function RecipeOverview({
           handleRecipeClick={handleRecipeClick}
         />
       )}
+      <Fab
+        color="primary"
+        aria-label="add"
+        style={fabStyle}
+        onClick={handleAddRecipe}
+      >
+        <AddIcon />
+      </Fab>
     </>
   );
 }

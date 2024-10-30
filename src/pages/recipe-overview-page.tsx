@@ -4,7 +4,7 @@ import { useData } from '@/libs/data-sources';
 
 const RecipeOverviewPage = () => {
   const { data, add: addRecipe, delete: deleteRecipe, update: updateRecipe } = useData('recipes');
-  console.log(data);
+
   return (
     <DefaultPaperbasePage title="Recipes">
       {/* <Box sx={{ flexGrow: 1 }}>
