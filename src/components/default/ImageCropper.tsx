@@ -1,8 +1,8 @@
 // @ts-nocheck
 
-import { useState, useCallback } from 'react';
-import Cropper from 'react-easy-crop';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import { useCallback, useState } from 'react';
+import Cropper from 'react-easy-crop';
 
 interface ImageCropperProps {
   imageUrl: string;
@@ -10,25 +10,9 @@ interface ImageCropperProps {
   onSave: (file: File, path: string) => Promise<string>;
   dialog?: {
     isOpen: boolean;
-    //open: () => void;
     close: () => void;
   };
   cropperProps?: any;
-  //   uploadFile: (file: File, path: string) => Promise<string>;
-  //   max_size?: number;
-  //   crop: {
-  //     uploadFile: (file: File, path: string) => Promise<string>;
-  //     path: string;
-  //     aspect: number;
-  //   };
-  //   thumbnail: {
-  //     uploadFile: (file: File, path: string) => Promise<string>;
-  //     path: string;
-  //     dimensions: {
-  //       width: number;
-  //       height: number;
-  //     };
-  //   };
 }
 
 async function convertImageToDataURL(url: string): Promise<string> {
@@ -63,57 +47,14 @@ const getCroppedImg = async (imageSrc: string, crop: any) => {
   });
 };
 
-const ImageCropper = ({
-  imageUrl,
-  filename,
-  onSave,
-  dialog,
-  cropperProps,
-  //   max_size = MAX_FILE_SIZE,
-  //   crop: cropObject,
-  //   thumbnail,
-}: ImageCropperProps) => {
-  //const [imageSrc, setImageSrc] = useState<string>(null);
+const ImageCropper = ({ imageUrl, filename, onSave, dialog, cropperProps }: ImageCropperProps) => {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
-  //const dialog = useDialog();
 
   const getFileName = (path: string): string => {
     return path.split('/').pop() || 'unknown-filename.jpg';
   };
-
-  //   const onFileChange = async (e: any) => {
-  //     let file = e.target.files[0];
-  //     if (file) {
-  //       if (file.size > max_size) {
-  //         console.log(
-  //           `Resizing image to 1000px width. Current size: ${file.size}, max size: ${max_size}`
-  //         );
-  //         file = await resizeImage(file, 1000); // Resize to 1000px width
-  //         console.log(`Resized image size: ${file.size}`);
-  //       }
-
-  //       if (cropObject?.path) {
-  //         const url = URL.createObjectURL(file);
-  //         setImageSrc(url);
-  //         dialog.open();
-  //       }
-
-  //       const originalFileUrl = await uploadFile(file, originalFileName);
-  //       console.log('Original file uploaded:', originalFileUrl);
-
-  //       if (thumbnail.path) {
-  //         const thumbnailBlob = await createThumbnail(file);
-  //         const thumbnailFile = new File([thumbnailBlob], getFileName(thumbnail.path), {
-  //           type: 'image/jpeg',
-  //         });
-  //         const uploadFunction = thumbnail.uploadFile || uploadFile;
-  //         const thumbnailFileUrl = await uploadFunction(thumbnailFile, thumbnail.path);
-  //         console.log('Thumbnail file uploaded:', thumbnailFileUrl);
-  //       }
-  //     }
-  //   };
 
   const onCropComplete = useCallback((_, croppedAreaPixels: any) => {
     setCroppedAreaPixels(croppedAreaPixels);
@@ -134,22 +75,6 @@ const ImageCropper = ({
 
   return (
     <div>
-      {/* <input
-        type="file"
-        accept="image/*"
-        onChange={onFileChange}
-        style={{ display: 'none' }}
-        id="upload-button"
-      />
-      <label htmlFor="upload-button">
-        <Button
-          variant="contained"
-          color="primary"
-          component="span"
-        >
-          Upload Image
-        </Button>
-      </label> */}
       <Dialog
         open={dialog?.isOpen || false}
         onClose={() => dialog?.close()}

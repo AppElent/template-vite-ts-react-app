@@ -1,7 +1,7 @@
+import ImageUploader from '@/components/default/ImageUploader';
 import useFetch from '@/hooks/use-fetch';
 import useFormFields from '@/hooks/use-form-fields';
 import { createGuid } from '@/libs/create-guid';
-import ImageUploader from '@/libs/file-uploader';
 import FirebaseStorageProvider from '@/libs/storage-providers/providers/FirebaseStorageProvider';
 import { recipeYupSchema } from '@/schemas/recipe';
 import Recipe from '@/types/recipe';
@@ -368,30 +368,23 @@ function RecipeDialog({
             )}
             <ImageUploader
               originalFileName={`/uploads/recipes/${recipe?.id || createGuid()}/${uploadFileName}.jpg`}
+              uploadFile={async (file, filename) => {
+                // Save the original file to storage
+                const storageClass = new FirebaseStorageProvider({} as any, { instance: {} });
+                const originalFileUrl = await storageClass.uploadFile(file, filename);
+                return originalFileUrl;
+              }}
               crop={{
-                uploadFile: async (file) => {
-                  const filepath = `/uploads/recipes/${recipe?.id || createGuid()}/${uploadFileName}-cropped.jpg`;
+                path: `/uploads/recipes/${recipe?.id || createGuid()}/${uploadFileName}-cropped.jpg`,
+                uploadFile: async (file, filename) => {
                   // Save the original file to storage
                   const storageClass = new FirebaseStorageProvider({} as any, { instance: {} });
-                  const originalFileUrl = await storageClass.uploadFile(file, filepath);
-                  //console.log('Original file uploaded:', originalFileUrl);
+                  const originalFileUrl = await storageClass.uploadFile(file, filename);
                   // update state with the type url
-                  //setImageUrl((prev: any) => ({ ...prev, [type]: originalFileUrl }));
                   formik.setFieldValue('image', originalFileUrl);
                   return originalFileUrl;
                 },
-                path: `/uploads/recipes/${recipe?.id || createGuid()}/${uploadFileName}-cropped.jpg`,
-                aspect: 16 / 9,
-              }}
-              uploadFile={async (file) => {
-                const filepath = `/uploads/recipes/${recipe?.id || createGuid()}/${uploadFileName}.jpg`;
-                // Save the original file to storage
-                const storageClass = new FirebaseStorageProvider({} as any, { instance: {} });
-                const originalFileUrl = await storageClass.uploadFile(file, filepath);
-                //console.log('Original file uploaded:', originalFileUrl);
-                // update state with the type url
-                //setImageUrl((prev: any) => ({ ...prev, [type]: originalFileUrl }));
-                return originalFileUrl;
+                props: { aspect: 16 / 9 },
               }}
             />
           </DialogContent>
