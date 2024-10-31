@@ -1,26 +1,18 @@
 import { useContext, useEffect, useMemo } from 'react';
+import { DataSourceContext, DataSourceSource } from '.';
 import { DataContext } from './DataProvider';
 
-const useData = (key: string, options = {}, newDataSource?: any) => {
+const useData = (
+  key: string,
+  options = {},
+  newDataSource?: DataSourceSource
+): DataSourceContext => {
   if (key === 'false') console.log(options);
   const context = useContext(DataContext);
   if (!context) {
     throw new Error('useData must be used within a DataProvider');
   }
 
-  // // If datasource key cannot be found
-  // if (!context.dataSources.find((ds) => ds.key === key)) {
-  //   console.log(newDataSource, !newDataSource)
-  //   if(newDataSource){
-  //     console.log('Adding new data source', newDataSource)
-  //     context.addDataSource({key, dataSource: newDataSource});
-  //   }else{
-  //     throw new Error(`Data source with key "${key}" not found`);
-  //   }
-
-  // }
-
-  //const { shouldSubscribe = true } = options;
   const dataSource = useMemo(
     () => context.dataSources.find((ds) => ds.key === key)?.dataSource,
     [key, context]
@@ -34,6 +26,7 @@ const useData = (key: string, options = {}, newDataSource?: any) => {
     error,
     add,
     update,
+    set,
     remove,
     addDataSource,
     setDataSource,
@@ -43,9 +36,6 @@ const useData = (key: string, options = {}, newDataSource?: any) => {
     if (dataSource && typeof dataSource?.subscribe === 'function' && !subscriptions[key]) {
       subscribeToData(key);
     }
-    // else {
-    //   fetchData(key);
-    // }
   }, [key, dataSource, subscribeToData, subscriptions, context.dataSources]);
 
   useEffect(() => {
@@ -67,6 +57,7 @@ const useData = (key: string, options = {}, newDataSource?: any) => {
     getAll: (filter: any) => dataSource?.getAll(filter),
     add: (item: any) => add(key, item),
     update: (id: string, data: any) => update(key, id, data),
+    set: (id: string, data: any) => set(key, id, data),
     delete: (id: string) => remove(key, id),
     dataSource,
     addDataSource,

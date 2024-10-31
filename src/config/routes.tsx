@@ -1,11 +1,11 @@
 import { Suspense } from 'react';
 import { Outlet, RouteObject } from 'react-router-dom';
 
-import defaultRoutes from '@/routes/defaultRoutes';
-import appRoutes from '@/routes/appRoutes';
 import AuthGuard from '@/guards/auth-guard';
 import PaperbaseLayout from '@/layouts/paperbase/Layout';
 import RecipeOverviewPage from '@/pages/recipe-overview-page';
+import appRoutes from '@/routes/appRoutes';
+import defaultRoutes from '@/routes/defaultRoutes';
 
 const LayoutSettings = {
   navigation: {},
@@ -31,10 +31,6 @@ const routes: RouteObject[] = [
     children: [
       {
         index: true,
-        element: <div></div>,
-      },
-      {
-        path: 'recipes',
         element: <RecipeOverviewPage />,
       },
       ...appRoutes,

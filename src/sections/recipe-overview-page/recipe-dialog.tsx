@@ -1,53 +1,79 @@
-import { useEffect, useState } from 'react';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  IconButton,
-  Box,
-  Typography,
-  useTheme,
-  useMediaQuery,
-  Stack,
-  ImageList,
-  ImageListItem,
-} from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
-import SaveIcon from '@mui/icons-material/Save';
-import * as Yup from 'yup';
-import useFormFields from '@/hooks/use-form-fields';
-import Recipe from '@/types/recipe';
 import useFetch from '@/hooks/use-fetch';
-import FirebaseStorageProvider from '@/libs/storage-providers/providers/FirebaseStorageProvider';
+import useFormFields from '@/hooks/use-form-fields';
 import { createGuid } from '@/libs/create-guid';
 import ImageUploader from '@/libs/file-uploader';
+import FirebaseStorageProvider from '@/libs/storage-providers/providers/FirebaseStorageProvider';
+import { recipeYupSchema } from '@/schemas/recipe';
+import Recipe from '@/types/recipe';
+import CancelIcon from '@mui/icons-material/Cancel';
+import CloseIcon from '@mui/icons-material/Close';
+import EditIcon from '@mui/icons-material/Edit';
+import SaveIcon from '@mui/icons-material/Save';
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Grid,
+  IconButton,
+  useMediaQuery,
+  useTheme,
+} from '@mui/material';
+import { useEffect, useMemo, useState } from 'react';
+import RecipeDialogFullImageViewer from './recipe-dialog-full-image-viewer';
+import RecipeDialogImageList from './recipe-dialog-image-list';
 
 function RecipeDialog({
   open,
   onClose,
-  onSave,
-  recipeData,
+  //onSave,
+  setRecipe,
+  updateRecipe,
+  deleteRecipe,
+  recipeId,
+  setRecipeId, // Add setRecipeId
+  recipes,
 }: {
   open: boolean;
   onClose: () => void;
-  onSave: (id: string | undefined, data: Recipe) => void;
-  recipeData?: Recipe;
+  //onSave: (id: string | undefined, data: Recipe) => void;
+  setRecipe: (id: string | undefined, data: Recipe) => any;
+  updateRecipe: (id: string, data: Partial<Recipe>) => void;
+  deleteRecipe: (id: string) => void;
+  recipeId?: string;
+  setRecipeId: (id: string) => void;
+  recipes: Recipe[];
 }) {
-  const [isEditing, setIsEditing] = useState(false); // If no recipe data is provided, default to editing mode
+  // Theme and media query
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
-  const [, setImage] = useState(recipeData?.image || null);
+  // Recipe information
+  const [isEditing, setIsEditing] = useState(recipeId === 'new'); // If no recipe data is provided, default to editing mode
+  // Toggle between viewing and editing mode
+  const toggleEditMode = () => setIsEditing(!isEditing);
+  // Get recipe information
+  const recipe = useMemo(() => {
+    if (recipeId === 'new') {
+      return null;
+    } else {
+      return recipes.find((r) => r.id === recipeId) || null;
+    }
+  }, [recipeId, recipes]);
+
+  // // Set editing mode to true if no recipe data is provided
+  useEffect(() => {
+    if (recipeId === 'new') {
+      setIsEditing(true);
+    }
+  }, [recipeId]);
+
+  // Image section
+  const [, setImage] = useState(recipe?.image || null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [uploadFileName] = useState<string | null>(createGuid());
-
-  const handleImageClick = (src: string) => {
-    setSelectedImage(src);
-  };
-
-  const handleCloseFullImage = () => {
-    setSelectedImage(null);
-  };
 
   const defaultValues = {
     name: '',
@@ -74,39 +100,42 @@ function RecipeDialog({
         name: 'name',
         label: 'Name',
         type: 'text',
-        validation: Yup.string().required('Recipe name is required').min(3, 'Minimum 3 characters'),
+        //validation: Yup.string().required('Recipe name is required').min(3, 'Minimum 3 characters'),
+        validation: (value) => recipeYupSchema.validateAt('name', value),
         props: { fullWidth: true, variant: 'outlined' },
-        customOptions: {
-          editMode: isEditing,
-        },
+        //await schema.validateAt('foo[0].bar', rootValue); // => ValidationError: must be a string
       },
       {
         name: 'description',
         label: 'Description',
         type: 'text',
-        props: { fullWidth: true, variant: 'outlined' },
+        props: { fullWidth: true, variant: 'outlined', multiline: true },
       },
       {
         name: 'cuisine',
         label: 'Cuisine',
         type: 'list',
-        validation: Yup.array().of(Yup.string()),
+        custom: {
+          header: true,
+        },
       },
       {
         name: 'ingredients',
         label: 'Ingredients',
         type: 'list',
-        initialValue: [recipeData?.ingredients || ['']],
-        validation: Yup.array().of(Yup.string()),
+        initialValue: [recipe?.ingredients || ['']],
+        custom: {
+          header: true,
+        },
       },
       {
         name: 'instructions',
         label: 'Instructions',
         type: 'list',
-        initialValue: [recipeData?.instructions || ['']],
-        validation: Yup.array().of(Yup.string()),
-        customOptions: {
+        initialValue: [recipe?.instructions || ['']],
+        custom: {
           numbered: true,
+          header: true,
         },
       },
       {
@@ -125,7 +154,11 @@ function RecipeDialog({
         name: 'score',
         label: 'Score',
         type: 'text',
-        props: { fullWidth: true, variant: 'outlined' },
+        props: {
+          fullWidth: true,
+          variant: 'outlined',
+          type: 'number',
+        },
       },
       {
         name: 'url',
@@ -137,61 +170,50 @@ function RecipeDialog({
         name: 'nutrition',
         label: 'Nutrition info',
         type: 'text',
-        props: { fullWidth: true, variant: 'outlined' },
+        props: { fullWidth: true, variant: 'outlined', type: 'number' },
       },
       {
         name: 'numberOfServings',
         label: 'Number of Servings',
         type: 'text',
-        props: { fullWidth: true, variant: 'outlined' },
-      },
-      {
-        name: 'dateAdded',
-        label: 'Date added',
-        type: 'text',
-        props: { fullWidth: true, variant: 'outlined', type: 'date' },
+        props: { fullWidth: true, variant: 'outlined', type: 'number' },
       },
       {
         name: 'keywords',
         label: 'Keywords',
         type: 'list',
-        initialValue: [recipeData?.keywords || ['']],
-        validation: Yup.array().of(Yup.string()),
+        initialValue: [recipe?.keywords || ['']],
       },
     ],
-    isEditing,
+    { editMode: isEditing },
     {
       initialValues: defaultValues,
-      onSubmit: (values: Recipe) => {
-        if (!values.id) {
+      validationSchema: recipeYupSchema,
+      onSubmit: async (values: Recipe) => {
+        if (!recipe?.id) {
           values.createdAt = new Date().toISOString();
         }
         values.updatedAt = new Date().toISOString();
-        onSave(recipeData?.id, values);
+        const savedRecipe = await setRecipe(recipe?.id, values);
+        if (recipeId === 'new') {
+          setRecipeId(savedRecipe.id);
+        }
+        console.log(savedRecipe);
         setIsEditing(false);
-        onClose();
+        //formik.resetForm();
+        //onClose();
       },
     }
   );
-
-  // // Set editing mode to true if no recipe data is provided
-  // useEffect(() => {
-  //   if (!formik.values?.id && !isEditing) {
-  //     setIsEditing(true);
-  //   }
-  // }, [formik.values, isEditing]);
 
   // Fetch recipe data from api
   const {
     data: externalRecipeData,
     loading,
-    error,
     fetchData,
   } = useFetch<any>(`https://api.appelent.site/recipes?url=${formik.values.url}`, {
     autoFetch: false,
   });
-
-  console.log(error);
 
   useEffect(() => {
     if (externalRecipeData) {
@@ -209,32 +231,22 @@ function RecipeDialog({
     }
   }, [externalRecipeData]);
 
-  const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
-
   useEffect(() => {
-    if (recipeData) {
+    if (recipe) {
       formik.setValues({
         ...defaultValues,
-        ...recipeData,
+        ...recipe,
       });
-      setImage(recipeData.image || null);
+      setImage(recipe.image || null);
     } else {
       formik.resetForm();
       setImage(null);
     }
-  }, [recipeData]);
+  }, [recipe]);
 
-  // Toggle between viewing and editing mode
-  const toggleEditMode = () => setIsEditing(!isEditing);
-
-  // Handle image upload
-  const handleImageUpload = (event: any) => {
-    const file = event.target.files[0];
-    if (file) {
-      setImage(URL.createObjectURL(file));
-    }
-  };
+  // Conditions for disabling submit button
+  const disableSubmit =
+    formik.isSubmitting || loading || !formik.isValid || !formik.dirty || formik.isValidating;
 
   return (
     <>
@@ -245,34 +257,47 @@ function RecipeDialog({
         fullWidth
         fullScreen={fullScreen}
       >
-        <DialogTitle>
-          {isEditing ? (recipeData ? 'Edit Recipe' : 'Add Recipe') : 'View Recipe'}
+        <DialogTitle
+          style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+        >
+          <div>
+            {isEditing ? (recipe ? 'Edit Recipe' : 'Add Recipe') : 'View Recipe'}
+            {recipeId !== 'new' && (
+              <IconButton
+                onClick={() => {
+                  if (isEditing) {
+                    formik.handleSubmit();
+                  } else {
+                    toggleEditMode();
+                  }
+                }}
+                disabled={recipeId === 'new' || disableSubmit} // Disable edit button if adding new recipe
+                style={{ marginLeft: '8px' }}
+              >
+                {isEditing ? <SaveIcon /> : <EditIcon />}
+              </IconButton>
+            )}
+          </div>
+          {isEditing && (
+            <IconButton
+              onClick={() => {
+                setIsEditing(false);
+                //formik.resetForm();
+              }}
+              style={{ marginLeft: '8px' }}
+            >
+              <CancelIcon />
+            </IconButton>
+          )}
           <IconButton
-            onClick={toggleEditMode}
-            style={{ marginLeft: '8px' }}
+            onClick={onClose} // Add your close handler here
+            style={{ marginLeft: 'auto' }}
           >
-            {isEditing ? <SaveIcon /> : <EditIcon />}
+            <CloseIcon />
           </IconButton>
         </DialogTitle>
         <form onSubmit={formik.handleSubmit}>
           <DialogContent dividers>
-            {/* {isEditing ? (
-              <TextField
-                label="Recipe Name"
-                fullWidth
-                margin="normal"
-                name="name"
-                value={formik.values.name}
-                onChange={formik.handleChange}
-              />
-            ) : (
-              <Typography
-                variant="body1"
-                margin="normal"
-              >
-                {formik.values.name}
-              </Typography>
-            )} */}
             {formik.values?.image && (
               <Box
                 display="flex"
@@ -283,386 +308,69 @@ function RecipeDialog({
                   src={formik.values.image}
                   alt="Recipe"
                   width="100%"
-                  style={{ borderRadius: '8px' }}
+                  style={{ borderRadius: '8px', maxHeight: '300px', objectFit: 'contain' }}
                 />
               </Box>
             )}
             {formFields['name']}
             {formFields['description']}
-            {/* {isEditing ? (
-              <TextField
-                label="Recipe URL"
-                fullWidth
-                margin="normal"
-                name="url"
-                value={formik.values.url}
-                onChange={formik.handleChange}
-              />
-            ) : (
-              <Typography
-                variant="body1"
-                margin="normal"
-              >
-                {formik.values.url}
-              </Typography>
-            )} */}
-            <Stack
+            <Grid
+              container
               spacing={2}
-              direction="row"
+              alignItems={'center'}
+              justifyContent={'space-between'}
             >
-              <Box>{formFields['url']}</Box>
-              {formik.values.url && (
-                <Box>
-                  <Button
-                    variant="contained"
-                    disabled={loading}
-                    //href="#" //{formik.values.url}
-                    onClick={() => {
-                      fetchData();
-                    }}
-                  >
-                    Get recipe information
-                  </Button>
-                </Box>
-              )}
-            </Stack>
-            <Typography
-              variant="h6"
-              sx={{ mt: 2 }}
-            >
-              Cuisine
-            </Typography>
-            {formFields['cuisine']}
-            <Typography
-              variant="h6"
-              sx={{ mt: 2 }}
-            >
-              Ingredients
-            </Typography>
-            {/* <List dense>
-              {formik.values.ingredients.map((ingredient, index) => (
-                <ListItem key={index}>
-                  <ListItemText>
-                    {isEditing ? (
-                      <TextField
-                        fullWidth
-                        margin="dense"
-                        value={ingredient}
-                        onChange={(e) => {
-                          const newIngredients = [...formik.values.ingredients];
-                          newIngredients[index] = e.target.value;
-                          formik.setFieldValue('ingredients', newIngredients);
-                        }}
-                      />
-                    ) : (
-                      <Typography variant="body2">{ingredient}</Typography>
-                    )}
-                  </ListItemText>
-                  {isEditing && (
-                    <ListItemSecondaryAction>
-                      <IconButton
-                        edge="end"
-                        onClick={() => deleteLine('ingredients', index)}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </ListItemSecondaryAction>
-                  )}
-                </ListItem>
-              ))}
-            </List> */}
-            {/* {isEditing && (
-              <Button
-                onClick={() => addLine('ingredients')}
-                fullWidth
-                variant="outlined"
-                style={{ marginBottom: '10px' }}
+              <Grid
+                item
+                xs={12}
+                sm={formik.values.url ? 8 : 12}
               >
-                Add Ingredient
-              </Button>
-            )} */}
-            {formFields['ingredients']}
-            <Typography
-              variant="h6"
-              sx={{ mt: 2 }}
-            >
-              Instructions
-            </Typography>
-            {/* <List dense>
-              {formik.values.instructions.map((instruction: any, index: number) => (
-                <ListItem key={index}>
-                  <ListItemText>
-                    {isEditing ? (
-                      <TextField
-                        fullWidth
-                        margin="dense"
-                        value={instruction}
-                        onChange={(e) => {
-                          const newInstructions = [...formik.values.instructions];
-                          newInstructions[index] = e.target.value;
-                          formik.setFieldValue('instructions', newInstructions);
-                        }}
-                      />
-                    ) : (
-                      <Typography variant="body2">{instruction}</Typography>
-                    )}
-                  </ListItemText>
-                  {isEditing && (
-                    <ListItemSecondaryAction>
-                      <IconButton
-                        edge="end"
-                        onClick={() => deleteLine('instructions', index)}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </ListItemSecondaryAction>
-                  )}
-                </ListItem>
-              ))}
-            </List>
-            {isEditing && (
-              <Button
-                onClick={() => addLine('instructions')}
-                fullWidth
-                variant="outlined"
-                style={{ marginBottom: '10px' }}
+                <Box>{formFields['url']}</Box>
+              </Grid>
+              <Grid
+                item
+                xs={12}
+                sm={4}
               >
-                Add Instruction
-              </Button>
-            )} */}
-            {formFields['instructions']}
-            {/* {isEditing ? (
-              <TextField
-                label="Score (out of 10)"
-                type="number"
-                fullWidth
-                margin="normal"
-                name="score"
-                value={formik.values.score}
-                onChange={formik.handleChange}
-              />
-            ) : (
-              <Typography
-                variant="body1"
-                margin="normal"
-              >
-                {formik.values.score}
-              </Typography>
-            )} */}
-            {formFields['score']}
-            {/* {isEditing ? (
-              <TextField
-                label="Comments"
-                fullWidth
-                multiline
-                rows={3}
-                margin="normal"
-                name="comments"
-                value={formik.values.comments}
-                onChange={formik.handleChange}
-              />
-            ) : (
-              <Typography
-                variant="body1"
-                margin="normal"
-              >
-                {formik.values.comments}
-              </Typography>
-            )} */}
-            {formFields['comments']}
-            {/* {isEditing ? (
-              <TextField
-                label="Cooking Time (in minutes)"
-                type="number"
-                fullWidth
-                margin="normal"
-                name="cookingTime"
-                value={formik.values.cookingTime}
-                onChange={formik.handleChange}
-              />
-            ) : (
-              <Typography
-                variant="body1"
-                margin="normal"
-              >
-                {formik.values.cookingTime} minutes
-              </Typography>
-            )} */}
-            {formFields['cookingTime']}
-            {/* {isEditing ? (
-              <TextField
-                label="Nutrition"
-                type="number"
-                fullWidth
-                margin="normal"
-                name="nutrition"
-                value={formik.values.nutrition}
-                onChange={formik.handleChange}
-              />
-            ) : (
-              <Typography
-                variant="body1"
-                margin="normal"
-              >
-                {formik.values.nutrition}
-              </Typography>
-            )} */}
-            {formFields['nutrition']}
-            {/* {isEditing ? (
-              <TextField
-                label="Category"
-                fullWidth
-                margin="normal"
-                name="category"
-                value={formik.values.category}
-                onChange={formik.handleChange}
-              />
-            ) : (
-              <Typography
-                variant="body1"
-                margin="normal"
-              >
-                {formik.values.category}
-              </Typography>
-            )} */}
-            {formFields['category']}
-            <Typography
-              variant="h6"
-              sx={{ mt: 2 }}
-            >
-              Keywords
-            </Typography>
-            {/* <List dense>
-              {formik.values.keywords.map((keyword, index) => (
-                <ListItem key={index}>
-                  <ListItemText>
-                    {isEditing ? (
-                      <TextField
-                        fullWidth
-                        margin="dense"
-                        value={keyword}
-                        onChange={(e) => {
-                          const newKeywords = [...formik.values.keywords];
-                          newKeywords[index] = e.target.value;
-                          formik.setFieldValue('keywords', newKeywords);
-                        }}
-                      />
-                    ) : (
-                      <Typography variant="body2">{keyword}</Typography>
-                    )}
-                  </ListItemText>
-                  {isEditing && (
-                    <ListItemSecondaryAction>
-                      <IconButton
-                        edge="end"
-                        onClick={() => deleteLine('keywords', index)}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </ListItemSecondaryAction>
-                  )}
-                </ListItem>
-              ))}
-            </List>
-            {isEditing && (
-              <Button
-                onClick={() => addLine('keywords')}
-                fullWidth
-                variant="outlined"
-                style={{ marginBottom: '10px' }}
-              >
-                Add Keyword
-              </Button>
-            )} */}
-            {formFields['keywords']}
-            {/* {isEditing ? (
-              <TextField
-                label="Date Added"
-                type="date"
-                fullWidth
-                margin="normal"
-                name="dateAdded"
-                value={formik.values.dateAdded}
-                onChange={formik.handleChange}
-                InputLabelProps={{
-                  shrink: true,
-                }}
-              />
-            ) : (
-              <Typography
-                variant="body1"
-                margin="normal"
-              >
-                {formik.values.dateAdded}
-              </Typography>
-            )} */}
-            {formFields['dateAdded']}
-
-            {/* {isEditing ? (
-              <TextField
-                label="Number of Servings"
-                type="number"
-                fullWidth
-                margin="normal"
-                name="numberOfServings"
-                value={formik.values.numberOfServings}
-                onChange={formik.handleChange}
-              />
-            ) : (
-              <Typography
-                variant="body1"
-                margin="normal"
-              >
-                {formik.values.numberOfServings}
-              </Typography>
-            )} */}
-            {formFields['numberOfServings']}
-
-            {isEditing && (
-              <Button
-                variant="contained"
-                component="label"
-                fullWidth
-                style={{ marginTop: '10px' }}
-              >
-                Upload Image
-                <input
-                  type="file"
-                  accept="image/*"
-                  hidden
-                  onChange={handleImageUpload}
-                />
-              </Button>
-            )}
-            {formik.values.images && formik.values.images.length > 0 && (
-              <ImageList
-                cols={formik.values.images?.length}
-                gap={8}
-                rowHeight={160}
-              >
-                {formik.values.images.map((src: string, index: number) => (
-                  <ImageListItem key={index}>
-                    <img
-                      src={src}
-                      alt={`Image ${index + 1}`}
-                      loading="lazy"
-                      onClick={() => handleImageClick(src)}
-                      style={{
-                        width: 150,
-                        height: 150,
-                        objectFit: 'cover',
-                        cursor: 'pointer',
+                {formik.values.url && (
+                  <Box>
+                    <Button
+                      variant="contained"
+                      disabled={loading}
+                      //href="#" //{formik.values.url}
+                      onClick={() => {
+                        fetchData();
                       }}
-                    />
-                  </ImageListItem>
-                ))}
-              </ImageList>
+                    >
+                      Get recipe information
+                    </Button>
+                  </Box>
+                )}
+              </Grid>
+            </Grid>
+
+            {formFields['cuisine']}
+            {formFields['ingredients']}
+            {formFields['instructions']}
+            {formFields['score']}
+            {formFields['comments']}
+            {formFields['cookingTime']}
+            {formFields['nutrition']}
+            {formFields['category']}
+            {formFields['keywords']}
+            {formFields['dateAdded']}
+            {formFields['numberOfServings']}
+            {formik.values.images && formik.values.images.length > 0 && (
+              <RecipeDialogImageList
+                images={formik.values.images}
+                setSelectedImage={setSelectedImage}
+              />
             )}
             <ImageUploader
-              originalFileName={`/uploads/recipes/${recipeData?.id || createGuid()}/${uploadFileName}.jpg`}
+              originalFileName={`/uploads/recipes/${recipe?.id || createGuid()}/${uploadFileName}.jpg`}
               crop={{
                 uploadFile: async (file) => {
-                  const filepath = `/uploads/recipes/${recipeData?.id || createGuid()}/${uploadFileName}-cropped.jpg`;
+                  const filepath = `/uploads/recipes/${recipe?.id || createGuid()}/${uploadFileName}-cropped.jpg`;
                   // Save the original file to storage
                   const storageClass = new FirebaseStorageProvider({} as any, { instance: {} });
                   const originalFileUrl = await storageClass.uploadFile(file, filepath);
@@ -672,11 +380,11 @@ function RecipeDialog({
                   formik.setFieldValue('image', originalFileUrl);
                   return originalFileUrl;
                 },
-                path: `/uploads/recipes/${recipeData?.id || createGuid()}/${uploadFileName}-cropped.jpg`,
+                path: `/uploads/recipes/${recipe?.id || createGuid()}/${uploadFileName}-cropped.jpg`,
                 aspect: 16 / 9,
               }}
               uploadFile={async (file) => {
-                const filepath = `/uploads/recipes/${recipeData?.id || createGuid()}/${uploadFileName}.jpg`;
+                const filepath = `/uploads/recipes/${recipe?.id || createGuid()}/${uploadFileName}.jpg`;
                 // Save the original file to storage
                 const storageClass = new FirebaseStorageProvider({} as any, { instance: {} });
                 const originalFileUrl = await storageClass.uploadFile(file, filepath);
@@ -692,7 +400,7 @@ function RecipeDialog({
               onClick={onClose}
               color="secondary"
             >
-              Cancel
+              {isEditing ? 'Cancel' : 'Close'}
             </Button>
             {isEditing && (
               <Button
@@ -702,13 +410,44 @@ function RecipeDialog({
                 Save
               </Button>
             )}
+            {recipeId !== 'new' && (
+              <Button
+                onClick={() => {
+                  if (recipeId) {
+                    deleteRecipe(recipeId);
+                  }
+
+                  formik.resetForm();
+                  onClose();
+                }}
+                color="error"
+              >
+                Delete
+              </Button>
+            )}
           </DialogActions>
         </form>
       </Dialog>
       {/* Full Image Dialog */}
-      <Dialog
+      <RecipeDialogFullImageViewer
+        selectedImage={selectedImage}
+        setSelectedImage={setSelectedImage}
+        set={(image: string) => {
+          // if dialog is set to editMode, we need to update right away, otherwise just update formik state
+          if (isEditing) {
+            formik.setValues({ ...formik.values, image });
+          } else {
+            if (recipe?.id) {
+              updateRecipe(recipe?.id, { image });
+            }
+
+            formik.setValues({ ...formik.values, image });
+          }
+        }}
+      />
+      {/* <Dialog
         open={Boolean(selectedImage)}
-        onClose={handleCloseFullImage}
+        onClose={() => setSelectedImage(null)}
         maxWidth="md"
       >
         <DialogContent>
@@ -731,7 +470,7 @@ function RecipeDialog({
             Set as main image
           </Button>
         </DialogActions>
-      </Dialog>
+      </Dialog> */}
     </>
   );
 }

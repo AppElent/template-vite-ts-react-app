@@ -1,58 +1,42 @@
-import { useState } from 'react';
-import {
-  ToggleButton,
-  ToggleButtonGroup,
-  Stack,
-  TextField,
-  MenuItem,
-  OutlinedInput,
-  InputAdornment,
-  IconButton,
-  Fab,
-} from '@mui/material';
-import ViewModuleIcon from '@mui/icons-material/ViewModule';
-import ViewListIcon from '@mui/icons-material/ViewList';
+import useDialog from '@/hooks/use-dialog';
+import useFilter from '@/hooks/use-filter';
+import Recipe from '@/types/recipe';
 import AddIcon from '@mui/icons-material/Add'; // Import AddIcon
 import ClearIcon from '@mui/icons-material/Clear';
+import ViewListIcon from '@mui/icons-material/ViewList';
+import ViewModuleIcon from '@mui/icons-material/ViewModule';
+import {
+  Fab,
+  IconButton,
+  InputAdornment,
+  MenuItem,
+  OutlinedInput,
+  Stack,
+  TextField,
+  ToggleButton,
+  ToggleButtonGroup,
+} from '@mui/material';
 import PropTypes from 'prop-types';
-import useDialog from '@/hooks/use-dialog';
+import { useState } from 'react';
 import RecipeDialog from './recipe-dialog';
 import RecipeOverviewGalleryView from './recipe-overview-gallery-view';
 import RecipeOverviewListView from './recipe-overview-list-view';
-import useFilter from '@/hooks/use-filter';
-import Recipe from '@/types/recipe';
-
-// const recipes = [
-//   {
-//     name: 'Spaghetti Carbonara',
-//     cookingTime: 20,
-//     image: 'https://example.com/spaghetti.jpg',
-//     ingredients: ['Spaghetti', 'Eggs', 'Bacon', 'Parmesan'],
-//     instructions: ['Cook spaghetti', 'fry bacon', 'mix eggs and cheese', 'combine all ingredients'],
-//   },
-//   {
-//     name: 'Chicken Curry',
-//     cookingTime: 40,
-//     image: 'https://example.com/chickencurry.jpg',
-//     ingredients: ['Chicken', 'Curry Paste', 'Coconut Milk', 'Vegetables'],
-//     instructions: ['Fry chicken', 'add curry paste', 'add coconut milk', 'add vegetables'],
-//   },
-//   // Add more recipes as needed
-// ];
 
 function RecipeOverview({
   recipes = [],
   addRecipe,
   updateRecipe,
-  //deleteRecipe,
+  setRecipe,
+  deleteRecipe,
 }: {
   recipes: Recipe[];
   addRecipe: (item: Recipe) => void;
-  updateRecipe: (id: string, item: Recipe) => void;
+  updateRecipe: (id: string, item: Partial<Recipe>) => void;
+  setRecipe: (id: string, item: Recipe) => void;
   deleteRecipe: (id: string) => void;
 }) {
   const [view, setView] = useState('gallery');
-  const dialog = useDialog();
+  const dialog = useDialog({ queryKey: 'recipe' });
 
   const { data: filteredItems, ...filterOptions } = useFilter(recipes, {
     initialSortField: 'name',
@@ -71,13 +55,13 @@ function RecipeOverview({
 
   const handleRecipeClick = (recipe: Recipe) => {
     console.log(recipe);
-    dialog.setData(recipe);
-    dialog.open();
+    //dialog.setData(recipe);
+    dialog.open(recipe.id);
   };
 
   const handleAddRecipe = () => {
-    dialog.setData(undefined); // Clear dialog data for new recipe
-    dialog.open();
+    //dialog.setData(undefined); // Clear dialog data for new recipe
+    dialog.open('new');
   };
 
   const fabStyle: React.CSSProperties = {
@@ -88,19 +72,27 @@ function RecipeOverview({
 
   return (
     <>
-      <RecipeDialog
-        open={dialog.isOpen}
-        onClose={() => dialog.close()}
-        onSave={(id, data) => {
-          if (id) {
-            updateRecipe(id, data);
-          } else {
-            addRecipe(data);
-          }
-          dialog.close();
-        }}
-        recipeData={dialog.data}
-      />
+      {dialog.data && (
+        <RecipeDialog
+          open={dialog.isOpen}
+          onClose={() => dialog.close()}
+          setRecipe={(id: string | undefined, data: any) => {
+            console.log(id, data);
+            if (id) {
+              return setRecipe(id, data);
+            } else {
+              return addRecipe(data);
+            }
+            //dialog.close();
+          }}
+          updateRecipe={updateRecipe}
+          deleteRecipe={deleteRecipe}
+          recipes={recipes}
+          recipeId={dialog.data}
+          setRecipeId={dialog.setData}
+        />
+      )}
+
       <Stack
         spacing={2}
         mb={2}
@@ -129,12 +121,6 @@ function RecipeOverview({
           sx={{ flexGrow: 1 }}
           onChange={(e) => filterOptions.setSearchQuery(e.target.value)}
         />
-        {/* <TextField
-          label="Search"
-          variant="outlined"
-          value={''}
-          onChange={(e) => console.log(e.target.value)}
-        /> */}
         <TextField
           label="Max Cooking Time"
           variant="outlined"
@@ -181,16 +167,6 @@ function RecipeOverview({
             <ViewListIcon /> List
           </ToggleButton>
         </ToggleButtonGroup>
-        {/* <Button
-          variant="contained"
-          color="primary"
-          startIcon={<AddIcon />}
-          onClick={handleAddRecipe}
-          size="medium"
-          style={{ alignSelf: 'center' }}
-        >
-          Add Recipe
-        </Button> */}
       </Stack>
 
       {/* Gallery View */}

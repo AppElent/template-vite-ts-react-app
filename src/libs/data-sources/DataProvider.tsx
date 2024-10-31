@@ -1,32 +1,5 @@
-import React, { createContext, useState, useEffect, useCallback, ReactNode } from 'react';
-
-// Define types for the data source and context
-export interface DataSource {
-  key: string;
-  dataSource: {
-    getAll: (filter: object) => Promise<any>;
-    get: (id?: string) => Promise<any>;
-    subscribe: (callback: (newData: any) => void) => () => void;
-    add: (item: any) => Promise<any>;
-    update: (id: string, data?: any) => Promise<void>;
-    delete: (id?: string) => Promise<void>;
-  };
-}
-
-interface DataContextType {
-  dataSources: DataSource[];
-  setDataSource: (key: string, dataSource: DataSource['dataSource']) => void;
-  addDataSource: (newDataSource: DataSource) => void;
-  data: Record<string, any>;
-  loading: Record<string, boolean>;
-  error: Record<string, any>;
-  fetchData: (key: string, filter?: object) => Promise<void>;
-  subscribeToData: (key: string) => void;
-  subscriptions: Record<string, () => void>;
-  add: (key: string, item: any) => Promise<void>;
-  update: (key: string, id: string, data: any) => Promise<void>;
-  remove: (key: string, id: string) => Promise<void>;
-}
+import React, { createContext, ReactNode, useCallback, useEffect, useState } from 'react';
+import { DataContextType, DataSource } from '.';
 
 // Create a context for the data
 export const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -104,6 +77,7 @@ const DataProvider: React.FC<DataProviderProps> = ({ dataSources, children }) =>
       if (!subscriptions[key] && data[key]) {
         setData((prev) => ({ ...prev, [key]: [...prev[key], newItem] }));
       }
+      return newItem;
     } catch (err) {
       setError((prev) => ({ ...prev, [key]: err }));
     } finally {
@@ -118,6 +92,26 @@ const DataProvider: React.FC<DataProviderProps> = ({ dataSources, children }) =>
       const dataSource = dataSourcesState.find((ds) => ds.key === key)?.dataSource;
       if (!dataSource) throw new Error(`Data source with key ${key} not found`);
       await dataSource.update(id, data);
+      if (!subscriptions[key] && data[key]) {
+        setData((prev) => ({
+          ...prev,
+          [key]: prev[key].map((item: any) => (item.id === id ? { ...item, ...data } : item)),
+        }));
+      }
+    } catch (err) {
+      setError((prev) => ({ ...prev, [key]: err }));
+    } finally {
+      setLoading((prev) => ({ ...prev, [key]: false }));
+    }
+  };
+
+  const set = async (key: string, id: string, data: any) => {
+    setLoading((prev) => ({ ...prev, [key]: true }));
+    setError((prev) => ({ ...prev, [key]: null }));
+    try {
+      const dataSource = dataSourcesState.find((ds) => ds.key === key)?.dataSource;
+      if (!dataSource) throw new Error(`Data source with key ${key} not found`);
+      await dataSource.set(id, data);
       if (!subscriptions[key] && data[key]) {
         setData((prev) => ({
           ...prev,
@@ -175,6 +169,7 @@ const DataProvider: React.FC<DataProviderProps> = ({ dataSources, children }) =>
         subscriptions,
         add,
         update,
+        set,
         remove,
       }}
     >

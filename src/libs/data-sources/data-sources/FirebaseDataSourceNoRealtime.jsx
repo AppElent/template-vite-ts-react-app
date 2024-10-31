@@ -1,12 +1,13 @@
 import {
+  addDoc,
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
-  addDoc,
-  updateDoc,
-  deleteDoc,
   query,
+  setDoc,
+  updateDoc,
   where,
 } from 'firebase/firestore';
 import BaseDataSource from './BaseDataSource';
@@ -97,19 +98,15 @@ export class FirebaseDataSourceNoRealtime extends BaseDataSource {
     }
   }
 
-  async upsert(id, data) {
+  // Update an existing document by ID
+  async set(id, data) {
     try {
       // Validate updated data
       this.validate(data);
       const docRef = doc(this.ref, id);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        await updateDoc(docRef, data);
-      } else {
-        await addDoc(this.ref, data);
-      }
+      await setDoc(docRef, data);
     } catch (error) {
-      console.error('Error upserting document:', error);
+      console.error('Error updating document:', error);
       throw error;
     }
   }

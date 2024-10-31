@@ -14,7 +14,6 @@ export default interface Recipe {
   nutrition?: number;
   category?: string;
   keywords?: string[];
-  dateAdded: string;
   numberOfServings?: number;
   description?: string;
   cuisine: string[];

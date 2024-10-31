@@ -1,17 +1,16 @@
 import PeopleIcon from '@mui/icons-material/People';
-import AssignmentRoundedIcon from '@mui/icons-material/AssignmentRounded';
 
 const menu = [
-  {
-    id: 'Recipe library',
-    children: [
-      {
-        id: 'Recipes',
-        icon: <AssignmentRoundedIcon />,
-        href: '/app/recipes',
-      },
-    ],
-  },
+  // {
+  //   id: 'Recipe library',
+  //   children: [
+  //     {
+  //       id: 'Recipes',
+  //       icon: <AssignmentRoundedIcon />,
+  //       href: '/app/recipes',
+  //     },
+  //   ],
+  // },
   {
     id: 'Settings',
     children: [
@@ -22,7 +21,10 @@ const menu = [
   },
 ];
 
-if (!menu.find((item) => item.id === 'Test pages') && import.meta.env.DEV)
+// get debug value from local storage
+const debug = localStorage.getItem('debug');
+
+if (!menu.find((item) => item.id === 'Test pages') && (import.meta.env.DEV || debug === 'true'))
   menu.push({
     id: 'Test pages',
     children: [

@@ -1,6 +1,5 @@
-import { useFormik } from 'formik';
-import * as Yup from 'yup';
-import FieldDefinitions from '@/config/field-definitions';
+import CustomField from '@/components/default/CustomField';
+import { FormikProps, useFormik } from 'formik';
 
 export interface FieldConfig {
   id?: string;
@@ -8,146 +7,97 @@ export interface FieldConfig {
   label?: string;
   type: string;
   initialValue?: any;
-  validation?: any;
+  validation?: (value: any) => any; //Yup.AnySchema;
   props?: any;
-  customOptions?: {
+  custom?: {
     [key: string]: any;
   };
 }
 
-const useFormFields = (fieldsConfig: FieldConfig[], editMode?: boolean, formikProps?: any): any => {
-  const initialValues = fieldsConfig.reduce((acc: any, field: FieldConfig) => {
+interface UseFormFieldsReturn {
+  formFields: { [key: string]: JSX.Element };
+  formik: FormikProps<any>;
+  save: () => void;
+}
+
+const useFormFields = (
+  fieldsConfig: FieldConfig[],
+  globalOptions?: any,
+  formikProps?: any
+): UseFormFieldsReturn => {
+  let initialValues = fieldsConfig.reduce((acc: any, field: FieldConfig) => {
     acc[field.name] = field.initialValue || '';
     return acc;
   }, {});
+  if (formikProps && formikProps.initialValues) {
+    initialValues = {
+      ...formikProps.initialValues,
+      ...initialValues,
+    };
+  }
 
-  const validationSchema = Yup.object(
-    fieldsConfig.reduce((acc: any, field) => {
-      if (field.validation) {
-        acc[field.name] = field.validation;
-      }
-      return acc;
-    }, {})
-  );
+  // const validationSchema = Yup.object(
+  //   fieldsConfig.reduce((acc: any, field) => {
+  //     if (field.validation) {
+  //       acc[field.name] = field.validation;
+  //     }
+  //     return acc;
+  //   }, {})
+  // );
 
   const formik = useFormik({
     initialValues,
-    validationSchema,
+    //validationSchema,
     onSubmit: (values) => {
       console.log('Form Submitted:', values);
     },
     ...formikProps,
   });
 
+  // const DefaultField = ({ field, formik }: { field: FieldConfig; formik: FormikProps<any> }) => {
+  //   return (
+  //     <TextField
+  //       key={field.name}
+  //       margin="dense"
+  //       name={field.name}
+  //       label={field.label}
+  //       type={field.type}
+  //       value={formik.values[field.name]}
+  //       onChange={formik.handleChange}
+  //       onBlur={formik.handleBlur}
+  //       error={formik.touched[field.name] && Boolean(formik.errors[field.name])}
+  //       helperText={formik.touched[field.name] && formik.errors[field.name]}
+  //       {...field.props}
+  //     />
+  //   );
+  // };
+
   const formFields = fieldsConfig.reduce((acc: any, field: FieldConfig) => {
     const key = field.id || field.name;
 
-    const fieldDefinitions = new FieldDefinitions(formik, field, editMode);
+    const options = {
+      ...globalOptions,
+      ...field.custom,
+    };
 
-    const fieldDefinition = fieldDefinitions.fieldDefinitions[field.type];
-    if (fieldDefinition) {
-      acc[key] = fieldDefinition();
-    } else {
-      acc[key] = fieldDefinitions.fieldDefinitions.default();
-    }
+    acc[key] = (
+      <CustomField
+        field={field}
+        formik={formik}
+        options={options}
+      />
+    );
 
-    // switch (field.type) {
-    //   // case 'select':
-    //   //   acc[key] = editMode ? (
-    //   //     <TextField
-    //   //       key={field.name}
-    //   //       name={field.name}
-    //   //       label={field.label}
-    //   //       type={field.type}
-    //   //       value={formik.values[field.name]}
-    //   //       onChange={formik.handleChange}
-    //   //       onBlur={formik.handleBlur}
-    //   //       error={formik.touched[field.name] && Boolean(formik.errors[field.name])}
-    //   //       helperText={formik.touched[field.name] && formik.errors[field.name]}
-    //   //       {...field.props}
-    //   //     />
-    //   //   ) : (
-    //   //     DefaultTypography
-    //   //   );
-    //   //   break;
-    //   case 'list': {
-    //     // Helper functions to manage ingredient and instruction arrays
-    //     const addLine = (field: string) => {
-    //       formik.setFieldValue(field, [...formik.values[field], '']);
-    //     };
-
-    //     const deleteLine = (field: string, index: number) => {
-    //       const newLines = [...formik.values[field]];
-    //       newLines.splice(index, 1);
-    //       formik.setFieldValue(field, newLines);
-    //     };
-    //     acc[key] = (
-    //       <>
-    //         <List dense>
-    //           {formik.values[field.name]?.map((item: any, index: number) => (
-    //             <ListItem key={index}>
-    //               <ListItemText>
-    //                 {editMode ? (
-    //                   <TextField
-    //                     fullWidth
-    //                     margin="dense"
-    //                     value={item}
-    //                     onChange={(e) => {
-    //                       const newItems = [...formik.values[field.name]];
-    //                       newItems[index] = e.target.value;
-    //                       formik.setFieldValue(field.name, newItems);
-    //                     }}
-    //                   />
-    //                 ) : (
-    //                   <Typography variant="body2">{item}</Typography>
-    //                 )}
-    //               </ListItemText>
-    //               {editMode && (
-    //                 <ListItemSecondaryAction>
-    //                   <IconButton
-    //                     edge="end"
-    //                     onClick={() => deleteLine(field.name, index)}
-    //                   >
-    //                     <DeleteIcon />
-    //                   </IconButton>
-    //                 </ListItemSecondaryAction>
-    //               )}
-    //             </ListItem>
-    //           ))}
-    //         </List>
-    //         {editMode && (
-    //           <Button
-    //             onClick={() => addLine(field.name)}
-    //             fullWidth
-    //             variant="outlined"
-    //             style={{ marginBottom: '10px' }}
-    //           >
-    //             Add {field.label}
-    //           </Button>
-    //         )}
-    //       </>
-    //     );
-    //     break;
-    //   }
-    //   default:
-    //     acc[key] = editMode ? (
-    //       <TextField
-    //         key={field.name}
-    //         margin="dense"
-    //         name={field.name}
-    //         label={field.label}
-    //         type={field.type}
-    //         value={formik.values[field.name]}
-    //         onChange={formik.handleChange}
-    //         onBlur={formik.handleBlur}
-    //         error={formik.touched[field.name] && Boolean(formik.errors[field.name])}
-    //         helperText={formik.touched[field.name] && formik.errors[field.name]}
-    //         {...field.props}
-    //       />
-    //     ) : (
-    //       DefaultTypography
-    //     );
-    //     break;
+    // const fieldDefinition: (config: FieldDefinitionConfig) => any = FieldDefinitions[field.type];
+    // if (fieldDefinition) {
+    //   acc[key] = fieldDefinition({ formik, field, options: { editMode } });
+    // } else {
+    //   acc[key] = (
+    //     <DefaultField
+    //       field={field}
+    //       formik={formik}
+    //     />
+    //   ); //fieldDefinitions.fieldDefinitions.default();
     // }
 
     return acc;

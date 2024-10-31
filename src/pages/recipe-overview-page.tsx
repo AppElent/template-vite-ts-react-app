@@ -1,9 +1,15 @@
+import { useData } from '@/libs/data-sources';
 import DefaultPaperbasePage from '@/pages/default/DefaultPaperbasePage';
 import RecipeOverview from '@/sections/recipe-overview-page/recipe-overview';
-import { useData } from '@/libs/data-sources';
 
 const RecipeOverviewPage = () => {
-  const { data, add: addRecipe, delete: deleteRecipe, update: updateRecipe } = useData('recipes');
+  const {
+    data,
+    add: addRecipe,
+    delete: deleteRecipe,
+    update: updateRecipe,
+    set: setRecipe,
+  } = useData('recipes');
 
   return (
     <DefaultPaperbasePage title="Recipes">
@@ -15,6 +21,7 @@ const RecipeOverviewPage = () => {
         addRecipe={addRecipe}
         deleteRecipe={deleteRecipe}
         updateRecipe={updateRecipe}
+        setRecipe={setRecipe}
       />
     </DefaultPaperbasePage>
   );

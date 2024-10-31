@@ -1,8 +1,19 @@
+// @ts-nocheck
+interface DataSourceOptions {
+  target: string;
+  schema?: Record<string, any>;
+  YupValidationSchema?: any;
+  targetMode?: 'collection' | 'document';
+}
+
 class BaseDataSource {
   defaultOptions = {
     targetMode: 'collection',
   };
-  constructor(options, providerConfig) {
+  options: DataSourceOptions;
+  providerConfig: any;
+  targetName: string;
+  constructor(options: DataSourceOptions, providerConfig: any) {
     if (new.target === BaseDataSource) {
       throw new TypeError('Cannot construct BaseDataSource instances directly');
     }
@@ -15,13 +26,13 @@ class BaseDataSource {
   }
 
   // Helper function to validate email format
-  isValidEmail(email) {
+  isValidEmail(email: string) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   }
 
   // Helper function to validate date
-  isValidDate(date) {
+  isValidDate(date: string) {
     return !isNaN(new Date(date).getTime());
   }
 
@@ -105,6 +116,10 @@ class BaseDataSource {
 
   async update(id, data) {
     throw new Error("Method 'update' must be implemented.");
+  }
+
+  async set(id, data) {
+    throw new Error("Method 'set' must be implemented.");
   }
 
   async delete(id) {

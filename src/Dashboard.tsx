@@ -1,21 +1,20 @@
-import { useEffect, FC } from 'react';
-import useRouter from '@/hooks/use-router';
+import IssueDialog from '@/components/default/issue-dialog';
+import { Seo, setPageTitleSuffix } from '@/components/default/seo';
+import { SplashScreen } from '@/components/default/splash-screen';
+import config from '@/config';
+import useDialog from '@/hooks/use-dialog';
 import useHttpsRedirect from '@/hooks/use-https-redirect';
-import { useRoutes } from 'react-router-dom';
+import useRouter from '@/hooks/use-router';
+import { AuthConsumer, AuthProvider } from '@/libs/auth';
+import defaultRoutes from '@/routes/defaultRoutes';
+import { Theme, ThemeProvider } from '@mui/material';
 import { ConfirmProvider } from 'material-ui-confirm';
+import PropTypes from 'prop-types';
+import { FC, useEffect } from 'react';
+import { useRoutes } from 'react-router-dom';
 import { QueryParamProvider } from 'use-query-params';
 import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
-import PropTypes from 'prop-types';
-import { Seo, setPageTitleSuffix } from '@/components/default/seo';
-import { ThemeProvider, Theme } from '@mui/material';
-import defaultRoutes from '@/routes/defaultRoutes';
-import config from '@/config';
-import { AuthConsumer, AuthProvider } from '@/libs/auth';
-import { SplashScreen } from '@/components/default/splash-screen';
-import IssueDialog from '@/components/default/issue-dialog';
-import useDialog from '@/hooks/use-dialog';
-import { DataProvider } from './libs/data-sources';
-import { DataSource } from './libs/data-sources/DataProvider';
+import { DataProvider, DataSource } from './libs/data-sources';
 
 interface DashboardProps {
   theme: Theme;

@@ -1,15 +1,14 @@
-import * as React from 'react';
-import useMediaQuery from '@mui/material/useMediaQuery';
-import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
+import CssBaseline from '@mui/material/CssBaseline';
 import Link from '@mui/material/Link';
+import Typography from '@mui/material/Typography';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import PropTypes from 'prop-types';
-import Navigator from './Navigator';
+import * as React from 'react';
 import Header from './Header';
+import Navigator from './Navigator';
 //import { OPTIONS } from '../../App';
 import theme from '@/theme/paperbase/theme';
-import config from '@/config';
 
 function Copyright() {
   return (
@@ -196,7 +195,8 @@ export default function Paperbase({ settings, children }) {
             PaperProps={{ style: { width: drawerWidth } }}
             variant="temporary"
             open={mobileOpen}
-            onClose={handleDrawerToggle}
+            onClose={() => setMobileOpen(false)}
+            closeDrawer={handleDrawerToggle}
           />
         )}
         <Navigator
@@ -210,7 +210,6 @@ export default function Paperbase({ settings, children }) {
           component="main"
           sx={{ flex: 1, py: 0, px: 0, bgcolor: '#eaeff1' }}
         >
-          {config?.custom?.loadComponents && config.custom.loadComponents}
           {children}
         </Box>
         <Box
