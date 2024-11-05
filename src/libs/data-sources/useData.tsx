@@ -33,17 +33,18 @@ const useData = (
   } = context;
 
   useEffect(() => {
-    if (dataSource && typeof dataSource?.subscribe === 'function' && !subscriptions[key]) {
+    if (
+      dataSource &&
+      dataSource.options?.subscribe &&
+      typeof dataSource?.subscribe === 'function' &&
+      !subscriptions[key]
+    ) {
       subscribeToData(key);
     }
   }, [key, dataSource, subscribeToData, subscriptions, context.dataSources]);
 
   useEffect(() => {
     if (newDataSource && !context.dataSources.find((ds) => ds.key === key)) {
-      console.log(
-        newDataSource,
-        context.dataSources.find((ds) => ds.key === key)
-      );
       addDataSource({ key, dataSource: newDataSource });
     }
   }, [newDataSource, key, addDataSource, context.dataSources]);
@@ -62,6 +63,7 @@ const useData = (
     dataSource,
     addDataSource,
     setDataSource,
+    dataSources: context.dataSources,
   };
 };
 

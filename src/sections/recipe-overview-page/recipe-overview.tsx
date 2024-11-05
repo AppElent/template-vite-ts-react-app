@@ -54,7 +54,6 @@ function RecipeOverview({
   };
 
   const handleRecipeClick = (recipe: Recipe) => {
-    console.log(recipe);
     //dialog.setData(recipe);
     dialog.open(recipe.id);
   };

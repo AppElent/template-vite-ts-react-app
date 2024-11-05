@@ -2,7 +2,6 @@ import { AppBar, Box, IconButton, Stack, Tab, Tabs, Tooltip } from '@mui/materia
 import PropTypes from 'prop-types';
 
 const TabSection = ({ tabs, buttons }) => {
-  console.log(tabs);
   return (
     <AppBar
       component="div"

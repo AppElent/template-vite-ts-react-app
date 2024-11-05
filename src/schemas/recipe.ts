@@ -21,7 +21,3 @@ export const recipeYupSchema = Yup.object().shape({
   createdAt: Yup.string().optional(),
   updatedAt: Yup.string().optional(),
 });
-
-console.log(recipeYupSchema.describe());
-console.log(Yup.reach(recipeYupSchema, 'name'));
-console.log();

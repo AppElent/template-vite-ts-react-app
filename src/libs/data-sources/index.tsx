@@ -5,7 +5,10 @@ import useData from './useData';
 export interface DataSourceInitOptions {
   target: string;
   targetMode: 'collection' | 'document';
-  YupValidationSchema: Yup.AnySchema;
+  subscribe?: boolean;
+  YupValidationSchema?: Yup.AnySchema;
+  schema?: Record<string, any>;
+  initialValue?: any;
 }
 
 export interface DataSource {
@@ -21,6 +24,8 @@ export interface DataSourceSource {
   update: (id: string, data?: any) => Promise<void>;
   set: (id: string, data?: any) => Promise<void>;
   delete: (id?: string) => Promise<void>;
+  options?: DataSourceInitOptions;
+  providerConfig?: any;
 }
 
 export interface DataContextType {
@@ -53,6 +58,7 @@ export interface DataSourceContext {
   dataSource: DataSourceSource | undefined;
   addDataSource: (newDataSource: DataSource) => void;
   setDataSource: (key: string, dataSource: DataSourceSource) => void;
+  dataSources: DataSource[];
 }
 
 export { DataProvider, useData };

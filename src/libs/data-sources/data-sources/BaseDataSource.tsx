@@ -1,19 +1,14 @@
-// @ts-nocheck
-interface DataSourceOptions {
-  target: string;
-  schema?: Record<string, any>;
-  YupValidationSchema?: any;
-  targetMode?: 'collection' | 'document';
-}
+import { DataSourceInitOptions } from '..';
 
 class BaseDataSource {
   defaultOptions = {
     targetMode: 'collection',
   };
-  options: DataSourceOptions;
+  options: DataSourceInitOptions;
   providerConfig: any;
   targetName: string;
-  constructor(options: DataSourceOptions, providerConfig: any) {
+  provider?: string;
+  constructor(options: DataSourceInitOptions, providerConfig: any) {
     if (new.target === BaseDataSource) {
       throw new TypeError('Cannot construct BaseDataSource instances directly');
     }
@@ -36,10 +31,10 @@ class BaseDataSource {
     return !isNaN(new Date(date).getTime());
   }
 
-  validateSchema = async (data) => {
+  validateSchema = async (data: any) => {
     if (this.options.schema) {
       const errors = [];
-      for (const [key, rules] of Object.entries(this.schema)) {
+      for (const [key, rules] of Object.entries(this.options.schema)) {
         const value = data[key];
 
         // Check required fields
@@ -81,48 +76,53 @@ class BaseDataSource {
     }
   };
 
-  validateYupSchema = async (data) => {
+  validateYupSchema = async (data: any) => {
     if (this.options.YupValidationSchema) {
       try {
         // Validate the data using Yup's schema and throw any validation errors
         await this.options.YupValidationSchema.validate(data, { abortEarly: false });
-      } catch (err) {
-        const validationErrors = err.errors.join(' ');
+      } catch (err: any) {
+        const validationErrors = err.errors?.join(' ');
         throw new Error(`Validation failed: ${validationErrors}`);
       }
     }
   };
 
-  validate = async (data) => {
+  validate = async (data: any) => {
     await this.validateSchema(data);
     await this.validateYupSchema(data);
+  };
+
+  _getInitialValue = () => {
+    const fallback = this.options.targetMode === 'collection' ? [] : {};
+    return this.options.initialValue || fallback;
   };
 
   _parseFilters = () => {
     throw new Error("Method '_parseFilters' is not implemented.");
   };
 
-  async get(id) {
+  async get(id: string): Promise<any> {
     throw new Error("Method 'get' must be implemented.");
   }
 
-  async getAll(filter = {}) {
+  async getAll(filter: { [key: string]: any } = {}): Promise<any> {
     throw new Error("Method 'getAll' must be implemented.");
   }
 
-  async add(item) {
+  async add(item: any): Promise<any> {
     throw new Error("Method 'add' must be implemented.");
   }
 
-  async update(id, data) {
+  async update(id: string, data: any): Promise<any> {
     throw new Error("Method 'update' must be implemented.");
   }
 
-  async set(id, data) {
+  async set(id: string, data: any): Promise<any> {
     throw new Error("Method 'set' must be implemented.");
   }
 
-  async delete(id) {
+  async delete(id: string): Promise<any> {
     throw new Error("Method 'delete' must be implemented.");
   }
 }

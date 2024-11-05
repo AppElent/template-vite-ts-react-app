@@ -1,8 +1,9 @@
 import { Suspense } from 'react';
 import { Outlet, RouteObject } from 'react-router-dom';
 
-import DataSources from '@/pages/default/test/data-sources';
 import Account from '@/pages/default/Account';
+import Settings from '@/pages/default/Settings';
+import DataSources from '@/pages/default/test/data-sources';
 import FileUploads from '@/pages/default/test/file-uploads';
 
 const appRoutes: RouteObject[] = [
@@ -12,7 +13,7 @@ const appRoutes: RouteObject[] = [
   },
   {
     path: 'settings',
-    element: <div></div>,
+    element: <Settings />,
   },
   {
     path: 'profile',

@@ -36,7 +36,10 @@ const DataProvider: React.FC<DataProviderProps> = ({ dataSources, children }) =>
       try {
         const dataSource = dataSourcesState.find((ds) => ds.key === key)?.dataSource;
         if (!dataSource) throw new Error(`Data source with key ${key} not found`);
-        const result = await dataSource.getAll(filter);
+        const result =
+          dataSource.options?.targetMode === 'document'
+            ? await dataSource.get()
+            : await dataSource.getAll(filter);
         setData((prev) => ({ ...prev, [key]: result }));
       } catch (err) {
         setError((prev) => ({ ...prev, [key]: err }));
@@ -49,6 +52,11 @@ const DataProvider: React.FC<DataProviderProps> = ({ dataSources, children }) =>
 
   const subscribeToData = useCallback(
     (key: string) => {
+      // Unsubscribe from the previous subscription if it exists
+      if (subscriptions[key]) {
+        subscriptions[key]();
+      }
+
       setLoading((prev) => ({ ...prev, [key]: true }));
       setError((prev) => ({ ...prev, [key]: null }));
       try {
@@ -64,7 +72,7 @@ const DataProvider: React.FC<DataProviderProps> = ({ dataSources, children }) =>
         setLoading((prev) => ({ ...prev, [key]: false }));
       }
     },
-    [dataSourcesState]
+    [dataSourcesState, subscriptions]
   );
 
   const add = async (key: string, item: any) => {
@@ -91,11 +99,13 @@ const DataProvider: React.FC<DataProviderProps> = ({ dataSources, children }) =>
     try {
       const dataSource = dataSourcesState.find((ds) => ds.key === key)?.dataSource;
       if (!dataSource) throw new Error(`Data source with key ${key} not found`);
-      await dataSource.update(id, data);
+      const newData = await dataSource.update(id, data);
       if (!subscriptions[key] && data[key]) {
         setData((prev) => ({
           ...prev,
-          [key]: prev[key].map((item: any) => (item.id === id ? { ...item, ...data } : item)),
+          [key]: prev[key].map((item: any) =>
+            item.id === id && newData ? { ...item, ...(newData as object) } : item
+          ),
         }));
       }
     } catch (err) {
@@ -149,7 +159,7 @@ const DataProvider: React.FC<DataProviderProps> = ({ dataSources, children }) =>
     return () => {
       Object.values(subscriptions).forEach((unsubscribe) => unsubscribe());
     };
-  }, [subscriptions]);
+  }, []);
 
   useEffect(() => {
     console.log('Data sources have new data', data);

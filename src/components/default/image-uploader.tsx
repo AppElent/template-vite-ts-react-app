@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import ImageCropper from '@/components/default/ImageCropper';
+import ImageCropper from '@/components/default/image-cropper';
 import useDialog from '@/hooks/use-dialog';
 import { Button } from '@mui/material';
 import { useState } from 'react';

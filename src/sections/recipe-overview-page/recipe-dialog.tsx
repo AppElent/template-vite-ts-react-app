@@ -1,10 +1,14 @@
-import ImageUploader from '@/components/default/ImageUploader';
+import JsonViewer from '@andypf/json-viewer/dist/esm/react/JsonViewer';
+
+import ImageUploader from '@/components/default/image-uploader';
+import LoadingButton from '@/components/default/loading-button';
 import useFetch from '@/hooks/use-fetch';
-import useFormFields from '@/hooks/use-form-fields';
-import { createGuid } from '@/libs/create-guid';
+import { FieldConfig, FieldDefinitionConfig, useFormFields } from '@/libs/forms';
+import { DefaultTextField } from '@/libs/forms/default-fields';
 import FirebaseStorageProvider from '@/libs/storage-providers/providers/FirebaseStorageProvider';
 import { recipeYupSchema } from '@/schemas/recipe';
 import Recipe from '@/types/recipe';
+import { createGuid } from '@/utils/create-guid';
 import CancelIcon from '@mui/icons-material/Cancel';
 import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
@@ -24,6 +28,49 @@ import {
 import { useEffect, useMemo, useState } from 'react';
 import RecipeDialogFullImageViewer from './recipe-dialog-full-image-viewer';
 import RecipeDialogImageList from './recipe-dialog-image-list';
+
+const parseExternalRecipeData = (data: any): Recipe => {
+  return {
+    ...(data.title && data.title.trim() && { name: data.title }),
+    ...(data.description &&
+      data.description.trim() && {
+        description: data.description,
+      }),
+    //TODO: cooking times
+    ...(data.yields &&
+      data.yields.trim() && {
+        yields: data.yields,
+      }),
+    ...(data.nutrients && {
+      nutrients: data.nutrients,
+    }),
+    ...(data.image && data.image.trim() && { image: data.image }),
+    ...(data.ingredients &&
+      data.ingredients.length > 0 && {
+        ingredients: data.ingredients,
+      }),
+    ...(data.instructions_list &&
+      data.instructions_list.length > 0 && {
+        instructions: data.instructions_list,
+      }),
+    ...(data.category &&
+      data.category.trim() && {
+        category: data.category,
+      }),
+    ...(data.keywords &&
+      data.keywords.length > 0 && {
+        keywords: data.keywords,
+      }),
+    ...(data.cuisine &&
+      data.cuisine.trim() && {
+        cuisine: data.cuisine.split(','),
+      }),
+
+    // external data
+    ...(data.site_name && data.site_name.trim() && { site: data.site_name }),
+    raw: data,
+  };
+};
 
 function RecipeDialog({
   open,
@@ -75,41 +122,35 @@ function RecipeDialog({
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [uploadFileName] = useState<string | null>(createGuid());
 
-  const defaultValues = {
-    name: '',
-    description: '',
-    url: '',
-    ingredients: [''],
-    instructions: [''],
-    image: '',
-    images: [],
-    cuisine: [''],
-    score: 0,
-    comments: '',
-    cookingTime: 0,
-    nutrition: 0,
-    category: '',
-    keywords: [''],
-    dateAdded: '',
-    numberOfServings: 2,
-  };
+  // const defaultValues = {
+  //   name: '',
+  //   description: '',
+  //   url: '',
+  //   ingredients: [''],
+  //   instructions: [''],
+  //   image: '',
+  //   images: [],
+  //   cuisine: [''],
+  //   score: 0,
+  //   comments: '',
+  //   cookingTime: 0,
+  //   nutrition: 0,
+  //   category: '',
+  //   keywords: [''],
+  //   numberOfServings: 2,
+  // };
 
-  const { formFields, formik } = useFormFields(
-    [
+  const fields: FieldConfig[] = useMemo(
+    () => [
       {
         name: 'name',
         label: 'Name',
-        type: 'text',
-        //validation: Yup.string().required('Recipe name is required').min(3, 'Minimum 3 characters'),
-        validation: (value) => recipeYupSchema.validateAt('name', value),
-        props: { fullWidth: true, variant: 'outlined' },
-        //await schema.validateAt('foo[0].bar', rootValue); // => ValidationError: must be a string
+        validation: (value: any) => recipeYupSchema.validateAt('name', value),
       },
       {
         name: 'description',
         label: 'Description',
         type: 'text',
-        props: { fullWidth: true, variant: 'outlined', multiline: true },
       },
       {
         name: 'cuisine',
@@ -142,52 +183,90 @@ function RecipeDialog({
         name: 'cookingTime',
         label: 'Cooking Time',
         type: 'text',
-        props: { fullWidth: true, variant: 'outlined' },
       },
       {
         name: 'comments',
         label: 'Comments',
         type: 'text',
-        props: { fullWidth: true, variant: 'outlined' },
       },
       {
         name: 'score',
         label: 'Score',
         type: 'text',
-        props: {
-          fullWidth: true,
-          variant: 'outlined',
-          type: 'number',
+        custom: {
+          muiTextFieldProps: {
+            type: 'number',
+          },
         },
       },
       {
         name: 'url',
         label: 'URL',
         type: 'text',
-        props: { fullWidth: true, variant: 'outlined' },
       },
       {
         name: 'nutrition',
         label: 'Nutrition info',
         type: 'text',
-        props: { fullWidth: true, variant: 'outlined', type: 'number' },
+        custom: {
+          muiTextFieldProps: {
+            type: 'number',
+          },
+        },
+      },
+      {
+        name: 'category',
+        label: 'Category',
       },
       {
         name: 'numberOfServings',
         label: 'Number of Servings',
-        type: 'text',
-        props: { fullWidth: true, variant: 'outlined', type: 'number' },
+        render: ({ field, formik, options, helpers }: FieldDefinitionConfig) => {
+          console.log(field, formik, options, helpers);
+          return (
+            <DefaultTextField
+              field={field}
+              formik={formik}
+              options={options}
+              helpers={helpers}
+            />
+          );
+        },
+        custom: {
+          muiTextFieldProps: {
+            type: 'number',
+          },
+        },
       },
       {
         name: 'keywords',
         label: 'Keywords',
-        type: 'list',
+        type: 'text',
         initialValue: [recipe?.keywords || ['']],
       },
+      {
+        //id: 'calories',
+        name: 'nutrients.calories',
+        type: 'object',
+        //accessor: 'nutrients.calories',
+        label: 'Nutrients.calories',
+        initialValue: [recipe?.nutrients?.calories || ['']],
+      },
     ],
-    { editMode: isEditing },
-    {
-      initialValues: defaultValues,
+    [recipe]
+  );
+
+  const { formFields, formik } = useFormFields({
+    fields,
+    options: {
+      editMode: isEditing,
+      muiTextFieldProps: {
+        fullWidth: true,
+        variant: 'outlined',
+      },
+    },
+    formikProps: {
+      //initialValues: defaultValues,
       validationSchema: recipeYupSchema,
       onSubmit: async (values: Recipe) => {
         if (!recipe?.id) {
@@ -198,35 +277,31 @@ function RecipeDialog({
         if (recipeId === 'new') {
           setRecipeId(savedRecipe.id);
         }
-        console.log(savedRecipe);
         setIsEditing(false);
         //formik.resetForm();
         //onClose();
       },
-    }
-  );
+    },
+  });
 
   // Fetch recipe data from api
   const {
     data: externalRecipeData,
     loading,
     fetchData,
-  } = useFetch<any>(`https://api.appelent.site/recipes?url=${formik.values.url}`, {
+  } = useFetch<any>(`https://api-python.appelent.site/recipes/scrape?url=${formik.values.url}`, {
     autoFetch: false,
   });
 
   useEffect(() => {
     if (externalRecipeData) {
-      formik.setValues({
-        ...formik.values,
-        name: externalRecipeData.name || '',
-        description: externalRecipeData.description || '',
-        image: externalRecipeData.image?.[0] ? externalRecipeData.image[0] : null,
-        images: externalRecipeData.image || [],
-        ingredients: externalRecipeData.recipeIngredient || [],
-        instructions: externalRecipeData.recipeInstructions?.map((i: any) => i.text) || [],
-        cuisine: externalRecipeData.recipeCuisine || [],
-      });
+      console.log(externalRecipeData);
+      if (externalRecipeData && externalRecipeData.status === 'success') {
+        formik.setValues({
+          ...formik.values,
+          ...parseExternalRecipeData(externalRecipeData.data),
+        });
+      }
       //formik.handleSubmit();
     }
   }, [externalRecipeData]);
@@ -234,7 +309,7 @@ function RecipeDialog({
   useEffect(() => {
     if (recipe) {
       formik.setValues({
-        ...defaultValues,
+        //...defaultValues,
         ...recipe,
       });
       setImage(recipe.image || null);
@@ -334,16 +409,16 @@ function RecipeDialog({
               >
                 {formik.values.url && (
                   <Box>
-                    <Button
+                    <LoadingButton
                       variant="contained"
-                      disabled={loading}
+                      isLoading={loading}
                       //href="#" //{formik.values.url}
                       onClick={() => {
                         fetchData();
                       }}
                     >
                       Get recipe information
-                    </Button>
+                    </LoadingButton>
                   </Box>
                 )}
               </Grid>
@@ -358,8 +433,8 @@ function RecipeDialog({
             {formFields['nutrition']}
             {formFields['category']}
             {formFields['keywords']}
-            {formFields['dateAdded']}
             {formFields['numberOfServings']}
+            {formFields['nutrients.calories']}
             {formik.values.images && formik.values.images.length > 0 && (
               <RecipeDialogImageList
                 images={formik.values.images}
@@ -386,6 +461,10 @@ function RecipeDialog({
                 },
                 props: { aspect: 16 / 9 },
               }}
+            />
+            <JsonViewer
+              data={formik.values}
+              expanded={false}
             />
           </DialogContent>
           <DialogActions>

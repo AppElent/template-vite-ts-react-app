@@ -2,13 +2,14 @@ import '@/config/firebase';
 import { db } from '@/config/firebase';
 import routes from '@/config/routes';
 import { FirebaseAuthProvider } from '@/libs/auth';
-import FirebaseDataSource from '@/libs/data-sources/data-sources/FirebaseDataSource';
+import { DataSource } from '@/libs/data-sources';
+import FirestoreDataSource from '@/libs/data-sources/data-sources/FirestoreDataSource';
+import { recipeYupSchema } from '@/schemas/recipe';
 import theme from '@/theme/paperbase/theme';
 import './App.css';
 import config from './config';
 import Dashboard from './Dashboard';
-import { DataSource } from './libs/data-sources';
-import { recipeYupSchema } from './schemas/recipe';
+import LocalStorageDataSource from './libs/data-sources/data-sources/LocalStorageDataSource';
 
 const firebaseProvider = new FirebaseAuthProvider({ login: '/login', logout: '/logout' });
 // const datasources = [
@@ -20,10 +21,19 @@ const dataSources: DataSource[] = [
   // { key: 'dummy2', dataSource: new FirebaseDataSourceNoRealtime(db, 'dummy') },
   {
     key: 'recipes',
-    dataSource: new FirebaseDataSource(
-      { target: 'recipes', targetMode: 'collection', YupValidationSchema: recipeYupSchema },
+    dataSource: new FirestoreDataSource(
+      {
+        target: 'recipes',
+        targetMode: 'collection',
+        YupValidationSchema: recipeYupSchema,
+        subscribe: true,
+      },
       { db }
     ),
+  },
+  {
+    key: 'settings',
+    dataSource: new LocalStorageDataSource({ target: 'settings', targetMode: 'document' }),
   },
   // {key: 'dummy', dataSource: new FirebaseDataSource({target: 'dummy', targetMode: 'collection'}, {db})},
   // {key: 'dummy2', dataSource: new FirebaseDataSourceNoRealtime({target: 'dummy', targetMode: 'collection'}, {db})},

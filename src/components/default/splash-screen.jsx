@@ -24,7 +24,7 @@ export const SplashScreen = () => (
         width: 48,
       }}
     > */}
-    <div>Waiting screen</div>
+    <div>Loading</div>
     {/* </Box> */}
   </Box>
 );

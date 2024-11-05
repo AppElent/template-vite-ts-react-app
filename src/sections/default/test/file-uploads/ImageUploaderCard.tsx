@@ -1,4 +1,4 @@
-import ImageUploader from '@/components/default/ImageUploader';
+import ImageUploader from '@/components/default/image-uploader';
 import { Box, Typography } from '@mui/material';
 import { useState } from 'react';
 
