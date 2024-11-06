@@ -30,10 +30,10 @@ function RecipeOverview({
   deleteRecipe,
 }: {
   recipes: Recipe[];
-  addRecipe: (item: Recipe) => void;
-  updateRecipe: (id: string, item: Partial<Recipe>) => void;
-  setRecipe: (id: string, item: Recipe) => void;
-  deleteRecipe: (id: string) => void;
+  addRecipe: (item: Recipe) => Promise<any>;
+  updateRecipe: (item: Partial<Recipe>, id: string) => Promise<any>;
+  setRecipe: (item: Recipe, id: string) => Promise<any>;
+  deleteRecipe: (id: string) => Promise<any>;
 }) {
   const [view, setView] = useState('gallery');
   const dialog = useDialog({ queryKey: 'recipe' });
@@ -75,10 +75,10 @@ function RecipeOverview({
         <RecipeDialog
           open={dialog.isOpen}
           onClose={() => dialog.close()}
-          setRecipe={(id: string | undefined, data: any) => {
+          setRecipe={(data: any, id: string | undefined) => {
             console.log(id, data);
             if (id) {
-              return setRecipe(id, data);
+              return setRecipe(data, id);
             } else {
               return addRecipe(data);
             }

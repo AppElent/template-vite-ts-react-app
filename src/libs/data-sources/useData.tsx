@@ -1,12 +1,8 @@
 import { useContext, useEffect, useMemo } from 'react';
-import { DataSourceContext, DataSourceSource } from '.';
+import { DataSourceSource } from '.';
 import { DataContext } from './DataProvider';
 
-const useData = (
-  key: string,
-  options = {},
-  newDataSource?: DataSourceSource
-): DataSourceContext => {
+const useData = (key: string, options = {}, newDataSource?: DataSourceSource) => {
   if (key === 'false') console.log(options);
   const context = useContext(DataContext);
   if (!context) {
@@ -57,8 +53,8 @@ const useData = (
     get: (id?: string) => dataSource?.get(id),
     getAll: (filter: any) => dataSource?.getAll(filter),
     add: (item: any) => add(key, item),
-    update: (id: string, data: any) => update(key, id, data),
-    set: (id: string, data: any) => set(key, id, data),
+    update: (data: any, id: string) => update(key, data, id),
+    set: (data: any, id: string) => set(key, data, id),
     delete: (id: string) => remove(key, id),
     dataSource,
     addDataSource,

@@ -18,7 +18,7 @@ const Settings = () => {
           {JSON.stringify(settings.data)}
           <Button
             onClick={() => {
-              settings.set('1', { test: 'test' });
+              settings.set({ test: 'test' }, 'id1');
             }}
           >
             Add data

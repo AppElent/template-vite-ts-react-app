@@ -1,6 +1,10 @@
 import { DataSourceInitOptions } from '..';
 
-class BaseDataSource {
+interface validateOptions {
+  full: boolean;
+}
+
+class BaseDataSource<T> {
   defaultOptions = {
     targetMode: 'collection',
   };
@@ -31,11 +35,11 @@ class BaseDataSource {
     return !isNaN(new Date(date).getTime());
   }
 
-  validateSchema = async (data: any) => {
+  validateSchema = async (data: Partial<T>, _options?: validateOptions) => {
     if (this.options.schema) {
       const errors = [];
       for (const [key, rules] of Object.entries(this.options.schema)) {
-        const value = data[key];
+        const value = (data as { [key: string]: any })[key];
 
         // Check required fields
         if (rules.required && (value === undefined || value === null)) {
@@ -76,7 +80,7 @@ class BaseDataSource {
     }
   };
 
-  validateYupSchema = async (data: any) => {
+  validateYupSchema = async (data: Partial<T>, _options?: validateOptions) => {
     if (this.options.YupValidationSchema) {
       try {
         // Validate the data using Yup's schema and throw any validation errors
@@ -88,9 +92,9 @@ class BaseDataSource {
     }
   };
 
-  validate = async (data: any) => {
-    await this.validateSchema(data);
-    await this.validateYupSchema(data);
+  validate = async (data: Partial<T>, options?: validateOptions) => {
+    await this.validateSchema(data, options);
+    await this.validateYupSchema(data, options);
   };
 
   _getInitialValue = () => {
@@ -102,27 +106,27 @@ class BaseDataSource {
     throw new Error("Method '_parseFilters' is not implemented.");
   };
 
-  async get(id: string): Promise<any> {
+  async get(): Promise<T | null> {
     throw new Error("Method 'get' must be implemented.");
   }
 
-  async getAll(filter: { [key: string]: any } = {}): Promise<any> {
+  async getAll(): Promise<T[]> {
     throw new Error("Method 'getAll' must be implemented.");
   }
 
-  async add(item: any): Promise<any> {
+  async add(_item: T): Promise<T> {
     throw new Error("Method 'add' must be implemented.");
   }
 
-  async update(id: string, data: any): Promise<any> {
+  async update(_data: Partial<T>, _id?: string): Promise<void> {
     throw new Error("Method 'update' must be implemented.");
   }
 
-  async set(id: string, data: any): Promise<any> {
+  async set(_data: T, _id?: string): Promise<void> {
     throw new Error("Method 'set' must be implemented.");
   }
 
-  async delete(id: string): Promise<any> {
+  async delete(): Promise<void> {
     throw new Error("Method 'delete' must be implemented.");
   }
 }

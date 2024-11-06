@@ -21,8 +21,8 @@ export interface DataSourceSource {
   get: (id?: string) => Promise<any>;
   subscribe: (callback: (newData: any) => void) => () => void;
   add: (item: any) => Promise<any>;
-  update: (id: string, data?: any) => Promise<void>;
-  set: (id: string, data?: any) => Promise<void>;
+  update: (data: any, id?: string) => Promise<void>;
+  set: (data: any, id?: string) => Promise<void>;
   delete: (id?: string) => Promise<void>;
   options?: DataSourceInitOptions;
   providerConfig?: any;
@@ -44,21 +44,21 @@ export interface DataContextType {
   remove: (key: string, id: string) => Promise<void>;
 }
 
-export interface DataSourceContext {
-  data: any;
-  loading: boolean;
-  error: any;
-  fetchData: (filter: any) => void;
-  get: (id?: string) => Promise<any> | undefined;
-  getAll: (filter: any) => Promise<any> | undefined;
-  add: (item: any) => Promise<any>;
-  update: (id: string, data: any) => Promise<void>;
-  set: (id: string, data: any) => Promise<void>;
-  delete: (id: string) => Promise<void>;
-  dataSource: DataSourceSource | undefined;
-  addDataSource: (newDataSource: DataSource) => void;
-  setDataSource: (key: string, dataSource: DataSourceSource) => void;
-  dataSources: DataSource[];
-}
+// export interface DataSourceContext {
+//   data: any;
+//   loading: boolean;
+//   error: any;
+//   fetchData: (filter: any) => void;
+//   get: (id?: string) => Promise<any> | undefined;
+//   getAll: (filter: any) => Promise<any> | undefined;
+//   add: (item: any) => Promise<any>;
+//   update: (data: any, id: string) => Promise<void>;
+//   set: (data: any, id: string) => Promise<void>;
+//   delete: (id: string) => Promise<void>;
+//   dataSource: DataSourceSource | undefined;
+//   addDataSource: (newDataSource: DataSource) => void;
+//   setDataSource: (key: string, dataSource: DataSourceSource) => void;
+//   dataSources: DataSource[];
+// }
 
 export { DataProvider, useData };

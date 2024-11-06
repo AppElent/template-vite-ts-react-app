@@ -20,3 +20,22 @@ export const dummyYupSchema = Yup.object().shape({
     })
     .optional(),
 });
+
+export interface Dummy extends Yup.InferType<typeof dummyYupSchema> {
+  // using interface instead of type generally gives nicer editor feedback
+  randomString?: string;
+}
+
+export default interface DummyBackup {
+  name: string;
+  number?: number;
+  date?: string;
+  boolean?: boolean;
+  array?: string[];
+  object?: {
+    key: string;
+  };
+}
+
+// Or the other way around:
+// let schema: Yup.ObjectSchema<Dummy> = dummyYupSchema;

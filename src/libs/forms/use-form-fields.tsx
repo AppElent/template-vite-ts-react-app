@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { useFormik } from 'formik';
 
 import { useMemo } from 'react';
@@ -31,7 +33,10 @@ const useFormFields = ({
   formikProps,
 }: UseFormFieldsProps): UseFormFieldsReturn => {
   let initialValues = fieldsConfig.reduce((acc: any, field: FieldConfig) => {
-    setNestedValue(acc, field.name, field.initialValue || '');
+    if (field.initialValue) {
+      setNestedValue(acc, field.name, field.initialValue);
+    }
+
     return acc;
   }, {});
   if (formikProps && formikProps.initialValues) {
@@ -40,8 +45,11 @@ const useFormFields = ({
       ...initialValues,
     };
   }
-
-  //console.log('typeof Formik', typeof formikProps);
+  initialValues = {
+    ...(formikProps && formikProps.initialValues && formikProps.initialValues),
+    ...(formikProps && formikProps.validationSchema && formikProps.validationSchema.getDefault()),
+    ...initialValues,
+  };
 
   const formik = useFormik({
     initialValues,

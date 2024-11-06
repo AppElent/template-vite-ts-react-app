@@ -3,11 +3,15 @@ import {
   collection,
   deleteDoc,
   doc,
+  DocumentSnapshot,
   getDoc,
   getDocs,
   onSnapshot,
   query,
+  QueryDocumentSnapshot,
+  QuerySnapshot,
   setDoc,
+  UpdateData,
   updateDoc,
   where,
 } from 'firebase/firestore';
@@ -18,7 +22,7 @@ interface FirestoreDataSourceProviderConfig {
   db: any;
 }
 
-export class FirestoreDataSource extends BaseDataSource {
+export class FirestoreDataSource<T> extends BaseDataSource<T> {
   firestore: any;
   ref: any;
 
@@ -44,13 +48,16 @@ export class FirestoreDataSource extends BaseDataSource {
   };
 
   // Get a single document by ID
-  async get(id?: string) {
+  async get(id?: string): Promise<T | null> {
     try {
+      if (!id && this.options.targetMode !== 'document') {
+        throw new Error('get() requires an ID when using collections');
+      }
       const docRef = this.options?.targetMode === 'document' ? this.ref : doc(this.ref, id);
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         const data = docSnap.data();
-        return { id: docSnap.id, ...(data ? data : {}) };
+        return { id: docSnap.id, ...(data ? data : {}) } as T;
       } else {
         return null;
       }
@@ -61,7 +68,7 @@ export class FirestoreDataSource extends BaseDataSource {
   }
 
   // Get all documents in the collection, with optional filters
-  async getAll(filter: { [key: string]: any } = {}) {
+  async getAll(filter: { [key: string]: any } = {}): Promise<T[]> {
     try {
       if (this.options.targetMode !== 'collection')
         throw new Error('getAll() can only be used with collections');
@@ -75,7 +82,7 @@ export class FirestoreDataSource extends BaseDataSource {
       querySnapshot.forEach((doc) => {
         documents.push({ id: doc.id, ...(doc.data() as object) });
       });
-      return documents;
+      return documents as T[];
     } catch (error) {
       console.error('Error getting documents:', error);
       throw error;
@@ -83,15 +90,15 @@ export class FirestoreDataSource extends BaseDataSource {
   }
 
   // Add a new document to the collection
-  async add(item: any) {
+  async add(item: T): Promise<T> {
     try {
       if (this.options.targetMode !== 'collection')
         throw new Error('add() can only be used with collections');
       // Validate new data
-      this.validate(item);
+      this.validate(item, { full: false });
       const docRef = await addDoc(this.ref, item);
       const newDoc = await getDoc(docRef);
-      return { id: docRef.id, ...newDoc.data() };
+      return { id: docRef.id, ...newDoc.data() } as T;
     } catch (error) {
       console.error('Error adding document:', error);
       throw error;
@@ -99,11 +106,14 @@ export class FirestoreDataSource extends BaseDataSource {
   }
 
   // Update an existing document by ID
-  async update(id: string, data: any) {
+  async update(data: Partial<T>, id?: string): Promise<void> {
     try {
+      if (!id && this.options.targetMode !== 'document') {
+        throw new Error('update() requires an ID when using collections');
+      }
       const docRef = this.options?.targetMode === 'document' ? this.ref : doc(this.ref, id);
       this.validate(data);
-      return await updateDoc(docRef, data);
+      await updateDoc(docRef, data as UpdateData<Partial<T>>);
     } catch (error) {
       console.error('Error updating document:', error);
       throw error;
@@ -111,9 +121,12 @@ export class FirestoreDataSource extends BaseDataSource {
   }
 
   // Update an existing document by ID
-  async set(id: string, data: any) {
+  async set(data: T, id?: string): Promise<void> {
     try {
       // Validate updated data
+      if (!id && this.options.targetMode !== 'document') {
+        throw new Error('set() requires an ID when using collections');
+      }
       this.validate(data);
       const docRef = this.options?.targetMode === 'document' ? this.ref : doc(this.ref, id);
       await setDoc(docRef, data);
@@ -124,8 +137,11 @@ export class FirestoreDataSource extends BaseDataSource {
   }
 
   // Delete a document by ID
-  async delete(id?: string) {
+  async delete(id?: string): Promise<void> {
     try {
+      if (!id && this.options.targetMode !== 'document') {
+        throw new Error('get() requires an ID when using collections');
+      }
       const docRef = this.options?.targetMode === 'document' ? this.ref : doc(this.ref, id);
       await deleteDoc(docRef);
     } catch (error) {
@@ -138,13 +154,18 @@ export class FirestoreDataSource extends BaseDataSource {
   subscribe(callback: (data: any) => any) {
     const unsubscribe =
       this.options?.targetMode === 'document'
-        ? onSnapshot(this.ref, (snapshot: any) => {
-            callback({ id: snapshot.id, ...snapshot.data() });
+        ? onSnapshot(this.ref, (snapshot: DocumentSnapshot) => {
+            const data = snapshot.data();
+            if (data) {
+              callback({ id: snapshot.id, ...snapshot.data() });
+            } else {
+              callback(null);
+            }
           })
-        : onSnapshot(this.ref, (snapshot: any) => {
-            const documents: any[] = [];
-            snapshot.forEach((doc: any) => {
-              documents.push({ id: doc.id, ...doc.data() });
+        : onSnapshot(this.ref, (snapshot: QuerySnapshot) => {
+            const documents: T[] = [];
+            snapshot.forEach((doc: QueryDocumentSnapshot) => {
+              documents.push({ id: doc.id, ...doc.data() } as T);
             });
             callback(documents);
           });

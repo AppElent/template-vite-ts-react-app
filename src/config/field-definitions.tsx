@@ -50,11 +50,17 @@ const FieldDefinitions: RenderFieldDefinitions = {
                       fullWidth
                       margin="dense"
                       value={item}
-                      onChange={(e) => {
-                        const newItems = [...helpers.value];
-                        newItems[index] = e.target.value;
-                        formik.setFieldValue(field.name, newItems);
-                      }}
+                      // onChange={(e) => {
+                      //   const newItems = [...helpers.value];
+                      //   newItems[index] = e.target.value;
+                      //   formik.setFieldValue(field.name, newItems);
+                      // }}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      name={`${field.name}[${index}]`}
+                      error={helpers.touched && Boolean(helpers.errors)}
+                      helperText={helpers.touched && helpers.errors}
+                      {...(options?.muiTextFieldProps && options.muiTextFieldProps)}
                     />
                   ) : (
                     <Typography variant="body2">
@@ -80,7 +86,6 @@ const FieldDefinitions: RenderFieldDefinitions = {
     );
   },
   object: ({ field, formik, options, helpers }: FieldDefinitionConfig): any => {
-    console.log(helpers.value);
     return (
       <DefaultTextField
         field={field}

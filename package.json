@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "tsc": "tsc -b",
     "lint": "eslint .",
     "preview": "vite preview",
     "lint-fix": "eslint --fix ./src",
@@ -26,6 +27,7 @@
     "@mui/material": "^6.1.5",
     "firebase": "^11.0.1",
     "formik": "^2.4.6",
+    "json-edit-react": "^1.17.1",
     "lodash": "^4.17.21",
     "material-ui-confirm": "^3.0.16",
     "prop-types": "^15.8.1",

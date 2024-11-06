@@ -27,7 +27,7 @@ export default interface Recipe {
   keywords?: string[];
   numberOfServings?: number; //todelete
 
-  cuisine: string[];
+  cuisine?: string[];
   // date fields
   createdAt?: string;
   updatedAt?: string;

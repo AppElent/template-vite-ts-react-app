@@ -1,3 +1,4 @@
+// @ts-nocheck
 import JsonViewer from '@andypf/json-viewer/dist/esm/react/JsonViewer';
 
 import ImageUploader from '@/components/default/image-uploader';
@@ -86,8 +87,8 @@ function RecipeDialog({
   open: boolean;
   onClose: () => void;
   //onSave: (id: string | undefined, data: Recipe) => void;
-  setRecipe: (id: string | undefined, data: Recipe) => any;
-  updateRecipe: (id: string, data: Partial<Recipe>) => void;
+  setRecipe: (data: Recipe, id: string | undefined) => any;
+  updateRecipe: (data: Partial<Recipe>, id: string) => void;
   deleteRecipe: (id: string) => void;
   recipeId?: string;
   setRecipeId: (id: string) => void;
@@ -164,7 +165,7 @@ function RecipeDialog({
         name: 'ingredients',
         label: 'Ingredients',
         type: 'list',
-        initialValue: [recipe?.ingredients || ['']],
+        //initialValue: [recipe?.ingredients || ['']],
         custom: {
           header: true,
         },
@@ -173,7 +174,7 @@ function RecipeDialog({
         name: 'instructions',
         label: 'Instructions',
         type: 'list',
-        initialValue: [recipe?.instructions || ['']],
+        //initialValue: [recipe?.instructions || ['']],
         custom: {
           numbered: true,
           header: true,
@@ -222,7 +223,6 @@ function RecipeDialog({
         name: 'numberOfServings',
         label: 'Number of Servings',
         render: ({ field, formik, options, helpers }: FieldDefinitionConfig) => {
-          console.log(field, formik, options, helpers);
           return (
             <DefaultTextField
               field={field}
@@ -241,8 +241,8 @@ function RecipeDialog({
       {
         name: 'keywords',
         label: 'Keywords',
-        type: 'text',
-        initialValue: [recipe?.keywords || ['']],
+        type: 'list',
+        //initialValue: [recipe?.keywords || ['']],
       },
       {
         //id: 'calories',
@@ -250,7 +250,7 @@ function RecipeDialog({
         type: 'object',
         //accessor: 'nutrients.calories',
         label: 'Nutrients.calories',
-        initialValue: [recipe?.nutrients?.calories || ['']],
+        //initialValue: [recipe?.nutrients?.calories || ['']],
       },
     ],
     [recipe]
@@ -269,17 +269,33 @@ function RecipeDialog({
       //initialValues: defaultValues,
       validationSchema: recipeYupSchema,
       onSubmit: async (values: Recipe) => {
-        if (!recipe?.id) {
-          values.createdAt = new Date().toISOString();
+        try {
+          console.log(values);
+          const cleanedValues = { ...values };
+          Object.keys(cleanedValues).forEach((key) => {
+            console.log(key, typeof cleanedValues[key]);
+            if (Array.isArray(cleanedValues[key])) {
+              cleanedValues[key] = values[key].filter((item) => item.trim() !== '');
+            }
+            if (cleanedValues[key] === undefined) {
+              delete cleanedValues[key];
+            }
+          });
+          console.log(cleanedValues);
+          if (!recipe?.id) {
+            cleanedValues.createdAt = new Date().toISOString();
+          }
+          cleanedValues.updatedAt = new Date().toISOString();
+          const savedRecipe = await setRecipe(cleanedValues, recipe?.id);
+          if (recipeId === 'new') {
+            setRecipeId(savedRecipe.id);
+          }
+          setIsEditing(false);
+          //formik.resetForm();
+          //onClose();
+        } catch (e) {
+          console.error(e);
         }
-        values.updatedAt = new Date().toISOString();
-        const savedRecipe = await setRecipe(recipe?.id, values);
-        if (recipeId === 'new') {
-          setRecipeId(savedRecipe.id);
-        }
-        setIsEditing(false);
-        //formik.resetForm();
-        //onClose();
       },
     },
   });
@@ -337,7 +353,7 @@ function RecipeDialog({
         >
           <div>
             {isEditing ? (recipe ? 'Edit Recipe' : 'Add Recipe') : 'View Recipe'}
-            {recipeId !== 'new' && (
+            {!(recipeId === 'new' && !isEditing) && (
               <IconButton
                 onClick={() => {
                   if (isEditing) {
@@ -346,7 +362,7 @@ function RecipeDialog({
                     toggleEditMode();
                   }
                 }}
-                disabled={recipeId === 'new' || disableSubmit} // Disable edit button if adding new recipe
+                disabled={disableSubmit} // Disable edit button if adding new recipe
                 style={{ marginLeft: '8px' }}
               >
                 {isEditing ? <SaveIcon /> : <EditIcon />}

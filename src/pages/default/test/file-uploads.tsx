@@ -2,7 +2,7 @@
 
 import { useAuth } from '@/libs/auth';
 import FirebaseStorageProvider from '@/libs/storage-providers/providers/FirebaseStorageProvider';
-import ImageUploaderCard from '@/sections/default/test/file-uploads/ImageUploaderCard';
+import ImageUploaderCard from '@/sections/default/test/file-uploads/image-uploader-card';
 import SimpleCropper from '@/sections/default/test/file-uploads/simple-cropper';
 import { Card, CardContent, CardHeader, Grid } from '@mui/material';
 import DefaultPaperbasePage from '../DefaultPaperbasePage';

@@ -10,6 +10,7 @@ import './App.css';
 import config from './config';
 import Dashboard from './Dashboard';
 import LocalStorageDataSource from './libs/data-sources/data-sources/LocalStorageDataSource';
+import Recipe from './types/recipe';
 
 const firebaseProvider = new FirebaseAuthProvider({ login: '/login', logout: '/logout' });
 // const datasources = [
@@ -21,7 +22,7 @@ const dataSources: DataSource[] = [
   // { key: 'dummy2', dataSource: new FirebaseDataSourceNoRealtime(db, 'dummy') },
   {
     key: 'recipes',
-    dataSource: new FirestoreDataSource(
+    dataSource: new FirestoreDataSource<Recipe>(
       {
         target: 'recipes',
         targetMode: 'collection',

@@ -93,13 +93,13 @@ const DataProvider: React.FC<DataProviderProps> = ({ dataSources, children }) =>
     }
   };
 
-  const update = async (key: string, id: string, data: any) => {
+  const update = async (key: string, data: any, id: string) => {
     setLoading((prev) => ({ ...prev, [key]: true }));
     setError((prev) => ({ ...prev, [key]: null }));
     try {
       const dataSource = dataSourcesState.find((ds) => ds.key === key)?.dataSource;
       if (!dataSource) throw new Error(`Data source with key ${key} not found`);
-      const newData = await dataSource.update(id, data);
+      const newData = await dataSource.update(data, id);
       if (!subscriptions[key] && data[key]) {
         setData((prev) => ({
           ...prev,
@@ -115,13 +115,13 @@ const DataProvider: React.FC<DataProviderProps> = ({ dataSources, children }) =>
     }
   };
 
-  const set = async (key: string, id: string, data: any) => {
+  const set = async (key: string, data: any, id: string) => {
     setLoading((prev) => ({ ...prev, [key]: true }));
     setError((prev) => ({ ...prev, [key]: null }));
     try {
       const dataSource = dataSourcesState.find((ds) => ds.key === key)?.dataSource;
       if (!dataSource) throw new Error(`Data source with key ${key} not found`);
-      await dataSource.set(id, data);
+      await dataSource.set(data, id);
       if (!subscriptions[key] && data[key]) {
         setData((prev) => ({
           ...prev,

@@ -21,7 +21,12 @@ const useTabs = (tabsData: TabData[], options: any) => {
     }
   };
   const [tab, setTab] = useState(getValue());
-  const [query, setQuery] = ['', ''];
+  const [query, setQuery] = [
+    '',
+    (value: any) => {
+      console.log(value);
+    },
+  ];
 
   useEffect(() => {
     if (queryParamName) {
@@ -32,7 +37,7 @@ const useTabs = (tabsData: TabData[], options: any) => {
     }
   }, [queryParamName, query]);
 
-  const handleTabChange = useCallback((_e, newValue) => {
+  const handleTabChange = useCallback((_e: any, newValue: any) => {
     if (queryParamName && setQuery) {
       setQuery(newValue);
     } else {
