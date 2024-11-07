@@ -1,19 +1,19 @@
 import PropTypes from 'prop-types';
 import { useCallback, useEffect, useState } from 'react';
 
-import { useAuth } from '@/libs/auth';
 import useRouter from '@/hooks/use-router';
+import { useAuth } from '@/libs/auth';
 
 const AuthGuard = (props: any) => {
   const { children } = props;
   const router = useRouter();
-  const { isAuthenticated, issuer, paths } = useAuth();
+  const { isAuthenticated, issuer, options } = useAuth();
   const [checked, setChecked] = useState(false);
 
   const check = useCallback(() => {
-    if (paths.login && !isAuthenticated && window.location.pathname !== paths?.login) {
+    if (options.login && !isAuthenticated && window.location.pathname !== options?.login) {
       const searchParams = new URLSearchParams({ returnTo: window.location.pathname }).toString();
-      const href = paths.login + `?${searchParams}`;
+      const href = options.login + `?${searchParams}`;
       router.replace(href);
     } else {
       setChecked(true);

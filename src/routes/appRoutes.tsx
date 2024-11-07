@@ -5,6 +5,7 @@ import Account from '@/pages/default/Account';
 import Settings from '@/pages/default/Settings';
 import DataSources from '@/pages/default/test/data-sources';
 import FileUploads from '@/pages/default/test/file-uploads';
+import TestAuthProviders from '@/pages/default/test/test-auth-provider';
 
 const appRoutes: RouteObject[] = [
   {
@@ -34,6 +35,10 @@ const appRoutes: RouteObject[] = [
       {
         path: 'file-uploads',
         element: <FileUploads />,
+      },
+      {
+        path: 'auth-providers',
+        element: <TestAuthProviders />,
       },
     ],
   },

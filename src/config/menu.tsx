@@ -38,6 +38,11 @@ if (!menu.find((item) => item.id === 'Test pages') && (import.meta.env.DEV || de
         icon: <PeopleIcon />,
         href: '/app/test/file-uploads',
       },
+      {
+        id: 'Auth providers',
+        icon: <PeopleIcon />,
+        href: '/app/test/auth-providers',
+      },
     ],
   });
 

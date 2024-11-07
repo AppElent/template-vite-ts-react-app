@@ -27,6 +27,8 @@ const getNestedValue = (obj: any, path: string) => {
   return path.split('.').reduce((acc, key) => acc && acc[key], obj);
 };
 
+// TODO: if no fieldsConfig provider, infer from yup validationschema
+
 const useFormFields = ({
   fields: fieldsConfig,
   options: globalOptions,

@@ -1,6 +1,6 @@
-import PropTypes from 'prop-types';
-import { createContext, useEffect, useReducer, useContext } from 'react';
 import useRouter from '@/hooks/use-router';
+import PropTypes from 'prop-types';
+import { createContext, useContext, useEffect, useReducer } from 'react';
 
 export const initialState = {
   isAuthenticated: false,
@@ -79,7 +79,7 @@ export const AuthProvider = (props: any) => {
         signInWithEmailAndPassword: provider.signIn,
         signInWithGoogle: provider.signInWithGoogle,
         signOut: provider.signOut,
-        paths: provider.paths,
+        options: provider.options,
         provider,
       }}
     >

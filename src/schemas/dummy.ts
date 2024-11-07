@@ -37,5 +37,7 @@ export default interface DummyBackup {
   };
 }
 
+const dummyObject: Dummy = {};
+
 // Or the other way around:
 // let schema: Yup.ObjectSchema<Dummy> = dummyYupSchema;

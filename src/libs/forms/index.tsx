@@ -6,6 +6,7 @@ export interface FieldConfig {
   name: string;
   label?: string;
   type?: string;
+  definition?: string;
   initialValue?: any;
   render?: (config: FieldDefinitionConfig) => any;
   validation?: (value: any) => any; //Yup.AnySchema;

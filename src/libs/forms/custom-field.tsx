@@ -14,8 +14,8 @@ const CustomField = memo(
         helpers={helpers}
       />
     );
-    if (field.type && FieldDefinitions[field.type]) {
-      ReturnField = FieldDefinitions[field.type]({ formik, field, options, helpers });
+    if (field.definition && FieldDefinitions[field.definition]) {
+      ReturnField = FieldDefinitions[field.definition]({ formik, field, options, helpers });
     }
 
     return ReturnField;

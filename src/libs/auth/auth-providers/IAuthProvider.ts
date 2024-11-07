@@ -1,4 +1,16 @@
+// @ts-nocheck
+// TODO: Check ts errors
+
 class IAuthProvider {
+  constructor(options?, providerOptions?) {
+    this.options = options;
+    this.providerOptions = providerOptions;
+  }
+
+  getDemoUser(): { username: string; password: string } {
+    throw new Error('Method not implemented.');
+  }
+
   getSignInPath() {
     throw new Error('Method not implemented.');
   }

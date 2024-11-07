@@ -151,12 +151,11 @@ function RecipeDialog({
       {
         name: 'description',
         label: 'Description',
-        type: 'text',
       },
       {
         name: 'cuisine',
         label: 'Cuisine',
-        type: 'list',
+        definition: 'list',
         custom: {
           header: true,
         },
@@ -164,7 +163,7 @@ function RecipeDialog({
       {
         name: 'ingredients',
         label: 'Ingredients',
-        type: 'list',
+        definition: 'list',
         //initialValue: [recipe?.ingredients || ['']],
         custom: {
           header: true,
@@ -173,7 +172,7 @@ function RecipeDialog({
       {
         name: 'instructions',
         label: 'Instructions',
-        type: 'list',
+        definition: 'list',
         //initialValue: [recipe?.instructions || ['']],
         custom: {
           numbered: true,
@@ -183,37 +182,25 @@ function RecipeDialog({
       {
         name: 'cookingTime',
         label: 'Cooking Time',
-        type: 'text',
+        type: 'number',
       },
       {
         name: 'comments',
         label: 'Comments',
-        type: 'text',
       },
       {
         name: 'score',
         label: 'Score',
-        type: 'text',
-        custom: {
-          muiTextFieldProps: {
-            type: 'number',
-          },
-        },
+        type: 'number',
       },
       {
         name: 'url',
         label: 'URL',
-        type: 'text',
       },
       {
         name: 'nutrition',
         label: 'Nutrition info',
-        type: 'text',
-        custom: {
-          muiTextFieldProps: {
-            type: 'number',
-          },
-        },
+        type: 'number',
       },
       {
         name: 'category',
@@ -231,11 +218,6 @@ function RecipeDialog({
               helpers={helpers}
             />
           );
-        },
-        custom: {
-          muiTextFieldProps: {
-            type: 'number',
-          },
         },
       },
       {

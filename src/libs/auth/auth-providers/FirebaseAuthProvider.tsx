@@ -1,4 +1,6 @@
-import IAuthProvider from './IAuthProvider';
+// @ts-nocheck
+// TODO: Check ts errors
+
 import {
   createUserWithEmailAndPassword,
   getAuth,
@@ -8,22 +10,26 @@ import {
   signInWithPopup,
   signOut,
 } from 'firebase/auth';
+import IAuthProvider from './IAuthProvider';
 
 class FirebaseAuthProvider extends IAuthProvider {
-  constructor(paths, providerOptions) {
-    super();
-    this.paths = paths;
-    this.providerOptions = providerOptions;
+  constructor(options?, providerOptions?) {
+    super(options, providerOptions);
+
     this.provider = 'FIREBASE';
     this.auth = getAuth();
   }
 
+  getDemoUser(): { username: string; password: string } {
+    return { username: 'demo@demo.com', password: 'demo123' };
+  }
+
   getSignInPath() {
-    return this.paths.login;
+    return this.options.login;
   }
 
   getSignOutPath() {
-    return this.paths.logout;
+    return this.options.logout;
   }
 
   async signUp(email, password) {

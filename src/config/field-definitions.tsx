@@ -13,6 +13,9 @@ import {
   Typography,
 } from '@mui/material';
 
+// TODO: add fielddefinition for autocompelte chip tag thingy
+// TODO: add fielddefinition for datepicker
+
 const FieldDefinitions: RenderFieldDefinitions = {
   list: ({ field, formik, options, helpers }: FieldDefinitionConfig): any => {
     const hasItems = helpers.value?.length > 0;
