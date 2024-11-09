@@ -4,6 +4,7 @@ import JsonViewer from '@andypf/json-viewer/dist/esm/react/JsonViewer';
 import ImageUploader from '@/components/default/image-uploader';
 import LoadingButton from '@/components/default/loading-button';
 import useFetch from '@/hooks/use-fetch';
+import { useAuth } from '@/libs/auth';
 import { FieldConfig, FieldDefinitionConfig, useFormFields } from '@/libs/forms';
 import { DefaultTextField } from '@/libs/forms/default-fields';
 import FirebaseStorageProvider from '@/libs/storage-providers/providers/FirebaseStorageProvider';
@@ -94,6 +95,7 @@ function RecipeDialog({
   setRecipeId: (id: string) => void;
   recipes: Recipe[];
 }) {
+  const auth = useAuth();
   // Theme and media query
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
@@ -119,7 +121,7 @@ function RecipeDialog({
   }, [recipeId]);
 
   // Image section
-  const [, setImage] = useState(recipe?.image || null);
+  //const [, setImage] = useState(recipe?.image || null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [uploadFileName] = useState<string | null>(createGuid());
 
@@ -235,7 +237,7 @@ function RecipeDialog({
         //initialValue: [recipe?.nutrients?.calories || ['']],
       },
     ],
-    [recipe]
+    []
   );
 
   const { formFields, formik } = useFormFields({
@@ -246,41 +248,39 @@ function RecipeDialog({
         fullWidth: true,
         variant: 'outlined',
       },
+      preSave: (values: any) => {
+        const cleanedValues = { ...values };
+        Object.keys(cleanedValues).forEach((key) => {
+          if (Array.isArray(cleanedValues[key])) {
+            cleanedValues[key] = values[key].filter((item) => item.trim() !== '');
+          }
+        });
+        //cleanedValues.owner = auth.user?.id || 'unknown';
+        if (!recipe?.id) {
+          cleanedValues.createdAt = new Date().toISOString();
+        }
+        cleanedValues.updatedAt = new Date().toISOString();
+        return cleanedValues;
+      },
     },
     formikProps: {
-      //initialValues: defaultValues,
+      initialValues: {
+        owner: auth.user.id,
+        ...recipe,
+      },
       validationSchema: recipeYupSchema,
+      enableReinitialize: true,
       onSubmit: async (values: Recipe) => {
-        try {
-          console.log(values);
-          const cleanedValues = { ...values };
-          Object.keys(cleanedValues).forEach((key) => {
-            console.log(key, typeof cleanedValues[key]);
-            if (Array.isArray(cleanedValues[key])) {
-              cleanedValues[key] = values[key].filter((item) => item.trim() !== '');
-            }
-            if (cleanedValues[key] === undefined) {
-              delete cleanedValues[key];
-            }
-          });
-          console.log(cleanedValues);
-          if (!recipe?.id) {
-            cleanedValues.createdAt = new Date().toISOString();
-          }
-          cleanedValues.updatedAt = new Date().toISOString();
-          const savedRecipe = await setRecipe(cleanedValues, recipe?.id);
-          if (recipeId === 'new') {
-            setRecipeId(savedRecipe.id);
-          }
-          setIsEditing(false);
-          //formik.resetForm();
-          //onClose();
-        } catch (e) {
-          console.error(e);
+        const savedRecipe = await setRecipe(values, recipe?.id);
+        if (recipeId === 'new') {
+          setRecipeId(savedRecipe.id);
         }
+        setIsEditing(false);
       },
     },
   });
+
+  console.log(formik);
 
   // Fetch recipe data from api
   const {
@@ -304,18 +304,28 @@ function RecipeDialog({
     }
   }, [externalRecipeData]);
 
-  useEffect(() => {
-    if (recipe) {
-      formik.setValues({
-        //...defaultValues,
-        ...recipe,
-      });
-      setImage(recipe.image || null);
-    } else {
-      formik.resetForm();
-      setImage(null);
-    }
-  }, [recipe]);
+  // useEffect(() => {
+  //   console.log('DEFAULT VALUES', recipeDefaultValues, recipe);
+
+  //   if (recipe) {
+  //     // formik.setValues({
+  //     //   //...defaultValues,
+  //     //   ...recipe,
+  //     // });
+  //     setImage(recipe.image || null);
+  //   } else {
+  //     //formik.resetForm();
+  //     setImage(null);
+  //   }
+  // }, [recipe]);
+
+  // useEffect(() => {
+  //   console.log('USER', auth.user);
+  //   if (auth?.user?.id && formik.values.owner !== auth.user.id) {
+  //     const user = auth.user?.id;
+  //     formik.setFieldValue('owner', user);
+  //   }
+  // }, [auth.user]);
 
   // Conditions for disabling submit button
   const disableSubmit =
@@ -335,19 +345,22 @@ function RecipeDialog({
         >
           <div>
             {isEditing ? (recipe ? 'Edit Recipe' : 'Add Recipe') : 'View Recipe'}
-            {!(recipeId === 'new' && !isEditing) && (
+            {!isEditing && (
               <IconButton
-                onClick={() => {
-                  if (isEditing) {
-                    formik.handleSubmit();
-                  } else {
-                    toggleEditMode();
-                  }
-                }}
-                disabled={disableSubmit} // Disable edit button if adding new recipe
+                onClick={toggleEditMode}
+                //disabled={disableSubmit} // Disable edit button if adding new recipe
                 style={{ marginLeft: '8px' }}
               >
-                {isEditing ? <SaveIcon /> : <EditIcon />}
+                {<EditIcon />}
+              </IconButton>
+            )}
+            {isEditing && (
+              <IconButton
+                onClick={formik.handleSubmit}
+                disabled={disableSubmit}
+                style={{ marginLeft: '8px' }}
+              >
+                {<SaveIcon />}
               </IconButton>
             )}
           </div>

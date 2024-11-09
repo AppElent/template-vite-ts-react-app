@@ -20,6 +20,9 @@ import BaseDataSource from './BaseDataSource';
 
 interface FirestoreDataSourceProviderConfig {
   db: any;
+  clearUndefinedValues?: boolean;
+  createdAt: boolean;
+  updatedAt: boolean;
 }
 
 export class FirestoreDataSource<T> extends BaseDataSource<T> {
@@ -32,44 +35,97 @@ export class FirestoreDataSource<T> extends BaseDataSource<T> {
     this.provider = 'Firestore';
     this.firestore = providerConfig.db;
     if (this.options.targetMode === 'collection') {
-      this.ref = collection(this.firestore, this.targetName);
+      this.ref = collection(this.firestore, this.options.target);
     } else if (this.options.targetMode === 'document') {
-      this.ref = doc(this.firestore, this.targetName);
+      this.ref = doc(this.firestore, this.options.target);
     }
   }
 
-  tryCatch = async (fn: () => any) => {
-    try {
-      return await fn();
-    } catch (error) {
-      console.error('Error:', error);
-      throw error;
+  // #tryCatch = async (fn: () => any) => {
+  //   try {
+  //     return await fn();
+  //   } catch (error) {
+  //     console.error('Error:', error);
+  //     throw error;
+  //   }
+  // };
+
+  // Get document reference
+  #getRef = (id?: string) => {
+    //TODO: implement this
+    if (!id && this.options.targetMode === 'collection') {
+      throw new Error('get() requires an ID when using collections');
     }
+    const docRef = this.options?.targetMode !== 'collection' ? this.ref : doc(this.ref, id);
+    return docRef;
   };
 
+  public testNewMethod = () => {
+    return true;
+  };
+
+  #clearUndefinedValues = (values: T | Partial<T>): T => {
+    if (
+      typeof values !== 'object' ||
+      values === null ||
+      !this.providerConfig.clearUndefinedValues
+    ) {
+      return values as T;
+    }
+
+    const result = Object.keys(values as object)
+      .filter((k) => k !== undefined && values[k as keyof T] !== undefined)
+      .reduce((acc: Partial<T>, key: string) => {
+        const value = values[key as keyof T];
+        if (Array.isArray(value)) {
+          acc[key as keyof T] = value.filter((item: any) => item !== undefined) as any;
+        } else if (typeof value === 'object' && value !== null) {
+          acc[key as keyof T] = this.#clearUndefinedValues(value as T) as any;
+        } else {
+          acc[key as keyof T] = value as T[keyof T];
+        }
+        return acc;
+      }, {} as Partial<T>);
+
+    return result as T;
+  };
+
+  // Add created at and updated at dates // TODO: implement
+  // #addDates = (data: T | Partial<T>) => {
+  //   const now = new Date();
+  //   if (this.providerConfig.createdAt) {
+  //     data.createdAt = now;
+  //   }
+  //   if (this.providerConfig.updatedAt) {
+  //     data.updatedAt = now;
+  //   }
+  //   return data;
+  // };
+
   // Get a single document by ID
-  async get(id?: string): Promise<T | null> {
+  get = async (id?: string): Promise<T | null> => {
     try {
       if (!id && this.options.targetMode !== 'document') {
         throw new Error('get() requires an ID when using collections');
       }
-      const docRef = this.options?.targetMode === 'document' ? this.ref : doc(this.ref, id);
+      const docRef = this.#getRef(id);
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         const data = docSnap.data();
         return { id: docSnap.id, ...(data ? data : {}) } as T;
       } else {
-        return null;
+        return this._getDefaultValue();
       }
     } catch (error) {
       console.error('Error getting document:', error);
       throw error;
     }
-  }
+  };
 
   // Get all documents in the collection, with optional filters
-  async getAll(filter: { [key: string]: any } = {}): Promise<T[]> {
+  getAll = async (filter: { [key: string]: any } = {}): Promise<T[]> => {
     try {
+      console.log(this.options);
       if (this.options.targetMode !== 'collection')
         throw new Error('getAll() can only be used with collections');
       let q = this.ref;
@@ -87,14 +143,15 @@ export class FirestoreDataSource<T> extends BaseDataSource<T> {
       console.error('Error getting documents:', error);
       throw error;
     }
-  }
+  };
 
   // Add a new document to the collection
-  async add(item: T): Promise<T> {
+  add = async (item: T): Promise<T> => {
     try {
       if (this.options.targetMode !== 'collection')
         throw new Error('add() can only be used with collections');
       // Validate new data
+      item = this.#clearUndefinedValues(item);
       this.validate(item, { full: false });
       const docRef = await addDoc(this.ref, item);
       const newDoc = await getDoc(docRef);
@@ -103,55 +160,57 @@ export class FirestoreDataSource<T> extends BaseDataSource<T> {
       console.error('Error adding document:', error);
       throw error;
     }
-  }
+  };
 
   // Update an existing document by ID
-  async update(data: Partial<T>, id?: string): Promise<void> {
+  update = async (data: Partial<T>, id?: string): Promise<void> => {
     try {
       if (!id && this.options.targetMode !== 'document') {
         throw new Error('update() requires an ID when using collections');
       }
-      const docRef = this.options?.targetMode === 'document' ? this.ref : doc(this.ref, id);
+      const docRef = this.#getRef(id);
+      data = this.#clearUndefinedValues(data);
       this.validate(data);
       await updateDoc(docRef, data as UpdateData<Partial<T>>);
     } catch (error) {
       console.error('Error updating document:', error);
       throw error;
     }
-  }
+  };
 
   // Update an existing document by ID
-  async set(data: T, id?: string): Promise<void> {
+  set = async (data: T, id?: string): Promise<void> => {
     try {
       // Validate updated data
       if (!id && this.options.targetMode !== 'document') {
         throw new Error('set() requires an ID when using collections');
       }
+      data = this.#clearUndefinedValues(data);
       this.validate(data);
-      const docRef = this.options?.targetMode === 'document' ? this.ref : doc(this.ref, id);
+      const docRef = this.#getRef(id);
       await setDoc(docRef, data);
     } catch (error) {
       console.error('Error setting document:', error);
       throw error;
     }
-  }
+  };
 
   // Delete a document by ID
-  async delete(id?: string): Promise<void> {
+  delete = async (id?: string): Promise<void> => {
     try {
       if (!id && this.options.targetMode !== 'document') {
         throw new Error('get() requires an ID when using collections');
       }
-      const docRef = this.options?.targetMode === 'document' ? this.ref : doc(this.ref, id);
+      const docRef = this.#getRef(id);
       await deleteDoc(docRef);
     } catch (error) {
       console.error('Error deleting document:', error);
       throw error;
     }
-  }
+  };
 
   // Subscribe to real-time updates for the collection
-  subscribe(callback: (data: any) => any) {
+  subscribe = (callback: (data: any) => any) => {
     const unsubscribe =
       this.options?.targetMode === 'document'
         ? onSnapshot(this.ref, (snapshot: DocumentSnapshot) => {
@@ -172,7 +231,7 @@ export class FirestoreDataSource<T> extends BaseDataSource<T> {
 
     // Return a function to unsubscribe from real-time updates
     return () => unsubscribe();
-  }
+  };
 }
 
 export default FirestoreDataSource;

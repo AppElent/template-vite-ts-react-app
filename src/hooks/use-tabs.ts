@@ -5,7 +5,7 @@ interface TabData {
   value: string;
 }
 
-const useTabs = (tabsData: TabData[], options: any) => {
+const useTabs = (tabsData: TabData[], options?: any) => {
   const { initialData, queryParamName } = options || {};
   const getValue = () => {
     if (queryParamName) {

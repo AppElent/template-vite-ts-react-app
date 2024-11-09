@@ -27,7 +27,7 @@ const getNestedValue = (obj: any, path: string) => {
   return path.split('.').reduce((acc, key) => acc && acc[key], obj);
 };
 
-// TODO: if no fieldsConfig provider, infer from yup validationschema
+// TODO: if no fieldsConfig provided, infer from yup validationschema
 
 const useFormFields = ({
   fields: fieldsConfig,
@@ -56,10 +56,27 @@ const useFormFields = ({
   const formik = useFormik({
     initialValues,
     //validationSchema,
-    onSubmit: (values) => {
-      console.log('Form Submitted:', values);
-    },
     ...formikProps,
+    onSubmit: (values) => {
+      try {
+        console.log('Form Submitted:', values);
+        const { onSubmit } = formikProps;
+
+        // Run presave function
+        if (globalOptions?.preSave) {
+          values = globalOptions.preSave(values);
+        }
+
+        // Submit
+        onSubmit(values);
+      } catch (e) {
+        console.error(e);
+        return e;
+      } finally {
+        formik.setSubmitting(false);
+        formik.resetForm();
+      }
+    },
   });
 
   const formFields = useMemo(

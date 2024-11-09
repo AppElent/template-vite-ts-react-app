@@ -29,7 +29,7 @@ export class LocalStorageDataSource extends BaseDataSource {
   // Helper function to get data from storage
   private getData(): T {
     const data = this.storage.getItem(this.storageKey);
-    return data ? JSON.parse(data) : this._getInitialValue();
+    return data ? JSON.parse(data) : this._getDefaultValue();
   }
 
   // Helper function to save data to storage and notify subscribers

@@ -1,11 +1,11 @@
 import React, { createContext, ReactNode, useCallback, useEffect, useState } from 'react';
-import { DataContextType, DataSource } from '.';
+import { DataSource, DataSourceObject } from '.';
 
 // Create a context for the data
-export const DataContext = createContext<DataContextType | undefined>(undefined);
+export const DataContext = createContext<any>(undefined);
 
 interface DataProviderProps {
-  dataSources: DataSource[];
+  dataSources: DataSourceObject;
   children: ReactNode;
 }
 
@@ -14,32 +14,39 @@ const DataProvider: React.FC<DataProviderProps> = ({ dataSources, children }) =>
   const [loading, setLoading] = useState<Record<string, boolean>>({});
   const [error, setError] = useState<Record<string, any>>({});
   const [subscriptions, setSubscriptions] = useState<Record<string, () => void>>({});
-  const [dataSourcesState, setDataSourcesState] = useState<DataSource[]>(dataSources);
+  const [dataSourcesState, setDataSourcesState] = useState(dataSources);
 
   const addDataSource = useCallback(
-    (newDataSource: DataSource) => {
-      setDataSourcesState((prev) => [...prev, newDataSource]);
+    (key: string, newDataSource: DataSource<any>) => {
+      setDataSourcesState((prev) => ({ ...prev, [key]: newDataSource }));
     },
     [setDataSourcesState]
   );
 
-  const setDataSource = useCallback((key: string, dataSource: DataSource['dataSource']) => {
-    setDataSourcesState((prev) => prev.map((ds) => (ds.key === key ? { ...ds, dataSource } : ds)));
+  const setDataSource = useCallback((key: string, dataSource: DataSource<any>) => {
+    setDataSourcesState((prev) => ({ ...prev, [key]: { ...prev[key], dataSource } }));
   }, []);
 
-  const fetchData = useCallback(
-    async (key: string, filter: object = {}) => {
-      if (subscriptions[key]) return; // Skip if there is an active subscription
+  const getDataSource = useCallback(
+    (key: string) => {
+      const dataSource = dataSourcesState[key];
+      if (!dataSource) throw new Error(`Data source with key ${key} not found`);
+      return dataSource;
+    },
+    [dataSourcesState]
+  );
 
+  const fetchData = useCallback(
+    async (key: string, filter?: object) => {
+      if (subscriptions[key]) return; // Skip if there is an active subscription
       setLoading((prev) => ({ ...prev, [key]: true }));
       setError((prev) => ({ ...prev, [key]: null }));
       try {
-        const dataSource = dataSourcesState.find((ds) => ds.key === key)?.dataSource;
-        if (!dataSource) throw new Error(`Data source with key ${key} not found`);
+        const dataSource = getDataSource(key);
         const result =
-          dataSource.options?.targetMode === 'document'
-            ? await dataSource.get()
-            : await dataSource.getAll(filter);
+          dataSource.options?.targetMode === 'collection'
+            ? await dataSource.getAll(filter)
+            : await dataSource.get();
         setData((prev) => ({ ...prev, [key]: result }));
       } catch (err) {
         setError((prev) => ({ ...prev, [key]: err }));
@@ -47,22 +54,18 @@ const DataProvider: React.FC<DataProviderProps> = ({ dataSources, children }) =>
         setLoading((prev) => ({ ...prev, [key]: false }));
       }
     },
-    [dataSourcesState, subscriptions]
+    [getDataSource, subscriptions]
   );
 
   const subscribeToData = useCallback(
     (key: string) => {
-      // Unsubscribe from the previous subscription if it exists
       if (subscriptions[key]) {
         subscriptions[key]();
       }
 
-      setLoading((prev) => ({ ...prev, [key]: true }));
-      setError((prev) => ({ ...prev, [key]: null }));
       try {
-        const dataSource = dataSourcesState.find((ds) => ds.key === key)?.dataSource;
-        if (!dataSource) throw new Error(`Data source with key ${key} not found`);
-        const unsubscribe = dataSource.subscribe((newData) => {
+        const dataSource = getDataSource(key);
+        const unsubscribe = dataSource.subscribe((newData: any) => {
           setData((prev) => ({ ...prev, [key]: newData }));
           setLoading((prev) => ({ ...prev, [key]: false }));
         });
@@ -72,33 +75,24 @@ const DataProvider: React.FC<DataProviderProps> = ({ dataSources, children }) =>
         setLoading((prev) => ({ ...prev, [key]: false }));
       }
     },
-    [dataSourcesState, subscriptions]
+    [getDataSource, subscriptions]
   );
 
-  const add = async (key: string, item: any) => {
-    setLoading((prev) => ({ ...prev, [key]: true }));
-    setError((prev) => ({ ...prev, [key]: null }));
-    try {
-      const dataSource = dataSourcesState.find((ds) => ds.key === key)?.dataSource;
-      if (!dataSource) throw new Error(`Data source with key ${key} not found`);
+  const add = useCallback(
+    async (key: string, item: any) => {
+      const dataSource = getDataSource(key);
       const newItem = await dataSource.add(item);
       if (!subscriptions[key] && data[key]) {
         setData((prev) => ({ ...prev, [key]: [...prev[key], newItem] }));
       }
       return newItem;
-    } catch (err) {
-      setError((prev) => ({ ...prev, [key]: err }));
-    } finally {
-      setLoading((prev) => ({ ...prev, [key]: false }));
-    }
-  };
+    },
+    [getDataSource, subscriptions, data]
+  );
 
-  const update = async (key: string, data: any, id: string) => {
-    setLoading((prev) => ({ ...prev, [key]: true }));
-    setError((prev) => ({ ...prev, [key]: null }));
-    try {
-      const dataSource = dataSourcesState.find((ds) => ds.key === key)?.dataSource;
-      if (!dataSource) throw new Error(`Data source with key ${key} not found`);
+  const update = useCallback(
+    async (key: string, data: any, id: string) => {
+      const dataSource = getDataSource(key);
       const newData = await dataSource.update(data, id);
       if (!subscriptions[key] && data[key]) {
         setData((prev) => ({
@@ -108,19 +102,13 @@ const DataProvider: React.FC<DataProviderProps> = ({ dataSources, children }) =>
           ),
         }));
       }
-    } catch (err) {
-      setError((prev) => ({ ...prev, [key]: err }));
-    } finally {
-      setLoading((prev) => ({ ...prev, [key]: false }));
-    }
-  };
+    },
+    [getDataSource, subscriptions]
+  );
 
-  const set = async (key: string, data: any, id: string) => {
-    setLoading((prev) => ({ ...prev, [key]: true }));
-    setError((prev) => ({ ...prev, [key]: null }));
-    try {
-      const dataSource = dataSourcesState.find((ds) => ds.key === key)?.dataSource;
-      if (!dataSource) throw new Error(`Data source with key ${key} not found`);
+  const set = useCallback(
+    async (key: string, data: any, id: string) => {
+      const dataSource = getDataSource(key);
       await dataSource.set(data, id);
       if (!subscriptions[key] && data[key]) {
         setData((prev) => ({
@@ -128,19 +116,13 @@ const DataProvider: React.FC<DataProviderProps> = ({ dataSources, children }) =>
           [key]: prev[key].map((item: any) => (item.id === id ? { ...item, ...data } : item)),
         }));
       }
-    } catch (err) {
-      setError((prev) => ({ ...prev, [key]: err }));
-    } finally {
-      setLoading((prev) => ({ ...prev, [key]: false }));
-    }
-  };
+    },
+    [getDataSource, subscriptions]
+  );
 
-  const remove = async (key: string, id: string) => {
-    setLoading((prev) => ({ ...prev, [key]: true }));
-    setError((prev) => ({ ...prev, [key]: null }));
-    try {
-      const dataSource = dataSources.find((ds) => ds.key === key)?.dataSource;
-      if (!dataSource) throw new Error(`Data source with key ${key} not found`);
+  const remove = useCallback(
+    async (key: string, id: string) => {
+      const dataSource = getDataSource(key);
       await dataSource.delete(id);
       if (!subscriptions[key] && data[key]) {
         setData((prev) => ({
@@ -148,12 +130,9 @@ const DataProvider: React.FC<DataProviderProps> = ({ dataSources, children }) =>
           [key]: prev[key].filter((item: any) => item.id !== id),
         }));
       }
-    } catch (err) {
-      setError((prev) => ({ ...prev, [key]: err }));
-    } finally {
-      setLoading((prev) => ({ ...prev, [key]: false }));
-    }
-  };
+    },
+    [getDataSource, subscriptions, data]
+  );
 
   useEffect(() => {
     return () => {

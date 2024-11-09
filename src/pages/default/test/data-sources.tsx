@@ -1,11 +1,10 @@
+import JsonEditor from '@/components/default/json-editor';
 import { db } from '@/config/firebase';
 import useTabs from '@/hooks/use-tabs';
 import FirestoreDataSource from '@/libs/data-sources/data-sources/FirestoreDataSource';
 import LocalStorageDataSource from '@/libs/data-sources/data-sources/LocalStorageDataSource';
-import { dummyYupSchema } from '@/schemas/dummy';
-import JsonViewer from '@andypf/json-viewer/dist/esm/react/JsonViewer';
+import { Dummy, dummyYupSchema } from '@/schemas/dummy';
 import { Button, Card, CardActions, CardContent, CardHeader, Grid } from '@mui/material';
-import { JsonEditor } from 'json-edit-react';
 import useData from '../../../libs/data-sources/useData';
 import DefaultPaperbasePage from '../DefaultPaperbasePage';
 
@@ -37,7 +36,7 @@ const datasources = {
     ),
     'Document - Realtime': new FirestoreDataSource(
       {
-        target: 'dummy/test',
+        target: 'dummy/01iQznR3TyhzhI5ct5cQ',
         targetMode: 'document',
         subscribe: true,
         YupValidationSchema: dummyYupSchema,
@@ -45,7 +44,11 @@ const datasources = {
       { db }
     ),
     'Document - Normal': new FirestoreDataSource(
-      { target: 'dummy/test', targetMode: 'document', YupValidationSchema: dummyYupSchema },
+      {
+        target: 'dummy/01iQznR3TyhzhI5ct5cQ',
+        targetMode: 'document',
+        YupValidationSchema: dummyYupSchema,
+      },
       { db }
     ),
   },
@@ -59,17 +62,24 @@ const datasources = {
   },
 };
 
-const DataSource = (props) => {
+const DataSource = (props: any) => {
   const { datasourceName, dataSource: newDataSource } = props;
-  const datasource = useData(datasourceName, {}, newDataSource);
-  console.log(datasource);
+  const datasource = useData<Dummy>(datasourceName, {}, newDataSource);
   const handleAdd = async () => {
     const newItem = dummyObject;
     await datasource.add(newItem);
   };
 
+  console.log(datasourceName, datasource);
+
   const handleGetAll = async () => {
-    const items = await datasource.getAll();
+    const items = await datasource?.getAll();
+    console.log(items);
+  };
+
+  const handleGet = async () => {
+    const item = await datasource?.get();
+    console.log(item);
   };
 
   return (
@@ -86,17 +96,7 @@ const DataSource = (props) => {
           Data:
           {datasource.data && (
             <>
-              <JsonViewer
-                data={JSON.stringify(datasource.data)}
-                expanded={false}
-              />
-              <JsonEditor
-                data={datasource.data}
-                setData={(alldata) => console.log(alldata)} // optional
-                theme={['githubLight']}
-                restrictDrag={false}
-                restrictDelete={false}
-              />
+              <JsonEditor data={datasource.data} />
             </>
           )}
         </CardContent>
@@ -118,6 +118,11 @@ const DataSource = (props) => {
               <Button onClick={handleGetAll}>Get All Items</Button>
             </>
           )}
+          {datasource.dataSource?.options?.targetMode !== 'collection' && (
+            <>
+              <Button onClick={handleGet}>Get item</Button>
+            </>
+          )}
         </CardActions>
       </div>
     </Card>
@@ -129,7 +134,8 @@ const DataOperations = () => {
     return { label: key, value: key };
   });
   const tabs = useTabs(tabsData);
-  const dataSources = datasources[tabs.tab];
+  const dataSources: { [key: string]: FirestoreDataSource<any> | LocalStorageDataSource } =
+    datasources[tabs.tab as keyof typeof datasources];
 
   return (
     <DefaultPaperbasePage
@@ -151,7 +157,7 @@ const DataOperations = () => {
               >
                 <DataSource
                   datasourceName={tabs.tab + ' - ' + datasourceName}
-                  dataSource={datasources[tabs.tab][datasourceName]}
+                  dataSource={dataSources[datasourceName]}
                 />
               </Grid>
             );

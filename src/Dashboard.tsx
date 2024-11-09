@@ -9,18 +9,17 @@ import { AuthConsumer, AuthProvider } from '@/libs/auth';
 import defaultRoutes from '@/routes/defaultRoutes';
 import { Theme, ThemeProvider } from '@mui/material';
 import { ConfirmProvider } from 'material-ui-confirm';
-import PropTypes from 'prop-types';
 import { FC, useEffect } from 'react';
 import { useRoutes } from 'react-router-dom';
 import { QueryParamProvider } from 'use-query-params';
 import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
-import { DataProvider, DataSource } from './libs/data-sources';
+import { DataProvider, DataSourceObject } from './libs/data-sources';
 
 interface DashboardProps {
   theme: Theme;
   routes?: any[];
   authProvider?: any;
-  dataSources?: DataSource[];
+  dataSources?: DataSourceObject;
 }
 
 const Dashboard: FC<DashboardProps> = ({ theme, routes, authProvider, dataSources }) => {
@@ -59,7 +58,7 @@ const Dashboard: FC<DashboardProps> = ({ theme, routes, authProvider, dataSource
 
               return (
                 <>
-                  <DataProvider dataSources={dataSources || []}>
+                  <DataProvider dataSources={dataSources || {}}>
                     <QueryParamProvider adapter={ReactRouter6Adapter}>
                       <ConfirmProvider>
                         <Seo />
@@ -80,13 +79,6 @@ const Dashboard: FC<DashboardProps> = ({ theme, routes, authProvider, dataSource
       </ThemeProvider>
     </>
   );
-};
-
-Dashboard.propTypes = {
-  theme: PropTypes.any.isRequired,
-  routes: PropTypes.array,
-  dataSources: PropTypes.array,
-  authProvider: PropTypes.any,
 };
 
 export default Dashboard;

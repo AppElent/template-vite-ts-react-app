@@ -1,18 +1,14 @@
 import { useContext, useEffect, useMemo } from 'react';
-import { DataSourceSource } from '.';
+import { DataSource } from '.';
 import { DataContext } from './DataProvider';
 
-const useData = (key: string, options = {}, newDataSource?: DataSourceSource) => {
-  if (key === 'false') console.log(options);
+const useData = <T,>(key: string, _options = {}, newDataSource?: DataSource<T>) => {
   const context = useContext(DataContext);
   if (!context) {
     throw new Error('useData must be used within a DataProvider');
   }
 
-  const dataSource = useMemo(
-    () => context.dataSources.find((ds) => ds.key === key)?.dataSource,
-    [key, context]
-  );
+  const dataSource = useMemo(() => context.dataSources[key], [key, context]);
 
   const {
     subscribeToData,
@@ -25,7 +21,7 @@ const useData = (key: string, options = {}, newDataSource?: DataSourceSource) =>
     set,
     remove,
     addDataSource,
-    setDataSource,
+    fetchData,
   } = context;
 
   useEffect(() => {
@@ -40,27 +36,101 @@ const useData = (key: string, options = {}, newDataSource?: DataSourceSource) =>
   }, [key, dataSource, subscribeToData, subscriptions, context.dataSources]);
 
   useEffect(() => {
-    if (newDataSource && !context.dataSources.find((ds) => ds.key === key)) {
-      addDataSource({ key, dataSource: newDataSource });
+    if (newDataSource && !context.dataSources[key]) {
+      addDataSource(key, newDataSource);
     }
   }, [newDataSource, key, addDataSource, context.dataSources]);
 
-  return {
-    data: data[key],
-    loading: loading[key],
-    error: error[key],
-    fetchData: (filter: any) => context.fetchData(key, filter),
-    get: (id?: string) => dataSource?.get(id),
-    getAll: (filter: any) => dataSource?.getAll(filter),
-    add: (item: any) => add(key, item),
-    update: (data: any, id: string) => update(key, data, id),
-    set: (data: any, id: string) => set(key, data, id),
-    delete: (id: string) => remove(key, id),
-    dataSource,
-    addDataSource,
-    setDataSource,
-    dataSources: context.dataSources,
-  };
+  const { get, getAll } = dataSource || {};
+
+  function getClassMethods(obj: { [key: string]: any }): Record<string, () => any> {
+    const allMethods: Record<string, () => any> = {};
+    const parentMethods: Set<string> = new Set();
+
+    let currentProto = Object.getPrototypeOf(obj);
+
+    // Collect all methods from the prototype chain (base/parent classes)
+    while (currentProto && currentProto !== Object.prototype) {
+      Object.getOwnPropertyNames(currentProto)
+        .filter(
+          (method) =>
+            method !== 'constructor' &&
+            typeof obj[method] === 'function' &&
+            !method.startsWith('#') &&
+            !method.startsWith('_') &&
+            method !== 'validate'
+        )
+        .forEach((method) => {
+          parentMethods.add(method);
+        });
+      currentProto = Object.getPrototypeOf(currentProto);
+    }
+
+    // Include methods from the object itself (child class) that are not in the parentMethods set
+    Object.getOwnPropertyNames(obj)
+      .filter(
+        (method) =>
+          method !== 'constructor' &&
+          typeof obj[method] === 'function' &&
+          !method.startsWith('#') &&
+          !method.startsWith('_') &&
+          method !== 'validate' &&
+          method !== 'subscribe' &&
+          !parentMethods.has(method)
+      )
+      .forEach((method) => {
+        if (!allMethods[method]) {
+          allMethods[method] = obj[method].bind(obj);
+        }
+      });
+
+    return allMethods;
+  }
+
+  const methods = useMemo(() => {
+    if (!dataSource) return;
+    return getClassMethods(dataSource);
+  }, [dataSource]);
+
+  const returnObject: DataSource<T> = useMemo(
+    () => ({
+      // Custom methods
+      custom: { ...methods },
+      // Data state
+      data: data[key],
+      loading: loading[key] || false,
+      error: error[key],
+      // Public methods
+      fetchData: (filter?: any) => fetchData(key, filter),
+      get: get || (() => {}),
+      getAll: getAll || (() => {}),
+      add: (item: T) => add(key, item),
+      update: (data, id) => update(key, data, id),
+      set: (data, id) => set(key, data, id),
+      delete: (id) => remove(key, id),
+      validate: dataSource?.validate,
+      // Raw datasource info
+      dataSource,
+      provider: dataSource?.provider,
+    }),
+    [
+      add,
+      fetchData,
+      data,
+      dataSource,
+      error,
+      get,
+      getAll,
+      key,
+      loading,
+      methods,
+      remove,
+      set,
+      update,
+    ]
+  );
+
+  return returnObject;
 };
 
 export default useData;

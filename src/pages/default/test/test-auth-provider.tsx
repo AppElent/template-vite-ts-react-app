@@ -2,7 +2,7 @@ import { FirebaseAuthProvider, useLoginForm } from '@/libs/auth';
 import { Button, Card, CardActions, CardContent, CardHeader, Grid, TextField } from '@mui/material';
 import DefaultPaperbasePage from '../DefaultPaperbasePage';
 
-const authProviders = {
+const authProviders: { [key: string]: any } = {
   Firebase: new FirebaseAuthProvider(),
   // /Composite: new CompositeAuthProvider(),
 };

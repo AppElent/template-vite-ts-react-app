@@ -19,10 +19,18 @@ export interface FieldOptions {
   [key: string]: any;
 }
 
+export interface GlobalFieldOptions extends FieldOptions {
+  owner?: string; // TODO: implement
+  preSave?: (value: any) => any; // TODO: implement
+}
+
 export interface UseFormFieldsProps {
   fields: FieldConfig[];
-  options?: FieldOptions;
-  formikProps?: any;
+  options?: GlobalFieldOptions;
+  formikProps: {
+    onSubmit: (values: any, formikBag?: any) => any;
+    [key: string]: any;
+  };
 }
 
 export interface UseFormFieldsReturn {

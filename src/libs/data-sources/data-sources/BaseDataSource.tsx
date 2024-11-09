@@ -5,37 +5,39 @@ interface validateOptions {
 }
 
 class BaseDataSource<T> {
-  defaultOptions = {
-    targetMode: 'collection',
+  protected defaultOptions = {
+    targetMode: 'collection' as const,
+    subscribe: false,
   };
   options: DataSourceInitOptions;
   providerConfig: any;
-  targetName: string;
-  provider?: string;
+  //targetName: string;
+  provider: string;
   constructor(options: DataSourceInitOptions, providerConfig: any) {
     if (new.target === BaseDataSource) {
       throw new TypeError('Cannot construct BaseDataSource instances directly');
     }
+    this.provider = 'Base';
     this.providerConfig = providerConfig;
     this.options = {
       ...this.defaultOptions,
       ...options,
     };
-    this.targetName = options.target;
+    //this.targetName = options.target;
   }
 
   // Helper function to validate email format
-  isValidEmail(email: string) {
+  #isValidEmail(email: string) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   }
 
   // Helper function to validate date
-  isValidDate(date: string) {
+  #isValidDate(date: string) {
     return !isNaN(new Date(date).getTime());
   }
 
-  validateSchema = async (data: Partial<T>, _options?: validateOptions) => {
+  #validateSchema = async (data: Partial<T>, _options?: validateOptions) => {
     if (this.options.schema) {
       const errors = [];
       for (const [key, rules] of Object.entries(this.options.schema)) {
@@ -60,10 +62,10 @@ class BaseDataSource<T> {
               if (typeof value !== 'boolean') errors.push(`${key} must be a boolean.`);
               break;
             case 'date':
-              if (!this.isValidDate(value)) errors.push(`${key} must be a valid date.`);
+              if (!this.#isValidDate(value)) errors.push(`${key} must be a valid date.`);
               break;
             case 'email':
-              if (!this.isValidEmail(value)) errors.push(`${key} must be a valid email.`);
+              if (!this.#isValidEmail(value)) errors.push(`${key} must be a valid email.`);
               break;
             default:
               break;
@@ -80,7 +82,7 @@ class BaseDataSource<T> {
     }
   };
 
-  validateYupSchema = async (data: Partial<T>, _options?: validateOptions) => {
+  #validateYupSchema = async (data: Partial<T>, _options?: validateOptions) => {
     if (this.options.YupValidationSchema) {
       try {
         // Validate the data using Yup's schema and throw any validation errors
@@ -93,16 +95,37 @@ class BaseDataSource<T> {
   };
 
   validate = async (data: Partial<T>, options?: validateOptions) => {
-    await this.validateSchema(data, options);
-    await this.validateYupSchema(data, options);
+    await this.#validateSchema(data, options);
+    await this.#validateYupSchema(data, options);
   };
 
-  _getInitialValue = () => {
-    const fallback = this.options.targetMode === 'collection' ? [] : {};
-    return this.options.initialValue || fallback;
+  protected _getDefaultValue = () => {
+    let fallback;
+
+    switch (this.options.targetMode) {
+      case 'collection':
+        fallback = [];
+        break;
+      case 'document':
+        fallback = {};
+        break;
+      case 'string':
+        fallback = '';
+        break;
+      case 'number':
+        fallback = 0;
+        break;
+      case 'boolean':
+        fallback = false;
+        break;
+      default:
+        fallback = null;
+        break;
+    }
+    return this.options.defaultValue || fallback;
   };
 
-  _parseFilters = () => {
+  protected _parseFilters = () => {
     throw new Error("Method '_parseFilters' is not implemented.");
   };
 

@@ -7,7 +7,7 @@ export const initialState = {
   isInitialized: false,
   user: null,
   raw: null,
-  paths: { login: null },
+  options: { login: null },
   provider: null,
 };
 
