@@ -1,11 +1,11 @@
 import { FacebookIcon, GoogleIcon } from '@/components/default/auth/CustomIcons';
 import { ButtonProps, TextFieldProps } from '@mui/material';
 import { FormikHelpers, useFormik } from 'formik';
-import { useState } from 'react';
 import * as Yup from 'yup';
 
 interface FormValues {
   email: string;
+  confirmEmail?: string;
   password: string;
   confirmPassword?: string;
   submit?: string;
@@ -26,6 +26,7 @@ interface UseLoginFormReturn {
   formik: any;
   fields: {
     email: TextFieldProps;
+    confirmEmail?: TextFieldProps;
     password: TextFieldProps;
     confirmPassword?: TextFieldProps;
   };
@@ -43,10 +44,15 @@ const useLoginForm = (
   authProvider: AuthProvider,
   mode: 'signin' | 'signup'
 ): UseLoginFormReturn => {
-  const [isSignUpMode, setIsSignUpMode] = useState(mode === 'signup');
-
+  const setIsSignUpMode = (isSignUpMode: boolean) => {};
+  const isSignUpMode = mode === 'signup';
   const validationSchema = Yup.object({
     email: Yup.string().email('Invalid email address').required('Required'),
+    ...(isSignUpMode && {
+      confirmEmail: Yup.string()
+        .oneOf([Yup.ref('email'), undefined], 'E-mails must match')
+        .required('Required'),
+    }),
     password: Yup.string().required('Required'),
     ...(isSignUpMode && {
       confirmPassword: Yup.string()
@@ -58,6 +64,7 @@ const useLoginForm = (
   const formik = useFormik<FormValues>({
     initialValues: {
       email: '',
+      confirmEmail: '',
       password: '',
       confirmPassword: '',
     },
@@ -87,17 +94,24 @@ const useLoginForm = (
       email: {
         id: 'email',
         name: 'email',
-        label: 'Email',
         value: formik.values.email,
         onChange: formik.handleChange,
         onBlur: formik.handleBlur,
         error: formik.touched.email && Boolean(formik.errors.email),
         helperText: formik.touched.email && formik.errors.email,
       },
+      confirmEmail: {
+        id: 'confirmEmail',
+        name: 'confirmEmail',
+        value: formik.values.confirmEmail,
+        onChange: formik.handleChange,
+        onBlur: formik.handleBlur,
+        error: formik.touched.confirmEmail && Boolean(formik.errors.confirmEmail),
+        helperText: formik.touched.confirmEmail && formik.errors.confirmEmail,
+      },
       password: {
         id: 'password',
         name: 'password',
-        label: 'Password',
         type: 'password',
         value: formik.values.password,
         onChange: formik.handleChange,
@@ -109,7 +123,6 @@ const useLoginForm = (
       confirmPassword: {
         id: 'confirmPassword',
         name: 'confirmPassword',
-        label: 'Confirm Password',
         type: 'password',
         value: formik.values.confirmPassword,
         onChange: formik.handleChange,
@@ -130,11 +143,18 @@ const useLoginForm = (
       },
       loginDemoUser: {
         text: 'Login as Demo User',
-        onClick: () =>
-          authProvider.signIn(
-            authProvider.getDemoUser().username,
-            authProvider.getDemoUser().password
-          ),
+        onClick: async () => {
+          const demoUser = authProvider.getDemoUser();
+          await formik.setValues({
+            email: demoUser.username,
+            password: demoUser.password,
+          });
+          // await formik.setTouched({
+          //   email: true,
+          //   password: true,
+          // });
+          formik.validateForm();
+        },
       },
       google: {
         text: 'Login with Google',

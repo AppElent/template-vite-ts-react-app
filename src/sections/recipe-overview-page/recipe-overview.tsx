@@ -17,7 +17,8 @@ import {
   ToggleButtonGroup,
 } from '@mui/material';
 import PropTypes from 'prop-types';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import RecipeDialog from './recipe-dialog';
 import RecipeOverviewGalleryView from './recipe-overview-gallery-view';
 import RecipeOverviewListView from './recipe-overview-list-view';
@@ -37,6 +38,20 @@ function RecipeOverview({
 }) {
   const [view, setView] = useState('gallery');
   const dialog = useDialog({ queryKey: 'recipe' });
+  const [searchParams] = useSearchParams();
+
+  console.log(searchParams.get('url'));
+
+  const handleAddRecipe = useCallback(() => {
+    //dialog.setData(undefined); // Clear dialog data for new recipe
+    dialog.open('new');
+  }, [dialog]); // TODO: receive url in dialog and remove it from query params
+
+  useEffect(() => {
+    if (searchParams.get('url') && !dialog.isOpen) {
+      handleAddRecipe();
+    }
+  }, [handleAddRecipe, searchParams]);
 
   const { data: filteredItems, ...filterOptions } = useFilter(recipes, {
     initialSortField: 'name',
@@ -56,11 +71,6 @@ function RecipeOverview({
   const handleRecipeClick = (recipe: Recipe) => {
     //dialog.setData(recipe);
     dialog.open(recipe.id);
-  };
-
-  const handleAddRecipe = () => {
-    //dialog.setData(undefined); // Clear dialog data for new recipe
-    dialog.open('new');
   };
 
   const fabStyle: React.CSSProperties = {

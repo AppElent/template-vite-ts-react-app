@@ -4,7 +4,6 @@ import { SplashScreen } from '@/components/default/splash-screen';
 import config from '@/config';
 import useDialog from '@/hooks/use-dialog';
 import useHttpsRedirect from '@/hooks/use-https-redirect';
-import useRouter from '@/hooks/use-router';
 import { AuthConsumer, AuthProvider } from '@/libs/auth';
 import defaultRoutes from '@/routes/defaultRoutes';
 import { Theme, ThemeProvider } from '@mui/material';
@@ -14,6 +13,7 @@ import { useRoutes } from 'react-router-dom';
 import { QueryParamProvider } from 'use-query-params';
 import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
 import { DataProvider, DataSourceObject } from './libs/data-sources';
+import useRouter from './hooks/use-router';
 
 interface DashboardProps {
   theme: Theme;
@@ -43,6 +43,7 @@ const Dashboard: FC<DashboardProps> = ({ theme, routes, authProvider, dataSource
 
   // Initialize routes
   const element = useRoutes(routes || defaultRoutes);
+  console.log(element);
 
   // Set HTML page title suffix
   if (config?.meta?.title) setPageTitleSuffix(config?.meta?.title);

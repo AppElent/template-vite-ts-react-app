@@ -9,17 +9,22 @@ import './App.css';
 import config from './config';
 import Dashboard from './Dashboard';
 import LocalStorageDataSource from './libs/data-sources/data-sources/LocalStorageDataSource';
-import Recipe from './types/recipe';
+import { Recipe2 } from './schemas/recipe';
 
 const firebaseProvider = new FirebaseAuthProvider({ login: '/login', logout: '/logout' });
 
 const dataSources = {
-  recipes: new FirestoreDataSource<Recipe>(
+  recipes: new FirestoreDataSource<Recipe2>(
     {
       target: 'recipes',
       targetMode: 'collection',
       YupValidationSchema: recipeYupSchema,
       subscribe: true,
+      targetFilter: {
+        filters: [
+          { field: 'owner', operator: '==', value: () => firebaseProvider.getCurrentUser()?.id },
+        ],
+      },
     },
     { db }
   ),

@@ -3,9 +3,10 @@ import * as Yup from 'yup';
 import DataProvider, { DataContext } from './DataProvider';
 import useData from './useData';
 
-export interface DataSourceInitOptions {
+export interface DataSourceInitOptions<T> {
   target: string;
   targetMode?: 'collection' | 'document' | 'number' | 'string' | 'boolean'; //TODO: implement
+  targetFilter?: FilterObject<T>;
   subscribe?: boolean;
   YupValidationSchema?: Yup.AnySchema;
   schema?: Record<string, any>;
@@ -28,7 +29,7 @@ export interface DataSourceObject {
 
 export interface DataSource<T> {
   // Options supplied to class constructor
-  options?: DataSourceInitOptions;
+  options?: DataSourceInitOptions<T>;
   providerConfig?: any;
   // Provider name
   provider: string;
@@ -41,6 +42,47 @@ export interface DataSource<T> {
   delete: (id?: string) => Promise<void>;
   // Custom methods
   [key: string]: any;
+}
+
+/**
+ * Represents the various operators that can be used to filter data.
+ *
+ * @typedef {('==' | '!=' | '<' | '<=' | '>' | '>=' | 'array-contains' | 'in' | 'not-in' | 'array-contains-any')} FilterOperator
+ *
+ * @property {'=='} EQUAL - Checks if a value is equal to another value.
+ * @property {'!='} NOT_EQUAL - Checks if a value is not equal to another value.
+ * @property {'<'} LESS_THAN - Checks if a value is less than another value.
+ * @property {'<='} LESS_THAN_OR_EQUAL - Checks if a value is less than or equal to another value.
+ * @property {'>'} GREATER_THAN - Checks if a value is greater than another value.
+ * @property {'>='} GREATER_THAN_OR_EQUAL - Checks if a value is greater than or equal to another value.
+ * @property {'array-contains'} ARRAY_CONTAINS - Checks if an array contains a specific value.
+ * @property {'in'} IN - Checks if a value is in a list of values.
+ * @property {'not-in'} NOT_IN - Checks if a value is not in a list of values.
+ * @property {'array-contains-any'} ARRAY_CONTAINS_ANY - Checks if an array contains any of the specified values.
+ */
+export type FilterOperator =
+  | '=='
+  | '!='
+  | '<'
+  | '<='
+  | '>'
+  | '>='
+  | 'array-contains'
+  | 'in'
+  | 'not-in'
+  | 'array-contains-any';
+
+export interface FilterObject<T> {
+  limit?: number;
+  orderBy?: { field: keyof T; direction: 'asc' | 'desc' }[];
+  pagination?: { page: number; pageSize: number };
+  filters?: { field: keyof T; operator: FilterOperator; value: any }[];
+  select?: (keyof T)[];
+}
+
+export interface FilterReturn<T> {
+  provider: any;
+  postFilter: FilterObject<T>;
 }
 
 // export interface DataContextType {

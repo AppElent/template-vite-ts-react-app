@@ -1,6 +1,6 @@
 import useRouter from '@/hooks/use-router';
 import PropTypes from 'prop-types';
-import { createContext, useContext, useEffect, useReducer } from 'react';
+import { createContext, useCallback, useContext, useEffect, useReducer } from 'react';
 
 export const initialState = {
   isAuthenticated: false,
@@ -44,31 +44,37 @@ export const AuthProvider = (props: any) => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const router = useRouter();
 
-  const handleAuthStateChanged = async (user: any) => {
-    console.log('User authentication changed', { user, provider });
-    if (user) {
-      // Here you should extract the complete user profile to make it available in your entire app.
-      // The auth state only provides basic information.
-      dispatch({
-        type: 'AUTH_STATE_CHANGED',
-        payload: {
-          isAuthenticated: true,
-          user: await provider.getCurrentUser(),
-        },
-      });
-    } else {
-      dispatch({
-        type: 'AUTH_STATE_CHANGED',
-        payload: {
-          isAuthenticated: false,
-          user: null,
-        },
-      });
-      router.replace(provider?.paths?.login || '/');
-    }
-  };
+  const handleAuthStateChanged = useCallback(
+    async (user: any) => {
+      console.log('User authentication changed', { user, provider });
+      if (user) {
+        // Here you should extract the complete user profile to make it available in your entire app.
+        // The auth state only provides basic information.
+        dispatch({
+          type: 'AUTH_STATE_CHANGED',
+          payload: {
+            isAuthenticated: true,
+            user: await provider.getCurrentUser(),
+          },
+        });
+      } else {
+        dispatch({
+          type: 'AUTH_STATE_CHANGED',
+          payload: {
+            isAuthenticated: false,
+            user: null,
+          },
+        });
+        //router.replace(provider?.paths?.login || '/');
+      }
+    },
+    [provider]
+  );
 
-  useEffect(() => provider.onAuthStateChanged(handleAuthStateChanged)(), [provider]);
+  useEffect(
+    () => provider.onAuthStateChanged(handleAuthStateChanged)(),
+    [provider, handleAuthStateChanged]
+  );
 
   return (
     <AuthContext.Provider

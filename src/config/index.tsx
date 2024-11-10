@@ -1,4 +1,3 @@
-
 const config = {
   meta: {
     title: 'Recipe tool',
@@ -7,6 +6,7 @@ const config = {
     auth: {
       login: '/login',
       logout: '/logout',
+      signup: '/signup',
       loginRedirect: '/app',
       redirectAfterLogin: '/',
       redirectAfterLogout: '/',

@@ -51,6 +51,21 @@ const datasources = {
       },
       { db }
     ),
+    'Collection - With Filters': new FirestoreDataSource(
+      {
+        target: 'dummy',
+        targetMode: 'collection',
+        subscribe: true,
+        YupValidationSchema: dummyYupSchema,
+        targetFilter: {
+          orderBy: [{ field: 'number', direction: 'desc' }],
+          limit: 10,
+          filters: [{ field: 'boolean', operator: '==', value: false }],
+          pagination: { page: 1, pageSize: 5 },
+        },
+      },
+      { db }
+    ),
   },
   LocalStorage: {
     Realtime: new LocalStorageDataSource({

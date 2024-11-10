@@ -1,4 +1,4 @@
-import { DataSourceInitOptions } from '..';
+import { DataSourceInitOptions, FilterObject } from '..';
 
 interface validateOptions {
   full: boolean;
@@ -9,11 +9,11 @@ class BaseDataSource<T> {
     targetMode: 'collection' as const,
     subscribe: false,
   };
-  options: DataSourceInitOptions;
+  options: DataSourceInitOptions<T>;
   providerConfig: any;
   //targetName: string;
   provider: string;
-  constructor(options: DataSourceInitOptions, providerConfig: any) {
+  constructor(options: DataSourceInitOptions<T>, providerConfig: any) {
     if (new.target === BaseDataSource) {
       throw new TypeError('Cannot construct BaseDataSource instances directly');
     }
@@ -123,6 +123,55 @@ class BaseDataSource<T> {
         break;
     }
     return this.options.defaultValue || fallback;
+  };
+
+  _getPostFilter = (data: T[], filterConfig: FilterObject<T>): Partial<T>[] => {
+    let result = data;
+    const { limit, orderBy, pagination, filter, select } = filterConfig;
+
+    // Apply filtering
+    if (filter) {
+      result = result.filter((item) =>
+        Object.entries(filter!).every(([key, value]) => item[key as keyof T] === value)
+      );
+    }
+
+    // Apply sorting
+    if (orderBy) {
+      result = result.sort((a, b) => {
+        for (const { field, direction } of orderBy!) {
+          if (a[field] < b[field]) return direction === 'asc' ? -1 : 1;
+          if (a[field] > b[field]) return direction === 'asc' ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+
+    // Apply pagination
+    if (pagination) {
+      const { page, pageSize } = pagination;
+      const start = (page - 1) * pageSize;
+      const end = start + pageSize;
+      result = result.slice(start, end);
+    }
+
+    // Apply limit
+    if (limit !== undefined) {
+      result = result.slice(0, limit);
+    }
+
+    // Apply select (projection)
+    if (select) {
+      result = result.map((item) => {
+        const selectedItem: Partial<T> = {};
+        this.select!.forEach((key) => {
+          selectedItem[key] = item[key];
+        });
+        return selectedItem;
+      });
+    }
+
+    return result;
   };
 
   protected _parseFilters = () => {

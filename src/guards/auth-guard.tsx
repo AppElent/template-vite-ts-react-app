@@ -18,7 +18,7 @@ const AuthGuard = (props: any) => {
     } else {
       setChecked(true);
     }
-  }, [isAuthenticated, issuer, router]);
+  }, [isAuthenticated, router, options.login]);
 
   // Only check on mount, this allows us to redirect the user manually when auth state changes
   useEffect(
@@ -26,7 +26,7 @@ const AuthGuard = (props: any) => {
       check();
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [isAuthenticated]
   );
 
   if (!checked) {

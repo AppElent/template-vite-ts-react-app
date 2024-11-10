@@ -1,19 +1,19 @@
-import * as React from 'react';
-import PropTypes from 'prop-types';
+import useRouter from '@/hooks/use-router';
+import { useAuth } from '@/libs/auth';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import LogoutIcon from '@mui/icons-material/Logout';
+import MenuIcon from '@mui/icons-material/Menu';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import SettingsIcon from '@mui/icons-material/Settings';
+import { ListItemIcon, Menu, MenuItem } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
 import Avatar from '@mui/material/Avatar';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
-import NotificationsIcon from '@mui/icons-material/Notifications';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import SettingsIcon from '@mui/icons-material/Settings';
-import LogoutIcon from '@mui/icons-material/Logout';
-import { useAuth } from '@/libs/auth';
-import { ListItemIcon, Menu, MenuItem } from '@mui/material';
-import useRouter from '@/hooks/use-router';
+import PropTypes from 'prop-types';
+import * as React from 'react';
 
 function Header(props) {
   const { onDrawerToggle } = props;

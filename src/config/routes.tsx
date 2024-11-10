@@ -39,4 +39,6 @@ const routes: RouteObject[] = [
   ...defaultRoutes,
 ];
 
+console.log(routes);
+
 export default routes;

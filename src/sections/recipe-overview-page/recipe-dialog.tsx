@@ -28,6 +28,7 @@ import {
   useTheme,
 } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import RecipeDialogFullImageViewer from './recipe-dialog-full-image-viewer';
 import RecipeDialogImageList from './recipe-dialog-image-list';
 
@@ -279,6 +280,17 @@ function RecipeDialog({
       },
     },
   });
+
+  //Receive URL from query params. If set, update formik state with the URL
+  const [queryParams, setQueryParams] = useSearchParams();
+  useEffect(() => {
+    console.log(formik.values.url, queryParams.get('url'));
+    if (queryParams.get('url') && formik.values.url !== queryParams.get('url')) {
+      console.log('jajajajaj');
+      formik.setFieldValue('url', queryParams.get('url'));
+      //setQueryParams(queryParams.delete('url'));
+    }
+  }, [queryParams, formik.values.url, setQueryParams]);
 
   console.log(formik);
 

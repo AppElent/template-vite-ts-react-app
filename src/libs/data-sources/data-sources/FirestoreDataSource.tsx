@@ -6,7 +6,9 @@ import {
   DocumentSnapshot,
   getDoc,
   getDocs,
+  limit,
   onSnapshot,
+  orderBy,
   query,
   QueryDocumentSnapshot,
   QuerySnapshot,
@@ -15,21 +17,22 @@ import {
   updateDoc,
   where,
 } from 'firebase/firestore';
-import { DataSourceInitOptions } from '..';
+import { DataSourceInitOptions, FilterObject, FilterReturn } from '..';
 import BaseDataSource from './BaseDataSource';
 
 interface FirestoreDataSourceProviderConfig {
   db: any;
   clearUndefinedValues?: boolean;
-  createdAt: boolean;
-  updatedAt: boolean;
 }
 
 export class FirestoreDataSource<T> extends BaseDataSource<T> {
   firestore: any;
   ref: any;
 
-  constructor(options: DataSourceInitOptions, providerConfig: FirestoreDataSourceProviderConfig) {
+  constructor(
+    options: DataSourceInitOptions<T>,
+    providerConfig: FirestoreDataSourceProviderConfig
+  ) {
     super(options, providerConfig);
 
     this.provider = 'Firestore';
@@ -102,6 +105,43 @@ export class FirestoreDataSource<T> extends BaseDataSource<T> {
   //   return data;
   // };
 
+  // Parses filter and returns an object for provider specific filterand and the generic js filtering
+  #parseFilters = (filterObject: FilterObject<T>): FilterReturn<T> => {
+    let q = this.ref;
+
+    // Apply filters
+    if (filterObject.filters) {
+      filterObject.filters.forEach(({ field, operator, value }) => {
+        // Is value is a function, run it, otherwise use the value as is
+        const defValue = typeof value === 'function' ? value() : value;
+        q = query(q, where(field as string, operator, defValue));
+      });
+    }
+
+    // Apply ordering
+    if (filterObject.orderBy) {
+      filterObject.orderBy.forEach(({ field, direction }) => {
+        q = query(q, orderBy(field as string, direction));
+      });
+    }
+
+    // Apply limit
+    if (filterObject.limit) {
+      q = query(q, limit(filterObject.limit));
+    }
+
+    return {
+      provider: q,
+      // return all properties of filterobject that havent been used
+      postFilter: {
+        ...filterObject,
+        filters: undefined,
+        orderBy: undefined,
+        limit: undefined,
+      },
+    };
+  };
+
   // Get a single document by ID
   get = async (id?: string): Promise<T | null> => {
     try {
@@ -123,17 +163,19 @@ export class FirestoreDataSource<T> extends BaseDataSource<T> {
   };
 
   // Get all documents in the collection, with optional filters
-  getAll = async (filter: { [key: string]: any } = {}): Promise<T[]> => {
+  getAll = async (filter?: FilterObject<T>): Promise<T[]> => {
     try {
       console.log(this.options);
       if (this.options.targetMode !== 'collection')
         throw new Error('getAll() can only be used with collections');
-      let q = this.ref;
-      Object.keys(filter).forEach((key) => {
-        q = query(q, where(key, '==', filter[key]));
-      });
 
-      const querySnapshot = await getDocs(q);
+      // Parse filter object
+      const filterObject = filter || this.options.targetFilter || {};
+      console.log(filterObject, filter, this.options.targetFilter);
+      const { provider: query, postFilter } = this.#parseFilters(filterObject);
+      console.log(query, postFilter);
+
+      const querySnapshot = await getDocs(query);
       const documents: any[] = [];
       querySnapshot.forEach((doc) => {
         documents.push({ id: doc.id, ...(doc.data() as object) });
@@ -211,9 +253,10 @@ export class FirestoreDataSource<T> extends BaseDataSource<T> {
 
   // Subscribe to real-time updates for the collection
   subscribe = (callback: (data: any) => any) => {
+    const ref = this.#parseFilters(this.options.targetFilter || {}).provider;
     const unsubscribe =
       this.options?.targetMode === 'document'
-        ? onSnapshot(this.ref, (snapshot: DocumentSnapshot) => {
+        ? onSnapshot(ref, (snapshot: DocumentSnapshot) => {
             const data = snapshot.data();
             if (data) {
               callback({ id: snapshot.id, ...snapshot.data() });
@@ -221,7 +264,7 @@ export class FirestoreDataSource<T> extends BaseDataSource<T> {
               callback(null);
             }
           })
-        : onSnapshot(this.ref, (snapshot: QuerySnapshot) => {
+        : onSnapshot(ref, (snapshot: QuerySnapshot) => {
             const documents: T[] = [];
             snapshot.forEach((doc: QueryDocumentSnapshot) => {
               documents.push({ id: doc.id, ...doc.data() } as T);

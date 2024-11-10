@@ -1,30 +1,25 @@
-import * as React from 'react';
+import { GoogleIcon, SitemarkIcon } from '@/components/default/auth/CustomIcons';
+import ForgotPassword from '@/components/default/auth/ForgotPassword';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Checkbox from '@mui/material/Checkbox';
+import MuiCard from '@mui/material/Card';
 import CssBaseline from '@mui/material/CssBaseline';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import Divider from '@mui/material/Divider';
-import FormLabel from '@mui/material/FormLabel';
 import FormControl from '@mui/material/FormControl';
+import FormLabel from '@mui/material/FormLabel';
 import Link from '@mui/material/Link';
+import Stack from '@mui/material/Stack';
+import { styled } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import Stack from '@mui/material/Stack';
-import MuiCard from '@mui/material/Card';
-import { styled } from '@mui/material/styles';
-import { useFormik } from 'formik';
-import * as Yup from 'yup';
 import PropTypes from 'prop-types';
-import ForgotPassword from '@/components/default/auth/ForgotPassword';
-import { GoogleIcon, FacebookIcon, SitemarkIcon } from '@/components/default/auth/CustomIcons';
+import * as React from 'react';
 //import AppTheme from '@/theme/AppTheme';
 import ColorModeSelect from '@/components/default/ColorModeSelect';
 import useMounted from '@/hooks/use-mounted';
 import useRouter from '@/hooks/use-router';
 import useSearchParams from '@/hooks/use-search-params';
-import { useAuth } from '@/libs/auth';
-import config from '@/config';
+import { useAuth, useLoginForm } from '@/libs/auth';
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -73,63 +68,69 @@ export default function SignIn(props) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const returnTo = searchParams.get('returnTo');
-  const { /*issuer,*/ signInWithEmailAndPassword, signUp /*, signInWithGoogle*/ } = useAuth();
+  const { /*issuer,*/ signInWithEmailAndPassword, signUp /*, signInWithGoogle*/, provider } =
+    useAuth();
+  const { authProvider, formik, fields, buttons } = useLoginForm(provider);
+  const { mode, paths, ...themeProps } = props;
 
-  const { mode, ...themeProps } = props;
+  console.log(buttons, fields);
+  const { text: loginButtonText, ...loginButtonProps } = buttons.login;
 
-  const initialValues =
-    mode === 'signin'
-      ? {
-          email: 'demo@demo.com',
-          password: 'demo123',
-          submit: null,
-        }
-      : {};
+  console.log(formik);
 
-  const validationSchema =
-    mode === 'signin'
-      ? Yup.object({
-          email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
-          password: Yup.string().max(255).required('Password is required'),
-        })
-      : Yup.object({
-          email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
-          confirmEmail: Yup.string().oneOf([Yup.ref('email'), null], 'Email must match'),
-          password: Yup.string().max(255).required('Password is required'),
-          confirmPassword: Yup.string().oneOf([Yup.ref('password'), null], 'Passwords must match'),
-        });
+  // const initialValues =
+  //   mode === 'signin'
+  //     ? {
+  //         email: 'demo@demo.com',
+  //         password: 'demo123',
+  //         submit: null,
+  //       }
+  //     : {};
 
-  const formik = useFormik({
-    initialValues,
-    validationSchema,
-    onSubmit: async (values, helpers) => {
-      try {
-        if (mode === 'signin') {
-          await signInWithEmailAndPassword(values.email, values.password);
-        } else {
-          await signUp(values.email, values.password);
-        }
+  // const validationSchema =
+  //   mode === 'signin'
+  //     ? Yup.object({
+  //         email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
+  //         password: Yup.string().max(255).required('Password is required'),
+  //       })
+  //     : Yup.object({
+  //         email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
+  //         confirmEmail: Yup.string().oneOf([Yup.ref('email'), null], 'Email must match'),
+  //         password: Yup.string().max(255).required('Password is required'),
+  //         confirmPassword: Yup.string().oneOf([Yup.ref('password'), null], 'Passwords must match'),
+  //       });
 
-        const redirectUrl = returnTo
-          ? returnTo
-          : config.auth?.redirectAfterLogin
-            ? config.auth?.redirectAfterLogin
-            : '/';
+  // const formik = useFormik({
+  //   initialValues,
+  //   validationSchema,
+  //   onSubmit: async (values, helpers) => {
+  //     try {
+  //       if (mode === 'signin') {
+  //         await signInWithEmailAndPassword(values.email, values.password);
+  //       } else {
+  //         await signUp(values.email, values.password);
+  //       }
 
-        if (isMounted()) {
-          router.push(redirectUrl);
-        }
-      } catch (err) {
-        console.error(err);
+  //       const redirectUrl = returnTo
+  //         ? returnTo
+  //         : config.auth?.redirectAfterLogin
+  //           ? config.auth?.redirectAfterLogin
+  //           : '/';
 
-        if (isMounted()) {
-          helpers.setStatus({ success: false });
-          helpers.setErrors({ submit: err.message });
-          helpers.setSubmitting(false);
-        }
-      }
-    },
-  });
+  //       if (isMounted()) {
+  //         router.push(redirectUrl);
+  //       }
+  //     } catch (err) {
+  //       console.error(err);
+
+  //       if (isMounted()) {
+  //         helpers.setStatus({ success: false });
+  //         helpers.setErrors({ submit: err.message });
+  //         helpers.setSubmitting(false);
+  //       }
+  //     }
+  //   },
+  // });
 
   const [open, setOpen] = React.useState(false);
 
@@ -141,14 +142,14 @@ export default function SignIn(props) {
     setOpen(false);
   };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
-  };
+  // const handleSubmit = (event) => {
+  //   event.preventDefault();
+  //   const data = new FormData(event.currentTarget);
+  //   console.log({
+  //     email: data.get('email'),
+  //     password: data.get('password'),
+  //   });
+  // };
 
   return (
     // <AppTheme {...themeProps}>
@@ -171,7 +172,7 @@ export default function SignIn(props) {
           </Typography>
           <Box
             component="form"
-            onSubmit={handleSubmit}
+            onSubmit={formik.handleSubmit}
             noValidate
             sx={{
               display: 'flex',
@@ -183,56 +184,30 @@ export default function SignIn(props) {
             <FormControl>
               <FormLabel htmlFor="email">Email</FormLabel>
               <TextField
-                error={!!(formik.touched.email && formik.errors.email)}
-                helperText={formik.touched.email && formik.errors.email}
-                onBlur={formik.handleBlur}
-                onChange={formik.handleChange}
-                value={formik.values.email}
-                id="email"
-                type="email"
-                name="email"
-                placeholder="your@email.com"
-                autoComplete="email"
-                autoFocus
+                {...fields.email}
                 required
                 fullWidth
                 variant="outlined"
-                sx={{ ariaLabel: 'email' }}
+                autoComplete="email"
               />
             </FormControl>
             {mode === 'signup' && (
               <FormControl>
                 <FormLabel htmlFor="email">Confirm e-mail</FormLabel>
                 <TextField
-                  error={!!(formik.touched.confirmEmail && formik.errors.confirmEmail)}
-                  helperText={formik.touched.confirmEmail && formik.errors.confirmEmail}
-                  onBlur={formik.handleBlur}
-                  onChange={formik.handleChange}
-                  value={formik.values.confirmEmail}
-                  id="confirmEmail"
-                  type="email"
-                  name="confirmEmail"
-                  autoFocus
+                  {...fields.confirmEmail}
                   required
                   fullWidth
                   variant="outlined"
-                  sx={{ ariaLabel: 'email' }}
+                  autoComplete="email"
                 />
               </FormControl>
             )}
 
             <FormControl>
               <FormLabel htmlFor="password">Password</FormLabel>
-
               <TextField
-                error={!!(formik.touched.password && formik.errors.password)}
-                helperText={formik.touched.password && formik.errors.password}
-                onBlur={formik.handleBlur}
-                onChange={formik.handleChange}
-                value={formik.values.password}
-                name="password"
-                type="password"
-                id="password"
+                {...fields.password}
                 required
                 fullWidth
                 variant="outlined"
@@ -252,14 +227,7 @@ export default function SignIn(props) {
               <FormControl>
                 <FormLabel htmlFor="password">Confirm password</FormLabel>
                 <TextField
-                  error={!!(formik.touched.confirmPassword && formik.errors.confirmPassword)}
-                  helperText={formik.touched.confirmPassword && formik.errors.confirmPassword}
-                  onBlur={formik.handleBlur}
-                  onChange={formik.handleChange}
-                  value={formik.values.confirmPassword}
-                  name="confirmPassword"
-                  type="password"
-                  id="confirmPassword"
+                  {...fields.confirmPassword}
                   required
                   fullWidth
                   variant="outlined"
@@ -267,7 +235,7 @@ export default function SignIn(props) {
               </FormControl>
             )}
 
-            {mode === 'signin' && (
+            {/* {mode === 'signin' && (
               <FormControlLabel
                 control={
                   <Checkbox
@@ -277,7 +245,7 @@ export default function SignIn(props) {
                 }
                 label="Remember me"
               />
-            )}
+            )} */}
 
             <ForgotPassword
               open={open}
@@ -287,9 +255,9 @@ export default function SignIn(props) {
               type="submit"
               fullWidth
               variant="contained"
-              onClick={formik.handleSubmit}
+              {...loginButtonProps}
             >
-              Sign in
+              {loginButtonText}
             </Button>
             {mode === 'signin' ? (
               <Typography sx={{ textAlign: 'center' }}>
@@ -326,7 +294,7 @@ export default function SignIn(props) {
               fullWidth
               disabled
               variant="outlined"
-              onClick={() => alert('Sign in with Google')}
+              {...buttons.google}
               startIcon={<GoogleIcon />}
             >
               Sign in with Google
@@ -336,10 +304,19 @@ export default function SignIn(props) {
               fullWidth
               disabled
               variant="outlined"
-              onClick={() => alert('Sign in with Facebook')}
-              startIcon={<FacebookIcon />}
+              // spread all props of buttons.facebook except text property
+              {...buttons.facebook}
             >
               Sign in with Facebook
+            </Button>
+            <Button
+              type="submit"
+              fullWidth
+              variant="outlined"
+              // spread all props of buttons.facebook except text property
+              {...buttons.loginDemoUser}
+            >
+              Login with demo account
             </Button>
           </Box>
         </Card>
