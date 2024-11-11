@@ -17,6 +17,7 @@ export const recipeYupSchema = Yup.object().shape({
     quantity: Yup.number().optional().default(0),
     unit: Yup.string().optional().default('servings'),
   }),
+  yieldsText: Yup.string().optional().default(''),
   nutrients: Yup.object()
     .shape({
       calories: Yup.string().optional().default('0'),

@@ -8,7 +8,6 @@ import {
   getDocs,
   limit,
   onSnapshot,
-  orderBy,
   query,
   QueryDocumentSnapshot,
   QuerySnapshot,
@@ -119,11 +118,11 @@ export class FirestoreDataSource<T> extends BaseDataSource<T> {
     }
 
     // Apply ordering
-    if (filterObject.orderBy) {
-      filterObject.orderBy.forEach(({ field, direction }) => {
-        q = query(q, orderBy(field as string, direction));
-      });
-    }
+    // if (filterObject.orderBy) {
+    //   filterObject.orderBy.forEach(({ field, direction }) => {
+    //     q = query(q, orderBy(field as string, direction));
+    //   });
+    // }
 
     // Apply limit
     if (filterObject.limit) {
@@ -136,7 +135,7 @@ export class FirestoreDataSource<T> extends BaseDataSource<T> {
       postFilter: {
         ...filterObject,
         filters: undefined,
-        orderBy: undefined,
+        //orderBy: undefined,
         limit: undefined,
       },
     };
@@ -165,21 +164,21 @@ export class FirestoreDataSource<T> extends BaseDataSource<T> {
   // Get all documents in the collection, with optional filters
   getAll = async (filter?: FilterObject<T>): Promise<T[]> => {
     try {
-      console.log(this.options);
       if (this.options.targetMode !== 'collection')
         throw new Error('getAll() can only be used with collections');
 
       // Parse filter object
       const filterObject = filter || this.options.targetFilter || {};
-      console.log(filterObject, filter, this.options.targetFilter);
+      //console.log(filterObject, filter, this.options.targetFilter);
       const { provider: query, postFilter } = this.#parseFilters(filterObject);
       console.log(query, postFilter);
 
       const querySnapshot = await getDocs(query);
-      const documents: any[] = [];
+      let documents: any[] = [];
       querySnapshot.forEach((doc) => {
         documents.push({ id: doc.id, ...(doc.data() as object) });
       });
+      documents = this._applyPostFilters(documents, postFilter);
       return documents as T[];
     } catch (error) {
       console.error('Error getting documents:', error);
@@ -253,10 +252,10 @@ export class FirestoreDataSource<T> extends BaseDataSource<T> {
 
   // Subscribe to real-time updates for the collection
   subscribe = (callback: (data: any) => any) => {
-    const ref = this.#parseFilters(this.options.targetFilter || {}).provider;
+    const { provider, postFilter } = this.#parseFilters(this.options.targetFilter || {});
     const unsubscribe =
       this.options?.targetMode === 'document'
-        ? onSnapshot(ref, (snapshot: DocumentSnapshot) => {
+        ? onSnapshot(provider, (snapshot: DocumentSnapshot) => {
             const data = snapshot.data();
             if (data) {
               callback({ id: snapshot.id, ...snapshot.data() });
@@ -264,12 +263,12 @@ export class FirestoreDataSource<T> extends BaseDataSource<T> {
               callback(null);
             }
           })
-        : onSnapshot(ref, (snapshot: QuerySnapshot) => {
+        : onSnapshot(provider, (snapshot: QuerySnapshot) => {
             const documents: T[] = [];
             snapshot.forEach((doc: QueryDocumentSnapshot) => {
               documents.push({ id: doc.id, ...doc.data() } as T);
             });
-            callback(documents);
+            callback(this._applyPostFilters(documents, postFilter));
           });
 
     // Return a function to unsubscribe from real-time updates

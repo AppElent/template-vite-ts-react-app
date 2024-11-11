@@ -1,4 +1,3 @@
-import useRouter from '@/hooks/use-router';
 import PropTypes from 'prop-types';
 import { createContext, useCallback, useContext, useEffect, useReducer } from 'react';
 
@@ -42,7 +41,7 @@ const reducer = (state: any, action: any) => {
 export const AuthProvider = (props: any) => {
   const { provider, children } = props;
   const [state, dispatch] = useReducer(reducer, initialState);
-  const router = useRouter();
+  //const router = useRouter();
 
   const handleAuthStateChanged = useCallback(
     async (user: any) => {

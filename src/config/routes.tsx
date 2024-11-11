@@ -20,7 +20,7 @@ const routes: RouteObject[] = [
   {
     path: 'app',
     element: (
-      <AuthGuard>
+      <AuthGuard options={{ shouldBeAuthenticated: true, login: '/login' }}>
         <PaperbaseLayout settings={LayoutSettings}>
           <Suspense>
             <Outlet />
@@ -38,7 +38,5 @@ const routes: RouteObject[] = [
   },
   ...defaultRoutes,
 ];
-
-console.log(routes);
 
 export default routes;

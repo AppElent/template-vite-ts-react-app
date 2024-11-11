@@ -1,7 +1,7 @@
-import { TextField, Typography } from '@mui/material';
-import { FieldDefinitionConfig } from '.';
 import isEqual from '@/utils/is-equal';
+import { TextField, Typography } from '@mui/material';
 import { memo } from 'react';
+import { FieldDefinitionConfig } from '.';
 
 export const DefaultTextField = memo(
   ({ field, formik, options, helpers }: FieldDefinitionConfig): any =>
@@ -21,7 +21,7 @@ export const DefaultTextField = memo(
         name={field.name}
         label={field.label}
         type={field.type}
-        value={helpers.value}
+        value={helpers.value || ''}
         onChange={formik.handleChange}
         onBlur={formik.handleBlur}
         error={helpers.touched && Boolean(helpers.errors)}

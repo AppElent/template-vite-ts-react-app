@@ -1,10 +1,18 @@
-// @ts-nocheck
 // TODO: Check ts errors
 
+export interface IAuthProviderOptions {
+  login: string;
+  logout: string;
+}
+
 class IAuthProvider {
-  constructor(options?, providerOptions?) {
-    this.options = options;
-    this.providerOptions = providerOptions;
+  public provider: string;
+
+  constructor(
+    public options: IAuthProviderOptions,
+    public providerOptions?: any
+  ) {
+    this.provider = 'Base';
   }
 
   getDemoUser(): { username: string; password: string } {
@@ -19,11 +27,11 @@ class IAuthProvider {
     throw new Error('Method not implemented.');
   }
 
-  signUp(email, password) {
+  signUp(_email: string, _password: string) {
     throw new Error('Method not implemented.');
   }
 
-  signIn(email, password) {
+  signIn(_email: string, _password: string) {
     throw new Error('Method not implemented.');
   }
 
@@ -35,7 +43,7 @@ class IAuthProvider {
     throw new Error('Method not implemented.');
   }
 
-  onAuthStateChanged(user) {
+  onAuthStateChanged(_user: any) {
     throw new Error('Method not implemented.');
   }
 
@@ -43,7 +51,7 @@ class IAuthProvider {
     throw new Error('Method not implemented.');
   }
 
-  resetPassword(email) {
+  resetPassword(_email: string) {
     throw new Error('Method not implemented.');
   }
 }

@@ -40,6 +40,11 @@ npm create vite@latest
 4. App: Dashboard
 5.
 
+# Todo:
+
+- TODO: Create mail datasource (with select etc)
+- TODO: Create notion database datasource
+
 # Default readme.md
 
 # React + TypeScript + Vite

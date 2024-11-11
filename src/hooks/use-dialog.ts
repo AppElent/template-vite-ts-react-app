@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useQueryParam } from 'use-query-params';
 
 interface UseDialogReturn {
   isOpen: boolean;
@@ -19,8 +19,8 @@ interface UseDialogOptionsProps {
 const useDialog = (options?: UseDialogOptionsProps): UseDialogReturn => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [dialogData, setDialogData] = useState<any | null>(options?.initialData);
-  const [queryParams, setQueryParams] = useSearchParams();
   const queryKeyRef = useRef(options?.queryKey);
+  const [dialogDataParam, setDialogDataParam] = useQueryParam(queryKeyRef.current || 'dialogData');
 
   // Update the ref when options.queryKey changes
   useEffect(() => {
@@ -30,29 +30,28 @@ const useDialog = (options?: UseDialogOptionsProps): UseDialogReturn => {
   }, [options?.queryKey]);
 
   // Get query value from URL
-  const queryValue = useMemo(() => {
-    if (queryKeyRef.current) {
-      return queryParams.get(queryKeyRef.current);
-    }
-  }, [queryParams]);
+  // const queryValue = useMemo(() => {
+  //   if (queryKeyRef.current) {
+  //     return queryParams.get(queryKeyRef.current);
+  //   }
+  // }, [queryParams]);
 
   // Determine if the dialog is open based on the query value OR the state variable
   const isOpenDef = useMemo(() => {
     if (queryKeyRef.current) {
-      return !!queryValue;
+      return !!dialogDataParam;
     } else {
       return isOpen;
     }
-  }, [isOpen, queryValue]);
+  }, [isOpen, dialogDataParam]);
 
   const setData = useCallback((data: any | null) => {
     if (queryKeyRef.current) {
       if (data) {
-        queryParams.set(queryKeyRef.current, data);
+        setDialogDataParam(data);
       } else {
-        queryParams.delete(queryKeyRef.current);
+        setDialogDataParam(undefined);
       }
-      setQueryParams(queryParams);
     } else {
       setDialogData(data);
     }
@@ -61,24 +60,23 @@ const useDialog = (options?: UseDialogOptionsProps): UseDialogReturn => {
   // Respond to changes in the query value
   useEffect(() => {
     if (queryKeyRef.current) {
-      if (queryValue) {
+      if (dialogDataParam) {
         setIsOpen(true);
       } else {
         setIsOpen(false);
       }
     }
-  }, [queryValue]);
+  }, [dialogDataParam]);
 
   // Open the dialog
   const openDialog = useCallback(
     (value?: string) => {
       if (queryKeyRef.current) {
         if (value) {
-          queryParams.set(queryKeyRef.current, value);
+          setDialogDataParam(value);
         } else {
-          queryParams.delete(queryKeyRef.current);
+          setDialogDataParam(undefined);
         }
-        setQueryParams(queryParams);
       } else {
         if (value) {
           setDialogData(value);
@@ -86,18 +84,17 @@ const useDialog = (options?: UseDialogOptionsProps): UseDialogReturn => {
         setIsOpen(true);
       }
     },
-    [queryParams, setQueryParams]
+    [setDialogDataParam]
   );
 
   // Close the dialog
   const closeDialog = useCallback(() => {
     if (queryKeyRef.current) {
-      queryParams.delete(queryKeyRef.current);
-      setQueryParams(queryParams);
+      setDialogDataParam(undefined);
     } else {
       setIsOpen(false);
     }
-  }, [setQueryParams, queryParams]);
+  }, [setDialogDataParam]);
 
   // useEffect(() => {
   //   setDialogData(initialData);
@@ -115,7 +112,7 @@ const useDialog = (options?: UseDialogOptionsProps): UseDialogReturn => {
 
   return {
     isOpen: isOpenDef,
-    data: queryKeyRef.current ? queryValue : dialogData,
+    data: queryKeyRef.current ? dialogDataParam : dialogData,
     setData: setData,
     open: openDialog,
     close: closeDialog,

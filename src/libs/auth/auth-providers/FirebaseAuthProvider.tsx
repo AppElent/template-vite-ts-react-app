@@ -1,4 +1,3 @@
-// @ts-nocheck
 // TODO: Check ts errors
 
 import {
@@ -10,14 +9,13 @@ import {
   signInWithPopup,
   signOut,
 } from 'firebase/auth';
-import IAuthProvider from './IAuthProvider';
+import IAuthProvider, { IAuthProviderOptions } from './IAuthProvider';
 
 class FirebaseAuthProvider extends IAuthProvider {
-  constructor(options?, providerOptions?) {
+  constructor(options: IAuthProviderOptions, providerOptions?: any) {
     super(options, providerOptions);
 
     this.provider = 'FIREBASE';
-    this.auth = getAuth();
   }
 
   getDemoUser(): { username: string; password: string } {
@@ -32,12 +30,12 @@ class FirebaseAuthProvider extends IAuthProvider {
     return this.options.logout;
   }
 
-  async signUp(email, password) {
+  async signUp(email: string, password: string) {
     const userCredential = await createUserWithEmailAndPassword(getAuth(), email, password);
     return userCredential.user;
   }
 
-  async signIn(email, password) {
+  async signIn(email: string, password: string) {
     const userCredential = await signInWithEmailAndPassword(getAuth(), email, password);
     return userCredential.user;
   }
@@ -52,7 +50,7 @@ class FirebaseAuthProvider extends IAuthProvider {
     return signOut(getAuth());
   }
 
-  onAuthStateChanged(callback) {
+  onAuthStateChanged(callback: () => any) {
     return () => onAuthStateChanged(getAuth(), callback);
   }
 

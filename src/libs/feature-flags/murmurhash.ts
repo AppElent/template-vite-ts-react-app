@@ -1,4 +1,4 @@
-/* eslint-disable no-fallthrough */
+ 
 /**
  * JS Implementation of MurmurHash3 (r136) (as of May 20, 2011)
  *

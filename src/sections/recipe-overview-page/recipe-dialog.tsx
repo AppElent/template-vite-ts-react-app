@@ -24,15 +24,33 @@ import {
   DialogTitle,
   Grid,
   IconButton,
+  Link,
+  Typography,
   useMediaQuery,
   useTheme,
 } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { StringParam, useQueryParam } from 'use-query-params';
 import RecipeDialogFullImageViewer from './recipe-dialog-full-image-viewer';
 import RecipeDialogImageList from './recipe-dialog-image-list';
 
 const parseExternalRecipeData = (data: any): Recipe => {
+  const timeObject = (data.prep_time || data.cook_time || data.total_time) && {
+    prep: data.prep_time,
+    cooking: data.cook_time,
+    total: data.total_time,
+  };
+  // Total time is prep time + cooking time. If one of the fields is empty, calculate the other field if possible
+  if (!timeObject.total) {
+    timeObject.total = (timeObject.prep || 0) + (timeObject.cooking || 0);
+  } else if (!timeObject.prep) {
+    // Make sure that prep time is not negative
+    timeObject.prep = Math.max(0, (timeObject.total || 0) - (timeObject.cooking || 0));
+  } else if (!timeObject.cooking) {
+    // Make sure that cooking time is not negative
+    timeObject.cooking = Math.max(0, (timeObject.total || 0) - (timeObject.prep || 0));
+  }
+
   return {
     ...(data.title && data.title.trim() && { name: data.title }),
     ...(data.description &&
@@ -40,10 +58,13 @@ const parseExternalRecipeData = (data: any): Recipe => {
         description: data.description,
       }),
     //TODO: cooking times
+    // If timeobject is undefined, at to object
+    ...(timeObject && { time: timeObject }),
+    //...(data.total_time && data.total_time.trim() && { time.total: data.total_time }),
     ...(data.yields &&
       data.yields.trim() && {
-        yields: data.yields,
-      }),
+        yieldsText: data.yields,
+      }), //TODO: make object instead of string
     ...(data.nutrients && {
       nutrients: data.nutrients,
     }),
@@ -183,7 +204,7 @@ function RecipeDialog({
         },
       },
       {
-        name: 'cookingTime',
+        name: 'time.total',
         label: 'Cooking Time',
         type: 'number',
       },
@@ -210,7 +231,7 @@ function RecipeDialog({
         label: 'Category',
       },
       {
-        name: 'numberOfServings',
+        name: 'yieldsText',
         label: 'Number of Servings',
         render: ({ field, formik, options, helpers }: FieldDefinitionConfig) => {
           return (
@@ -226,15 +247,18 @@ function RecipeDialog({
       {
         name: 'keywords',
         label: 'Keywords',
-        type: 'list',
+        definition: 'list', //TODO: make list of keywords
         //initialValue: [recipe?.keywords || ['']],
+        custom: {
+          header: true,
+        },
       },
       {
         //id: 'calories',
         name: 'nutrients.calories',
         type: 'object',
         //accessor: 'nutrients.calories',
-        label: 'Nutrients.calories',
+        label: 'Calories',
         //initialValue: [recipe?.nutrients?.calories || ['']],
       },
     ],
@@ -248,6 +272,7 @@ function RecipeDialog({
       muiTextFieldProps: {
         fullWidth: true,
         variant: 'outlined',
+        multiline: true,
       },
       preSave: (values: any) => {
         const cleanedValues = { ...values };
@@ -281,31 +306,32 @@ function RecipeDialog({
     },
   });
 
-  //Receive URL from query params. If set, update formik state with the URL
-  const [queryParams, setQueryParams] = useSearchParams();
-  useEffect(() => {
-    console.log(formik.values.url, queryParams.get('url'));
-    if (queryParams.get('url') && formik.values.url !== queryParams.get('url')) {
-      console.log('jajajajaj');
-      formik.setFieldValue('url', queryParams.get('url'));
-      //setQueryParams(queryParams.delete('url'));
-    }
-  }, [queryParams, formik.values.url, setQueryParams]);
-
-  console.log(formik);
-
   // Fetch recipe data from api
   const {
     data: externalRecipeData,
     loading,
+    error: fetchUrlError,
     fetchData,
   } = useFetch<any>(`https://api-python.appelent.site/recipes/scrape?url=${formik.values.url}`, {
     autoFetch: false,
   });
 
+  //Receive URL from query params. If set, update formik state with the URL
+  const [urlParam, setUrlParam] = useQueryParam('url', StringParam);
+  useEffect(() => {
+    const fetchDataAndUpdateFormik = async () => {
+      await formik.setFieldValue('url', urlParam);
+      await fetchData(`https://api-python.appelent.site/recipes/scrape?url=${urlParam}`);
+      setUrlParam(undefined, 'replaceIn');
+    };
+    if (urlParam && formik.values.url !== urlParam && !loading) {
+      fetchDataAndUpdateFormik();
+    }
+  }, [urlParam, formik.values.url, fetchData, setUrlParam, loading]);
+
   useEffect(() => {
     if (externalRecipeData) {
-      console.log(externalRecipeData);
+      console.log('ja?');
       if (externalRecipeData && externalRecipeData.status === 'success') {
         formik.setValues({
           ...formik.values,
@@ -315,6 +341,8 @@ function RecipeDialog({
       //formik.handleSubmit();
     }
   }, [externalRecipeData]);
+
+  console.log(formik);
 
   // useEffect(() => {
   //   console.log('DEFAULT VALUES', recipeDefaultValues, recipe);
@@ -423,7 +451,13 @@ function RecipeDialog({
                 xs={12}
                 sm={formik.values.url ? 8 : 12}
               >
-                <Box>{formFields['url']}</Box>
+                <Box>
+                  {isEditing ? (
+                    formFields['url']
+                  ) : (
+                    <Link href={formik.values.url}>{formFields['url']}</Link>
+                  )}
+                </Box>
               </Grid>
               <Grid
                 item
@@ -446,17 +480,24 @@ function RecipeDialog({
                 )}
               </Grid>
             </Grid>
+            {fetchUrlError && (
+              <Typography
+                color="error"
+                gutterBottom
+              >
+                {fetchUrlError}
+              </Typography>
+            )}
 
             {formFields['cuisine']}
             {formFields['ingredients']}
             {formFields['instructions']}
             {formFields['score']}
             {formFields['comments']}
-            {formFields['cookingTime']}
-            {formFields['nutrition']}
+            {formFields['time.total']}
             {formFields['category']}
             {formFields['keywords']}
-            {formFields['numberOfServings']}
+            {formFields['yieldsText']}
             {formFields['nutrients.calories']}
             {formik.values.images && formik.values.images.length > 0 && (
               <RecipeDialogImageList

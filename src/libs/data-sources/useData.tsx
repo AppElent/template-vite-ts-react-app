@@ -109,6 +109,7 @@ const useData = <T,>(key: string, _options = {}, newDataSource?: DataSource<T>) 
       set: (data, id) => set(key, data, id),
       delete: (id) => remove(key, id),
       validate: dataSource?.validate,
+      getDummyData: dataSource?.getDummyData,
       // Raw datasource info
       dataSource,
       provider: dataSource?.provider,

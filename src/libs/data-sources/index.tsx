@@ -14,7 +14,9 @@ export interface DataSourceInitOptions<T> {
   mock?: boolean; //TODO: implement
   mockOptions?: {
     count?: number;
-    schema?: Record<string, any>;
+    schema?: {
+      [key: string]: () => any;
+    };
   };
 }
 

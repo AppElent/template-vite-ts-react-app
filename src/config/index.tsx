@@ -1,6 +1,62 @@
-const config = {
+/**
+ * Application configuration interface
+ */
+interface AppConfig {
+  meta: {
+    /** Application title */
+    title: string;
+    /** Application version */
+    version?: string;
+    /** Copyright information */
+    copyright?: string;
+    /** Application URL */
+    url?: string;
+  };
+  paths: {
+    auth: {
+      /** Path to login */
+      login: string;
+      /** Path to logout */
+      logout: string;
+      /** Path to signup */
+      signup: string;
+      /** Path to redirect after login */
+      loginRedirect: string;
+      /** Path to redirect after login */
+      redirectAfterLogin: string;
+      /** Path to redirect after logout */
+      redirectAfterLogout: string;
+    };
+    /** Path to index */
+    index: string;
+    /** Flag to indicate if HTTPS redirection is enabled */
+    httpsRedirect: boolean;
+    /** Path to redirect from root */
+    rootRedirect: string;
+  };
+  settings: {
+    /** Log level setting */
+    logLevel: 'info' | 'debug' | 'warn' | 'error';
+  };
+  /** Issue dialog configuration */
+  issueDialog?: {
+    [key: string]: any;
+  };
+  /** Custom configuration */
+  custom?: {
+    [key: string]: any;
+  };
+}
+
+/**
+ * Application configuration object
+ */
+const config: AppConfig = {
   meta: {
     title: 'Recipe tool',
+    version: 'v0.0.1',
+    url: 'recipes.appelent.site',
+    copyright: 'AppElent',
   },
   paths: {
     auth: {
@@ -13,32 +69,10 @@ const config = {
     },
     index: '/app',
     httpsRedirect: !import.meta.env.DEV && window.location.hostname !== 'localhost',
-    rootRedirect: '/app', //false, //or location, e.g. /app
+    rootRedirect: '/app',
   },
-  // data: {
-  //   title: 'Satisfactory Build Tool',
-  //   subtitle: 'Making Satisfactory easy again',
-  //   plan: 'PRO',
-  //   version: 'v0.0.1',
-  //   copyright: 'AppElent',
-  //   url: 'satisfactory.appelent.com',
-  //   stagingUrl: 'satisfactory-stg.appelent.com',
-  //   loginRedirect: '/',
-  //   backend: 'https://api.appelent.com',
-  //   logo: {
-  //     big: '/assets/satisfactory/icon.png',
-  //     icon: '/location',
-  //   },
-  //   index: '/satisfactory',
-  // },
   settings: {
-    //httpsRedirect: !import.meta.env.DEV && window.location.hostname !== 'localhost',
-    //redirectFromRoot: '/satisfactory', //false, //or location, e.g. /app
     logLevel: 'info',
-    // confirmationDialogOptions: {
-    //   confirmationButtonProps: { variant: 'contained', autoFocus: true },
-    //   cancellationButtonProps: { variant: 'outlined', color: 'error' },
-    // },
   },
   issueDialog: {
     // The issue dialog needs functions to open and close it

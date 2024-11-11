@@ -44,7 +44,7 @@ const useLoginForm = (
   authProvider: AuthProvider,
   mode: 'signin' | 'signup'
 ): UseLoginFormReturn => {
-  const setIsSignUpMode = (isSignUpMode: boolean) => {};
+  const setIsSignUpMode = (_isSignUpMode: boolean) => {};
   const isSignUpMode = mode === 'signup';
   const validationSchema = Yup.object({
     email: Yup.string().email('Invalid email address').required('Required'),

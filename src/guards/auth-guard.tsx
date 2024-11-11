@@ -1,46 +1,52 @@
-import PropTypes from 'prop-types';
 import { useCallback, useEffect, useState } from 'react';
 
+import config from '@/config';
 import useRouter from '@/hooks/use-router';
 import { useAuth } from '@/libs/auth';
 
-const AuthGuard = (props: any) => {
-  const { children } = props;
-  const router = useRouter();
-  const { isAuthenticated, issuer, options } = useAuth();
+interface AuthGuardProps {
+  children: React.ReactNode;
+  options: {
+    login: string;
+    shouldBeAuthenticated?: boolean;
+  };
+}
+
+/**
+ * AuthGuard component to protect routes based on authentication status.
+ * @param {React.ReactNode} children - The child components to render.
+ * @param {Object} options - Options for the AuthGuard.
+ * @param {string} options.login - The login route.
+ * @param {boolean} [options.shouldBeAuthenticated=true] - Flag indicating if the user should be authenticated.
+ * @returns {JSX.Element | null} - The rendered component or null if redirecting.
+ */
+const AuthGuard: React.FC<AuthGuardProps> = ({ children, options }) => {
   const [checked, setChecked] = useState(false);
+  const router = useRouter();
+  const { isAuthenticated } = useAuth();
 
   const check = useCallback(() => {
-    if (options.login && !isAuthenticated && window.location.pathname !== options?.login) {
+    const { shouldBeAuthenticated = true, login } = options;
+    if (shouldBeAuthenticated && !isAuthenticated && window.location.pathname !== login) {
       const searchParams = new URLSearchParams({ returnTo: window.location.pathname }).toString();
-      const href = options.login + `?${searchParams}`;
+      const href = login + `?${searchParams}`;
       router.replace(href);
+    } else if (!shouldBeAuthenticated && isAuthenticated) {
+      router.replace(config.paths.index);
     } else {
       setChecked(true);
     }
-  }, [isAuthenticated, router, options.login]);
+  }, [isAuthenticated, router, options]);
 
-  // Only check on mount, this allows us to redirect the user manually when auth state changes
-  useEffect(
-    () => {
-      check();
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isAuthenticated]
-  );
+  useEffect(() => {
+    check();
+  }, [isAuthenticated, check]);
 
   if (!checked) {
     return null;
   }
 
-  // If got here, it means that the redirect did not occur, and that tells us that the user is
-  // authenticated / authorized.
-
   return <>{children}</>;
 };
 
 export default AuthGuard;
-
-AuthGuard.propTypes = {
-  children: PropTypes.node,
-};

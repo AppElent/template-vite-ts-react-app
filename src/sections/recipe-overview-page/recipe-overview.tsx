@@ -18,7 +18,7 @@ import {
 } from '@mui/material';
 import PropTypes from 'prop-types';
 import { useCallback, useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useQueryParam } from 'use-query-params';
 import RecipeDialog from './recipe-dialog';
 import RecipeOverviewGalleryView from './recipe-overview-gallery-view';
 import RecipeOverviewListView from './recipe-overview-list-view';
@@ -38,9 +38,7 @@ function RecipeOverview({
 }) {
   const [view, setView] = useState('gallery');
   const dialog = useDialog({ queryKey: 'recipe' });
-  const [searchParams] = useSearchParams();
-
-  console.log(searchParams.get('url'));
+  const [urlParam] = useQueryParam('url');
 
   const handleAddRecipe = useCallback(() => {
     //dialog.setData(undefined); // Clear dialog data for new recipe
@@ -48,10 +46,10 @@ function RecipeOverview({
   }, [dialog]); // TODO: receive url in dialog and remove it from query params
 
   useEffect(() => {
-    if (searchParams.get('url') && !dialog.isOpen) {
+    if (urlParam && !dialog.isOpen) {
       handleAddRecipe();
     }
-  }, [handleAddRecipe, searchParams]);
+  }, [handleAddRecipe, urlParam, dialog.isOpen]);
 
   const { data: filteredItems, ...filterOptions } = useFilter(recipes, {
     initialSortField: 'name',

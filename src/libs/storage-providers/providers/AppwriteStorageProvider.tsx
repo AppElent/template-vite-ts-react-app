@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+ 
 import BaseStorageProvider from './BaseStorageProvider';
 
 export default class AppwriteStorage extends BaseStorageProvider {

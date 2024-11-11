@@ -1,9 +1,13 @@
+import config from '@/config';
 import { FirebaseAuthProvider, useLoginForm } from '@/libs/auth';
 import { Button, Card, CardActions, CardContent, CardHeader, Grid, TextField } from '@mui/material';
 import DefaultPaperbasePage from '../DefaultPaperbasePage';
 
 const authProviders: { [key: string]: any } = {
-  Firebase: new FirebaseAuthProvider(),
+  Firebase: new FirebaseAuthProvider({
+    login: config.paths.auth.login,
+    logout: config.paths.auth.logout,
+  }),
   // /Composite: new CompositeAuthProvider(),
 };
 

@@ -1,7 +1,46 @@
 import { AppBar, Box, IconButton, Stack, Tab, Tabs, Tooltip } from '@mui/material';
 import PropTypes from 'prop-types';
 
-const TabSection = ({ tabs, buttons }) => {
+/**
+ * Tab data type
+ */
+interface TabData {
+  value: string | number;
+  label: string;
+}
+
+/**
+ * Tabs props type
+ */
+interface TabsProps {
+  tab: string | number;
+  tabsData: TabData[];
+  handleTabChange: (event: React.SyntheticEvent, newValue: string | number) => void;
+}
+
+/**
+ * Button props type
+ */
+interface ButtonProps {
+  tooltip: string;
+  icon: React.ReactElement;
+  onClick: () => void;
+}
+
+/**
+ * TabSection props type
+ */
+interface TabSectionProps {
+  tabs?: TabsProps;
+  buttons?: ButtonProps[];
+}
+
+/**
+ * TabSection component
+ * @param {TabSectionProps} props - The props for the component
+ * @returns {JSX.Element} The TabSection component
+ */
+const TabSection: React.FC<TabSectionProps> = ({ tabs, buttons }) => {
   return (
     <AppBar
       component="div"
@@ -31,10 +70,6 @@ const TabSection = ({ tabs, buttons }) => {
                   value={tab.value}
                 />
               ))}
-              {/* <Tab label="Users" />
-        <Tab label="Sign-in method" />
-        <Tab label="Templates" />
-        <Tab label="Usage" /> */}
             </Tabs>
           )}
         </Box>
@@ -50,12 +85,7 @@ const TabSection = ({ tabs, buttons }) => {
                 placement="top"
                 key={button.tooltip}
               >
-                <IconButton
-                  onClick={button.onClick}
-                  //color="primary"
-                >
-                  {button.icon}
-                </IconButton>
+                <IconButton onClick={button.onClick}>{button.icon}</IconButton>
               </Tooltip>
             );
           })}

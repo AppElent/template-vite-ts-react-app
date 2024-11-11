@@ -3,21 +3,11 @@ import { db } from '@/config/firebase';
 import useTabs from '@/hooks/use-tabs';
 import FirestoreDataSource from '@/libs/data-sources/data-sources/FirestoreDataSource';
 import LocalStorageDataSource from '@/libs/data-sources/data-sources/LocalStorageDataSource';
-import { Dummy, dummyYupSchema } from '@/schemas/dummy';
+import MockDataSource from '@/libs/data-sources/data-sources/MockDataSource';
+import { Dummy, dummyMockSchema, dummyYupSchema } from '@/schemas/dummy';
 import { Button, Card, CardActions, CardContent, CardHeader, Grid } from '@mui/material';
 import useData from '../../../libs/data-sources/useData';
 import DefaultPaperbasePage from '../DefaultPaperbasePage';
-
-const dummyObject = {
-  name: 'John Doe',
-  number: 42,
-  date: '2023-10-01',
-  boolean: true,
-  array: ['item1', 'item2'],
-  object: {
-    key: 'value',
-  },
-};
 
 const datasources = {
   Firestore: {
@@ -27,6 +17,7 @@ const datasources = {
         targetMode: 'collection',
         subscribe: true,
         YupValidationSchema: dummyYupSchema,
+        mockOptions: { schema: dummyMockSchema },
       },
       { db }
     ),
@@ -40,6 +31,7 @@ const datasources = {
         targetMode: 'document',
         subscribe: true,
         YupValidationSchema: dummyYupSchema,
+        mockOptions: { schema: dummyMockSchema },
       },
       { db }
     ),
@@ -48,6 +40,7 @@ const datasources = {
         target: 'dummy/01iQznR3TyhzhI5ct5cQ',
         targetMode: 'document',
         YupValidationSchema: dummyYupSchema,
+        mockOptions: { schema: dummyMockSchema },
       },
       { db }
     ),
@@ -63,6 +56,7 @@ const datasources = {
           filters: [{ field: 'boolean', operator: '==', value: false }],
           pagination: { page: 1, pageSize: 5 },
         },
+        mockOptions: { schema: dummyMockSchema },
       },
       { db }
     ),
@@ -75,17 +69,27 @@ const datasources = {
     }),
     Normal: new LocalStorageDataSource({ target: 'dummy', YupValidationSchema: dummyYupSchema }),
   },
+  MockDataSource: {
+    Normal: new MockDataSource(
+      {
+        target: 'dummy',
+        subscribe: true,
+        YupValidationSchema: dummyYupSchema,
+        mockOptions: { schema: dummyMockSchema },
+      },
+      { count: 10 }
+    ),
+  },
 };
 
 const DataSource = (props: any) => {
   const { datasourceName, dataSource: newDataSource } = props;
   const datasource = useData<Dummy>(datasourceName, {}, newDataSource);
   const handleAdd = async () => {
-    const newItem = dummyObject;
+    const newItem = datasource.getDummyData(); //getDummyTestData(1) as Dummy;
+    console.log(newItem);
     await datasource.add(newItem);
   };
-
-  console.log(datasourceName, datasource);
 
   const handleGetAll = async () => {
     const items = await datasource?.getAll();
@@ -149,8 +153,9 @@ const DataOperations = () => {
     return { label: key, value: key };
   });
   const tabs = useTabs(tabsData);
-  const dataSources: { [key: string]: FirestoreDataSource<any> | LocalStorageDataSource } =
-    datasources[tabs.tab as keyof typeof datasources];
+  const dataSources: {
+    [key: string]: FirestoreDataSource<any> | LocalStorageDataSource | MockDataSource;
+  } = datasources[tabs.tab as keyof typeof datasources];
 
   return (
     <DefaultPaperbasePage

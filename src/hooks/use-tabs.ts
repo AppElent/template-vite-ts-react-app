@@ -21,7 +21,7 @@ const useTabs = (tabsData: TabData[], options?: any) => {
     }
   };
   const [tab, setTab] = useState(getValue());
-  // TODO: fix url query functionality
+  // TODO: fix this hook
   const [query, setQuery] = [
     '',
     (value: any) => {
