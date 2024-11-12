@@ -19,33 +19,34 @@ export interface FieldOptions {
   [key: string]: any;
 }
 
-export interface GlobalFieldOptions extends FieldOptions {
-  owner?: string; // TODO: implement
-  preSave?: (value: any) => any; // TODO: implement
-}
+// export interface GlobalFieldOptions extends FieldOptions {
+//   owner?: string; // TODO: implement
+//   preSave?: (value: any) => any; // TODO: implement
+// }
 
-export interface UseFormFieldsProps {
-  fields: FieldConfig[];
-  options?: GlobalFieldOptions;
-  formikProps: {
-    onSubmit: (values: any, formikBag?: any) => any;
-    [key: string]: any;
-  };
-}
+// export interface UseFormFieldsProps {
+//   fields: FieldConfig[];
+//   options?: GlobalFieldOptions;
+//   formikProps: {
+//     onSubmit: (values: any, formikBag?: any) => any;
+//     [key: string]: any;
+//   };
+// }
 
-export interface UseFormFieldsReturn {
-  formFields: { [key: string]: JSX.Element };
-  formik: FormikProps<any>;
-  save: () => any;
-}
+// export interface UseFormFieldsReturn {
+//   formFields: { [key: string]: JSX.Element };
+//   formik: FormikProps<any>;
+//   save: () => any;
+// }
 
 export interface FieldDefinitionConfig {
   field: FieldConfig;
   formik: FormikProps<any>;
-  options: { [key: string]: any };
+  options: FieldOptions;
   helpers: {
     add: () => any;
     remove: (index: number) => any;
+    handleChange: (e: any) => any;
     value: any;
     errors: any;
     touched: any;
@@ -57,4 +58,4 @@ export interface RenderFieldDefinitions {
 }
 
 export { default as CustomField } from './custom-field';
-export { default as useFormFields } from './use-form-fields';
+export { default as CustomForm } from './custom-form';

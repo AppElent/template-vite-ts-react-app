@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker';
 import * as yup from 'yup';
 import { DataSourceInitOptions, FilterObject } from '..';
 
-type YupSchema<T extends yup.AnyObject> = yup.ObjectSchema<T>;
+//type YupSchema<T extends yup.AnyObject> = yup.ObjectSchema<T>;
 
 interface validateOptions {
   full: boolean;
@@ -252,7 +252,7 @@ class BaseDataSource<T> {
 
     if (filters) {
       result = result.filter((item) => {
-        return Object.entries(filters!).every(([key, value]) => {
+        return Object.entries(filters!).every(([_key, value]) => {
           const itemValue = item[value.field as keyof T];
           const filterValue = typeof value.value === 'function' ? value.value() : value.value;
           return itemValue === filterValue;

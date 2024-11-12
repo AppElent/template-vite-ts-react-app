@@ -1,5 +1,6 @@
-import { Card, CardContent, CardMedia, Grid, Typography } from '@mui/material';
+import NoImageAvailable from '@/components/default/no-image-available';
 import Recipe from '@/types/recipe';
+import { Card, CardContent, CardMedia, Grid, Rating, Typography } from '@mui/material';
 
 const RecipeOverviewGalleryView = ({
   recipes,
@@ -22,7 +23,7 @@ const RecipeOverviewGalleryView = ({
           key={recipe.id}
           onClick={() => handleRecipeClick(recipe)}
         >
-          <Card>
+          <Card sx={{ position: 'relative' }}>
             {recipe.image ? (
               <CardMedia
                 component="img"
@@ -31,19 +32,7 @@ const RecipeOverviewGalleryView = ({
                 alt={recipe.name}
               />
             ) : (
-              <div
-                style={{
-                  height: '160px',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  backgroundColor: '#f0f0f0',
-                  color: '#888',
-                  fontSize: '14px',
-                }}
-              >
-                No image available
-              </div>
+              <NoImageAvailable />
             )}
             <CardContent>
               <Typography
@@ -56,7 +45,11 @@ const RecipeOverviewGalleryView = ({
                 variant="body2"
                 color="text.secondary"
               >
-                Cooking Time: {recipe.cookingTime} minutes
+                {recipe.time?.cook && <>Cooking Time: {recipe.time.cook} minutes</>}
+                <Rating
+                  value={recipe.score || 0}
+                  readOnly
+                />
               </Typography>
             </CardContent>
           </Card>

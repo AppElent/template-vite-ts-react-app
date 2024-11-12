@@ -3,11 +3,14 @@ import { DefaultTextField } from '@/libs/forms/default-fields';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import {
+  Autocomplete,
+  Chip,
   IconButton,
   List,
   ListItem,
   ListItemSecondaryAction,
   ListItemText,
+  Rating,
   Stack,
   TextField,
   Typography,
@@ -58,7 +61,7 @@ const FieldDefinitions: RenderFieldDefinitions = {
                       //   newItems[index] = e.target.value;
                       //   formik.setFieldValue(field.name, newItems);
                       // }}
-                      onChange={formik.handleChange}
+                      onChange={helpers.handleChange}
                       onBlur={formik.handleBlur}
                       name={`${field.name}[${index}]`}
                       error={helpers.touched && Boolean(helpers.errors)}
@@ -95,6 +98,67 @@ const FieldDefinitions: RenderFieldDefinitions = {
         formik={formik}
         options={options}
         helpers={helpers}
+      />
+    );
+  },
+  tag_list: ({ field, formik, options, helpers }: FieldDefinitionConfig): any => {
+    return options?.editMode ? (
+      <Autocomplete
+        multiple
+        freeSolo
+        options={field.custom?.suggestions || []}
+        value={helpers.value || []}
+        onChange={(_event, newValue) => formik.setFieldValue(field.name, newValue)}
+        renderTags={(value, getTagProps) =>
+          value.map((option, index) => (
+            <Chip
+              variant="outlined"
+              label={option}
+              {...getTagProps({ index })}
+              key={option}
+              onDelete={() => {
+                const newKeywords = helpers.value.filter((keyword: string) => keyword !== option);
+                formik.setFieldValue(field.name, newKeywords);
+              }}
+            />
+          ))
+        }
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            variant="outlined"
+            label={field.label}
+            placeholder={`Add a ${field.label}`}
+            margin="dense"
+          />
+        )}
+      />
+    ) : (
+      <Typography
+        key={field.name}
+        variant="body1"
+        margin="normal"
+        {...(options?.muiTypographyProps && options.muiTypographyProps)}
+      >
+        {field.label}: {helpers.value?.join(', ')}
+      </Typography>
+    );
+  },
+  rating: ({ field, formik, options, helpers }: FieldDefinitionConfig): any => {
+    return (
+      <Rating
+        name={field.name}
+        value={helpers.value || 0}
+        onChange={(_event, newValue) => {
+          formik.setFieldValue(field.name, newValue);
+          if (!options?.editMode) {
+            formik.handleSubmit();
+          }
+        }}
+        precision={0.5}
+        // icon={<FavoriteIcon fontSize="inherit" />}
+        // emptyIcon={<FavoriteBorderIcon fontSize="inherit" />}
+        {...(options?.muiRatingProps && options.muiRatingProps)}
       />
     );
   },

@@ -7,6 +7,7 @@ import ViewListIcon from '@mui/icons-material/ViewList';
 import ViewModuleIcon from '@mui/icons-material/ViewModule';
 import {
   Fab,
+  FormControl,
   IconButton,
   InputAdornment,
   MenuItem,
@@ -52,8 +53,8 @@ function RecipeOverview({
   }, [handleAddRecipe, urlParam, dialog.isOpen]);
 
   const { data: filteredItems, ...filterOptions } = useFilter(recipes, {
-    initialSortField: 'name',
-    initialSortDirection: 'asc',
+    initialSortField: 'score',
+    initialSortDirection: 'desc',
     initialRowsPerPage: 25,
     initialPage: 0,
     updateInitialData: true,
@@ -71,11 +72,23 @@ function RecipeOverview({
     dialog.open(recipe.id);
   };
 
+  const handleSortChange = (event: any) => {
+    filterOptions.setSortField(event.target.value.split('-')[0]);
+    filterOptions.setSortDirection(event.target.value.split('-')[1]);
+  };
+
   const fabStyle: React.CSSProperties = {
     position: 'fixed',
     bottom: 16,
     right: 16,
   };
+
+  const sortOptions = [
+    { value: 'name-asc', label: 'Name (Ascending)' },
+    { value: 'createdAt-desc', label: 'Date added (Newest first)' },
+    { value: 'updatedAt-desc', label: 'Date modified (Newest first)' },
+    { value: 'score-desc', label: 'Rating (Highest first)' },
+  ];
 
   return (
     <>
@@ -84,7 +97,6 @@ function RecipeOverview({
           open={dialog.isOpen}
           onClose={() => dialog.close()}
           setRecipe={(data: any, id: string | undefined) => {
-            console.log(id, data);
             if (id) {
               return setRecipe(data, id);
             } else {
@@ -128,7 +140,7 @@ function RecipeOverview({
           sx={{ flexGrow: 1 }}
           onChange={(e) => filterOptions.setSearchQuery(e.target.value)}
         />
-        <TextField
+        {/* <TextField
           label="Max Cooking Time"
           variant="outlined"
           type="number"
@@ -147,7 +159,7 @@ function RecipeOverview({
           <MenuItem value="Indian">Indian</MenuItem>
           <MenuItem value="Chinese">Chinese</MenuItem>
           {/* Add more categories as needed */}
-        </TextField>
+        {/* </TextField> */}
       </Stack>
       {/* Toggle button to switch between views */}
       <Stack
@@ -174,6 +186,28 @@ function RecipeOverview({
             <ViewListIcon /> List
           </ToggleButton>
         </ToggleButtonGroup>
+        <FormControl
+          className="sort-options"
+          sx={{ minWidth: 300 }}
+        >
+          <TextField
+            id="sort-label"
+            label="Sort By"
+            select
+            value={`${filterOptions.sortField}-${filterOptions.sortDirection}`}
+            onChange={handleSortChange}
+            margin="dense"
+          >
+            {sortOptions.map((option) => (
+              <MenuItem
+                key={option.value}
+                value={option.value}
+              >
+                {option.label}
+              </MenuItem>
+            ))}
+          </TextField>
+        </FormControl>
       </Stack>
 
       {/* Gallery View */}

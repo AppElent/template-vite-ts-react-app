@@ -1,12 +1,15 @@
 // @ts-nocheck
-import JsonViewer from '@andypf/json-viewer/dist/esm/react/JsonViewer';
 
 import ImageUploader from '@/components/default/image-uploader';
+import JsonEditor from '@/components/default/json-editor';
 import LoadingButton from '@/components/default/loading-button';
 import useFetch from '@/hooks/use-fetch';
 import { useAuth } from '@/libs/auth';
-import { FieldConfig, FieldDefinitionConfig, useFormFields } from '@/libs/forms';
-import { DefaultTextField } from '@/libs/forms/default-fields';
+import CustomField from '@/libs/forms/custom-field';
+import CustomForm from '@/libs/forms/custom-form';
+import useCustomFormik from '@/libs/forms/use-custom-formik';
+import getRecipeFields from '@/libs/recipes/get-recipe-fields';
+import parseExternalRecipeData from '@/libs/recipes/parse-external-recipe-data';
 import FirebaseStorageProvider from '@/libs/storage-providers/providers/FirebaseStorageProvider';
 import { recipeYupSchema } from '@/schemas/recipe';
 import Recipe from '@/types/recipe';
@@ -24,7 +27,6 @@ import {
   DialogTitle,
   Grid,
   IconButton,
-  Link,
   Typography,
   useMediaQuery,
   useTheme,
@@ -33,68 +35,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { StringParam, useQueryParam } from 'use-query-params';
 import RecipeDialogFullImageViewer from './recipe-dialog-full-image-viewer';
 import RecipeDialogImageList from './recipe-dialog-image-list';
-
-const parseExternalRecipeData = (data: any): Recipe => {
-  const timeObject = (data.prep_time || data.cook_time || data.total_time) && {
-    prep: data.prep_time,
-    cooking: data.cook_time,
-    total: data.total_time,
-  };
-  // Total time is prep time + cooking time. If one of the fields is empty, calculate the other field if possible
-  if (!timeObject.total) {
-    timeObject.total = (timeObject.prep || 0) + (timeObject.cooking || 0);
-  } else if (!timeObject.prep) {
-    // Make sure that prep time is not negative
-    timeObject.prep = Math.max(0, (timeObject.total || 0) - (timeObject.cooking || 0));
-  } else if (!timeObject.cooking) {
-    // Make sure that cooking time is not negative
-    timeObject.cooking = Math.max(0, (timeObject.total || 0) - (timeObject.prep || 0));
-  }
-
-  return {
-    ...(data.title && data.title.trim() && { name: data.title }),
-    ...(data.description &&
-      data.description.trim() && {
-        description: data.description,
-      }),
-    //TODO: cooking times
-    // If timeobject is undefined, at to object
-    ...(timeObject && { time: timeObject }),
-    //...(data.total_time && data.total_time.trim() && { time.total: data.total_time }),
-    ...(data.yields &&
-      data.yields.trim() && {
-        yieldsText: data.yields,
-      }), //TODO: make object instead of string
-    ...(data.nutrients && {
-      nutrients: data.nutrients,
-    }),
-    ...(data.image && data.image.trim() && { image: data.image }),
-    ...(data.ingredients &&
-      data.ingredients.length > 0 && {
-        ingredients: data.ingredients,
-      }),
-    ...(data.instructions_list &&
-      data.instructions_list.length > 0 && {
-        instructions: data.instructions_list,
-      }),
-    ...(data.category &&
-      data.category.trim() && {
-        category: data.category,
-      }),
-    ...(data.keywords &&
-      data.keywords.length > 0 && {
-        keywords: data.keywords,
-      }),
-    ...(data.cuisine &&
-      data.cuisine.trim() && {
-        cuisine: data.cuisine.split(','),
-      }),
-
-    // external data
-    ...(data.site_name && data.site_name.trim() && { site: data.site_name }),
-    raw: data,
-  };
-};
 
 function RecipeDialog({
   open,
@@ -147,164 +87,31 @@ function RecipeDialog({
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [uploadFileName] = useState<string | null>(createGuid());
 
-  // const defaultValues = {
-  //   name: '',
-  //   description: '',
-  //   url: '',
-  //   ingredients: [''],
-  //   instructions: [''],
-  //   image: '',
-  //   images: [],
-  //   cuisine: [''],
-  //   score: 0,
-  //   comments: '',
-  //   cookingTime: 0,
-  //   nutrition: 0,
-  //   category: '',
-  //   keywords: [''],
-  //   numberOfServings: 2,
-  // };
+  const initialValues = useMemo(() => {
+    return {
+      owner: auth.user.id,
+      ...recipe,
+    };
+  }, [recipe, auth.user.id]);
 
-  const fields: FieldConfig[] = useMemo(
-    () => [
-      {
-        name: 'name',
-        label: 'Name',
-        validation: (value: any) => recipeYupSchema.validateAt('name', value),
-      },
-      {
-        name: 'description',
-        label: 'Description',
-      },
-      {
-        name: 'cuisine',
-        label: 'Cuisine',
-        definition: 'list',
-        custom: {
-          header: true,
-        },
-      },
-      {
-        name: 'ingredients',
-        label: 'Ingredients',
-        definition: 'list',
-        //initialValue: [recipe?.ingredients || ['']],
-        custom: {
-          header: true,
-        },
-      },
-      {
-        name: 'instructions',
-        label: 'Instructions',
-        definition: 'list',
-        //initialValue: [recipe?.instructions || ['']],
-        custom: {
-          numbered: true,
-          header: true,
-        },
-      },
-      {
-        name: 'time.total',
-        label: 'Cooking Time',
-        type: 'number',
-      },
-      {
-        name: 'comments',
-        label: 'Comments',
-      },
-      {
-        name: 'score',
-        label: 'Score',
-        type: 'number',
-      },
-      {
-        name: 'url',
-        label: 'URL',
-      },
-      {
-        name: 'nutrition',
-        label: 'Nutrition info',
-        type: 'number',
-      },
-      {
-        name: 'category',
-        label: 'Category',
-      },
-      {
-        name: 'yieldsText',
-        label: 'Number of Servings',
-        render: ({ field, formik, options, helpers }: FieldDefinitionConfig) => {
-          return (
-            <DefaultTextField
-              field={field}
-              formik={formik}
-              options={options}
-              helpers={helpers}
-            />
-          );
-        },
-      },
-      {
-        name: 'keywords',
-        label: 'Keywords',
-        definition: 'list', //TODO: make list of keywords
-        //initialValue: [recipe?.keywords || ['']],
-        custom: {
-          header: true,
-        },
-      },
-      {
-        //id: 'calories',
-        name: 'nutrients.calories',
-        type: 'object',
-        //accessor: 'nutrients.calories',
-        label: 'Calories',
-        //initialValue: [recipe?.nutrients?.calories || ['']],
-      },
-    ],
-    []
-  );
+  const fields = useMemo(() => getRecipeFields(recipes), [recipes]);
 
-  const { formFields, formik } = useFormFields({
+  // Get formik instance ref
+  const formik = useCustomFormik({
+    initialValues,
+    validationSchema: recipeYupSchema,
+    enableReinitialize: true,
+    onSubmit: async (values: Recipe) => {
+      const savedRecipe = await setRecipe(values, recipe?.id);
+      if (recipeId === 'new') {
+        setRecipeId(savedRecipe.id);
+      }
+      setIsEditing(false);
+    },
     fields,
-    options: {
-      editMode: isEditing,
-      muiTextFieldProps: {
-        fullWidth: true,
-        variant: 'outlined',
-        multiline: true,
-      },
-      preSave: (values: any) => {
-        const cleanedValues = { ...values };
-        Object.keys(cleanedValues).forEach((key) => {
-          if (Array.isArray(cleanedValues[key])) {
-            cleanedValues[key] = values[key].filter((item) => item.trim() !== '');
-          }
-        });
-        //cleanedValues.owner = auth.user?.id || 'unknown';
-        if (!recipe?.id) {
-          cleanedValues.createdAt = new Date().toISOString();
-        }
-        cleanedValues.updatedAt = new Date().toISOString();
-        return cleanedValues;
-      },
-    },
-    formikProps: {
-      initialValues: {
-        owner: auth.user.id,
-        ...recipe,
-      },
-      validationSchema: recipeYupSchema,
-      enableReinitialize: true,
-      onSubmit: async (values: Recipe) => {
-        const savedRecipe = await setRecipe(values, recipe?.id);
-        if (recipeId === 'new') {
-          setRecipeId(savedRecipe.id);
-        }
-        setIsEditing(false);
-      },
-    },
   });
+
+  console.log('FORMIK', formik);
 
   // Fetch recipe data from api
   const {
@@ -312,7 +119,7 @@ function RecipeDialog({
     loading,
     error: fetchUrlError,
     fetchData,
-  } = useFetch<any>(`https://api-python.appelent.site/recipes/scrape?url=${formik.values.url}`, {
+  } = useFetch<any>(`https://api-python.appelent.site/recipes/scrape?url=${formik?.values.url}`, {
     autoFetch: false,
   });
 
@@ -327,11 +134,10 @@ function RecipeDialog({
     if (urlParam && formik.values.url !== urlParam && !loading) {
       fetchDataAndUpdateFormik();
     }
-  }, [urlParam, formik.values.url, fetchData, setUrlParam, loading]);
+  }, [urlParam, formik?.values?.url, fetchData, setUrlParam, loading]);
 
   useEffect(() => {
     if (externalRecipeData) {
-      console.log('ja?');
       if (externalRecipeData && externalRecipeData.status === 'success') {
         formik.setValues({
           ...formik.values,
@@ -342,34 +148,16 @@ function RecipeDialog({
     }
   }, [externalRecipeData]);
 
-  console.log(formik);
-
-  // useEffect(() => {
-  //   console.log('DEFAULT VALUES', recipeDefaultValues, recipe);
-
-  //   if (recipe) {
-  //     // formik.setValues({
-  //     //   //...defaultValues,
-  //     //   ...recipe,
-  //     // });
-  //     setImage(recipe.image || null);
-  //   } else {
-  //     //formik.resetForm();
-  //     setImage(null);
-  //   }
-  // }, [recipe]);
-
-  // useEffect(() => {
-  //   console.log('USER', auth.user);
-  //   if (auth?.user?.id && formik.values.owner !== auth.user.id) {
-  //     const user = auth.user?.id;
-  //     formik.setFieldValue('owner', user);
-  //   }
-  // }, [auth.user]);
+  useEffect(() => {
+    // Temp to fix yields
+    if (typeof formik?.values?.yields === 'string') {
+      formik.setFieldValue('yields', undefined);
+    }
+  }, [formik?.values?.yields]);
 
   // Conditions for disabling submit button
   const disableSubmit =
-    formik.isSubmitting || loading || !formik.isValid || !formik.dirty || formik.isValidating;
+    formik?.isSubmitting || loading || !formik?.isValid || !formik?.dirty || formik?.isValidating;
 
   return (
     <>
@@ -380,51 +168,61 @@ function RecipeDialog({
         fullWidth
         fullScreen={fullScreen}
       >
-        <DialogTitle
-          style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+        <CustomForm
+          formik={formik}
+          options={{
+            editMode: isEditing,
+            muiTextFieldProps: {
+              fullWidth: true,
+              variant: 'outlined',
+              multiline: true,
+            },
+          }}
         >
-          <div>
-            {isEditing ? (recipe ? 'Edit Recipe' : 'Add Recipe') : 'View Recipe'}
-            {!isEditing && (
-              <IconButton
-                onClick={toggleEditMode}
-                //disabled={disableSubmit} // Disable edit button if adding new recipe
-                style={{ marginLeft: '8px' }}
-              >
-                {<EditIcon />}
-              </IconButton>
-            )}
+          <DialogTitle
+            style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+          >
+            <div>
+              {isEditing ? (recipe ? 'Edit Recipe' : 'Add Recipe') : 'View Recipe'}
+              {!isEditing && (
+                <IconButton
+                  onClick={toggleEditMode}
+                  //disabled={disableSubmit} // Disable edit button if adding new recipe
+                  style={{ marginLeft: '8px' }}
+                >
+                  {<EditIcon />}
+                </IconButton>
+              )}
+              {isEditing && (
+                <IconButton
+                  onClick={formik.handleSubmit}
+                  disabled={disableSubmit}
+                  style={{ marginLeft: '8px' }}
+                >
+                  {<SaveIcon />}
+                </IconButton>
+              )}
+            </div>
             {isEditing && (
               <IconButton
-                onClick={formik.handleSubmit}
-                disabled={disableSubmit}
+                onClick={() => {
+                  setIsEditing(false);
+                  //formik.resetForm();
+                }}
                 style={{ marginLeft: '8px' }}
               >
-                {<SaveIcon />}
+                <CancelIcon />
               </IconButton>
             )}
-          </div>
-          {isEditing && (
             <IconButton
-              onClick={() => {
-                setIsEditing(false);
-                //formik.resetForm();
-              }}
-              style={{ marginLeft: '8px' }}
+              onClick={onClose} // Add your close handler here
+              style={{ marginLeft: 'auto' }}
             >
-              <CancelIcon />
+              <CloseIcon />
             </IconButton>
-          )}
-          <IconButton
-            onClick={onClose} // Add your close handler here
-            style={{ marginLeft: 'auto' }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
-        <form onSubmit={formik.handleSubmit}>
+          </DialogTitle>
           <DialogContent dividers>
-            {formik.values?.image && (
+            {formik?.values?.image && (
               <Box
                 display="flex"
                 justifyContent="center"
@@ -438,8 +236,8 @@ function RecipeDialog({
                 />
               </Box>
             )}
-            {formFields['name']}
-            {formFields['description']}
+            <CustomField field={fields.name} />
+            <CustomField field={fields.description} />
             <Grid
               container
               spacing={2}
@@ -449,14 +247,10 @@ function RecipeDialog({
               <Grid
                 item
                 xs={12}
-                sm={formik.values.url ? 8 : 12}
+                sm={formik?.values.url ? 8 : 12}
               >
                 <Box>
-                  {isEditing ? (
-                    formFields['url']
-                  ) : (
-                    <Link href={formik.values.url}>{formFields['url']}</Link>
-                  )}
+                  <CustomField field={fields.url} />
                 </Box>
               </Grid>
               <Grid
@@ -464,7 +258,7 @@ function RecipeDialog({
                 xs={12}
                 sm={4}
               >
-                {formik.values.url && (
+                {formik?.values?.url && (
                   <Box>
                     <LoadingButton
                       variant="contained"
@@ -489,17 +283,40 @@ function RecipeDialog({
               </Typography>
             )}
 
-            {formFields['cuisine']}
-            {formFields['ingredients']}
-            {formFields['instructions']}
-            {formFields['score']}
-            {formFields['comments']}
-            {formFields['time.total']}
-            {formFields['category']}
-            {formFields['keywords']}
-            {formFields['yieldsText']}
-            {formFields['nutrients.calories']}
-            {formik.values.images && formik.values.images.length > 0 && (
+            <CustomField field={fields.cuisine} />
+            <CustomField field={fields.ingredients} />
+            <CustomField field={fields.instructions} />
+            <CustomField field={fields.score} />
+            <CustomField field={fields.comments} />
+            <Grid
+              container
+              spacing={1}
+            >
+              <Grid
+                item
+                xs={4}
+              >
+                <CustomField field={fields.prepTime} />
+              </Grid>
+              <Grid
+                item
+                xs={4}
+              >
+                <CustomField field={fields.cookTime} />
+              </Grid>
+              <Grid
+                item
+                xs={4}
+              >
+                <CustomField field={fields.totalTime} />
+              </Grid>
+            </Grid>
+
+            <CustomField field={fields.category} />
+            <CustomField field={fields.keywords} />
+            <CustomField field={fields.yieldsText} />
+            <CustomField field={fields.calories} />
+            {formik?.values?.images && formik?.values?.images?.length > 0 && (
               <RecipeDialogImageList
                 images={formik.values.images}
                 setSelectedImage={setSelectedImage}
@@ -526,8 +343,8 @@ function RecipeDialog({
                 props: { aspect: 16 / 9 },
               }}
             />
-            <JsonViewer
-              data={formik.values}
+            <JsonEditor
+              data={{ recipe, formik: formik?.values }}
               expanded={false}
             />
           </DialogContent>
@@ -562,7 +379,7 @@ function RecipeDialog({
               </Button>
             )}
           </DialogActions>
-        </form>
+        </CustomForm>
       </Dialog>
       {/* Full Image Dialog */}
       <RecipeDialogFullImageViewer
@@ -581,32 +398,6 @@ function RecipeDialog({
           }
         }}
       />
-      {/* <Dialog
-        open={Boolean(selectedImage)}
-        onClose={() => setSelectedImage(null)}
-        maxWidth="md"
-      >
-        <DialogContent>
-          {selectedImage && (
-            <img
-              src={selectedImage}
-              alt="Full size"
-              style={{ width: '100%', height: 'auto' }}
-            />
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => {
-              formik.setValues({ ...formik.values, image: selectedImage });
-              setSelectedImage(null);
-            }}
-            color="primary"
-          >
-            Set as main image
-          </Button>
-        </DialogActions>
-      </Dialog> */}
     </>
   );
 }

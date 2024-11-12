@@ -1,3 +1,4 @@
+import NoImageAvailable from '@/components/default/no-image-available';
 import Recipe from '@/types/recipe';
 import {
   Paper,
@@ -34,12 +35,16 @@ const RecipeOverviewListView = ({
               onClick={() => handleRecipeClick(recipe)}
             >
               <TableCell>
-                <img
-                  src={recipe.image}
-                  alt={recipe.name}
-                  width="80"
-                  style={{ borderRadius: '8px' }}
-                />
+                {recipe.image ? (
+                  <img
+                    src={recipe.image}
+                    alt={recipe.name}
+                    width="80"
+                    style={{ borderRadius: '8px' }}
+                  />
+                ) : (
+                  <NoImageAvailable />
+                )}
               </TableCell>
               <TableCell>{recipe.name}</TableCell>
               <TableCell>{recipe.cookingTime} mins</TableCell>

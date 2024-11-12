@@ -1,4 +1,5 @@
-import { useState, useMemo, useEffect } from 'react';
+import _ from 'lodash';
+import { useEffect, useMemo, useState } from 'react';
 
 interface Options {
   initialPage?: number;
@@ -95,18 +96,24 @@ function useFilter(initialData: any[] = [], options: Options = {}): UseFilterRet
   };
 
   /**
-   * Applies sorting to the dataset based on the sortField and sortDirection.
-   * @param {Array} data - The dataset to be sorted.
-   * @returns {Array} The sorted dataset.
+   * Applies sorting to the given data array based on the specified sort field and direction.
+   * @param {any[]} data - The array of data to be sorted.
+   * @returns {any[]} The sorted array.
    */
-  const applySort = (data: any[]) => {
+  const applySort = (data: any[]): any[] => {
     if (!sortField) return data;
 
-    return [...data].sort((a, b) => {
-      if (a[sortField] < b[sortField]) return sortDirection === 'asc' ? -1 : 1;
-      if (a[sortField] > b[sortField]) return sortDirection === 'asc' ? 1 : -1;
-      return 0;
-    });
+    return _.orderBy(
+      data,
+      (item) => {
+        const value = item[sortField as string];
+        if (typeof value === 'string') {
+          return value.toLowerCase();
+        }
+        return value === undefined || value === null ? '' : value;
+      },
+      [sortDirection]
+    );
   };
 
   /**

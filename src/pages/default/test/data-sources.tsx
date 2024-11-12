@@ -154,7 +154,7 @@ const DataOperations = () => {
   });
   const tabs = useTabs(tabsData);
   const dataSources: {
-    [key: string]: FirestoreDataSource<any> | LocalStorageDataSource | MockDataSource;
+    [key: string]: FirestoreDataSource<any> | LocalStorageDataSource | MockDataSource<any>;
   } = datasources[tabs.tab as keyof typeof datasources];
 
   return (
