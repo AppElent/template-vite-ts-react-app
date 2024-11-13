@@ -8,6 +8,7 @@ import ViewModuleIcon from '@mui/icons-material/ViewModule';
 import {
   Fab,
   FormControl,
+  Grid,
   IconButton,
   InputAdornment,
   MenuItem,
@@ -16,6 +17,8 @@ import {
   TextField,
   ToggleButton,
   ToggleButtonGroup,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import PropTypes from 'prop-types';
 import { useCallback, useEffect, useState } from 'react';
@@ -40,6 +43,10 @@ function RecipeOverview({
   const [view, setView] = useState('gallery');
   const dialog = useDialog({ queryKey: 'recipe' });
   const [urlParam] = useQueryParam('url');
+
+  // For mobile, set no minWidth on sort options
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const handleAddRecipe = useCallback(() => {
     //dialog.setData(undefined); // Clear dialog data for new recipe
@@ -162,16 +169,76 @@ function RecipeOverview({
         {/* </TextField> */}
       </Stack>
       {/* Toggle button to switch between views */}
-      <Stack
+      {/* <Stack
         justifyContent={'space-between'}
         direction={'row'}
+        alignItems={'center'}
+        sx={{ mb: 1 }}
+      > */}
+      <Grid
+        container
+        spacing={2}
+        justifyContent={'space-between'}
+        sx={{ mb: 2 }}
       >
-        <ToggleButtonGroup
+        <Grid
+          item
+          xs={12}
+          md={6}
+        >
+          <ToggleButtonGroup
+            value={view}
+            exclusive
+            onChange={handleViewChange}
+            aria-label="view toggle"
+            //style={{ marginBottom: '16px' }}
+          >
+            <ToggleButton
+              value="gallery"
+              aria-label="gallery view"
+            >
+              <ViewModuleIcon /> Gallery
+            </ToggleButton>
+            <ToggleButton
+              value="list"
+              aria-label="list view"
+            >
+              <ViewListIcon /> List
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </Grid>
+        <Grid item>
+          <FormControl
+            className="sort-options"
+            sx={{ minWidth: isMobile ? undefined : 275 }}
+          >
+            <TextField
+              id="sort-label"
+              label="Sort By"
+              select
+              value={`${filterOptions.sortField}-${filterOptions.sortDirection}`}
+              onChange={handleSortChange}
+              margin="dense"
+              size="small"
+            >
+              {sortOptions.map((option) => (
+                <MenuItem
+                  key={option.value}
+                  value={option.value}
+                >
+                  {option.label}
+                </MenuItem>
+              ))}
+            </TextField>
+          </FormControl>
+        </Grid>
+      </Grid>
+      {/* <ToggleButtonGroup
           value={view}
           exclusive
           onChange={handleViewChange}
           aria-label="view toggle"
-          style={{ marginBottom: '16px' }}
+          //style={{ marginBottom: '16px' }}
         >
           <ToggleButton
             value="gallery"
@@ -188,7 +255,7 @@ function RecipeOverview({
         </ToggleButtonGroup>
         <FormControl
           className="sort-options"
-          sx={{ minWidth: 300 }}
+          sx={{ minWidth: isMobile ? undefined : 275 }}
         >
           <TextField
             id="sort-label"
@@ -197,6 +264,7 @@ function RecipeOverview({
             value={`${filterOptions.sortField}-${filterOptions.sortDirection}`}
             onChange={handleSortChange}
             margin="dense"
+            size="small"
           >
             {sortOptions.map((option) => (
               <MenuItem
@@ -208,7 +276,7 @@ function RecipeOverview({
             ))}
           </TextField>
         </FormControl>
-      </Stack>
+      </Stack> */}
 
       {/* Gallery View */}
       {view === 'gallery' && (

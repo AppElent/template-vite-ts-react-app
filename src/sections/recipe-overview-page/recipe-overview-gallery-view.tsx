@@ -22,8 +22,9 @@ const RecipeOverviewGalleryView = ({
           md={4}
           key={recipe.id}
           onClick={() => handleRecipeClick(recipe)}
+          sx={{ display: 'flex', flexDirection: 'column' }}
         >
-          <Card sx={{ position: 'relative' }}>
+          <Card sx={{ position: 'relative', flex: 1, display: 'flex', flexDirection: 'column' }}>
             {recipe.image ? (
               <CardMedia
                 component="img"
@@ -36,12 +37,6 @@ const RecipeOverviewGalleryView = ({
             )}
             <CardContent>
               <Typography
-                variant="h6"
-                component="div"
-              >
-                {recipe.name}
-              </Typography>
-              <Typography
                 variant="body2"
                 color="text.secondary"
               >
@@ -50,6 +45,12 @@ const RecipeOverviewGalleryView = ({
                   value={recipe.score || 0}
                   readOnly
                 />
+              </Typography>
+              <Typography
+                variant="h6"
+                component="div"
+              >
+                {recipe.name}
               </Typography>
             </CardContent>
           </Card>

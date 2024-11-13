@@ -177,6 +177,9 @@ function RecipeDialog({
               variant: 'outlined',
               multiline: true,
             },
+            muiRatingProps: {
+              size: 'large',
+            },
           }}
         >
           <DialogTitle
