@@ -64,7 +64,7 @@ const ROLES = {
       view: true,
       create: true,
       update: true,
-      delete: (user, todo) => todo.completed,
+      delete: (_user, todo) => todo.completed,
     },
   },
   user: {
