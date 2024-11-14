@@ -16,6 +16,7 @@ import PropTypes from 'prop-types';
 import * as React from 'react';
 //import AppTheme from '@/theme/AppTheme';
 import ColorModeSelect from '@/components/default/ColorModeSelect';
+import config from '@/config';
 import useMounted from '@/hooks/use-mounted';
 import useRouter from '@/hooks/use-router';
 import useSearchParams from '@/hooks/use-search-params';
@@ -70,8 +71,9 @@ export default function SignIn(props) {
   const returnTo = searchParams.get('returnTo');
   const { /*issuer,*/ signInWithEmailAndPassword, signUp /*, signInWithGoogle*/, provider } =
     useAuth();
-  const { authProvider, formik, fields, buttons } = useLoginForm(provider);
+  
   const { mode, paths, ...themeProps } = props;
+  const { authProvider, formik, fields, buttons } = useLoginForm(provider, {mode, redirectAfterLogin: config.paths.auth.redirectAfterLogin});
 
   console.log(buttons, fields);
   const { text: loginButtonText, ...loginButtonProps } = buttons.login;

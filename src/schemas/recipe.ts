@@ -54,6 +54,8 @@ export const recipeYupSchema = Yup.object().shape({
 export interface Recipe2 extends Yup.InferType<typeof recipeYupSchema> {
   // using interface instead of type generally gives nicer editor feedback
   randomString?: string;
+  // createdAt?: string | undefined; //TODO: Make dates
+  // updatedAt?: string | undefined;
 }
 
 export const recipeDefaultValues: Partial<Recipe2> = recipeYupSchema.getDefault();

@@ -44,6 +44,7 @@ const RecipeOverviewGalleryView = ({
                 <Rating
                   value={recipe.score || 0}
                   readOnly
+                  precision={0.5}
                 />
               </Typography>
               <Typography

@@ -3,8 +3,6 @@ import useFilter from '@/hooks/use-filter';
 import Recipe from '@/types/recipe';
 import AddIcon from '@mui/icons-material/Add'; // Import AddIcon
 import ClearIcon from '@mui/icons-material/Clear';
-import ViewListIcon from '@mui/icons-material/ViewList';
-import ViewModuleIcon from '@mui/icons-material/ViewModule';
 import {
   Fab,
   FormControl,
@@ -15,10 +13,8 @@ import {
   OutlinedInput,
   Stack,
   TextField,
-  ToggleButton,
-  ToggleButtonGroup,
   useMediaQuery,
-  useTheme,
+  useTheme
 } from '@mui/material';
 import PropTypes from 'prop-types';
 import { useCallback, useEffect, useState } from 'react';
@@ -40,7 +36,7 @@ function RecipeOverview({
   setRecipe: (item: Recipe, id: string) => Promise<any>;
   deleteRecipe: (id: string) => Promise<any>;
 }) {
-  const [view, setView] = useState('gallery');
+  const [view /*, setView*/] = useState('gallery');
   const dialog = useDialog({ queryKey: 'recipe' });
   const [urlParam] = useQueryParam('url');
 
@@ -68,11 +64,11 @@ function RecipeOverview({
     //searchableFields: ['name'],
   });
 
-  const handleViewChange = (_event: any, nextView: any) => {
-    if (nextView !== null) {
-      setView(nextView);
-    }
-  };
+  // const handleViewChange = (_event: any, nextView: any) => {
+  //   if (nextView !== null) {
+  //     setView(nextView);
+  //   }
+  // };
 
   const handleRecipeClick = (recipe: Recipe) => {
     //dialog.setData(recipe);
@@ -181,7 +177,7 @@ function RecipeOverview({
         justifyContent={'space-between'}
         sx={{ mb: 2 }}
       >
-        <Grid
+        {/* <Grid
           item
           xs={12}
           md={6}
@@ -206,7 +202,7 @@ function RecipeOverview({
               <ViewListIcon /> List
             </ToggleButton>
           </ToggleButtonGroup>
-        </Grid>
+        </Grid> */}
         <Grid item>
           <FormControl
             className="sort-options"

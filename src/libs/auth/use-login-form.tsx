@@ -1,6 +1,7 @@
 import { FacebookIcon, GoogleIcon } from '@/components/default/auth/CustomIcons';
 import { ButtonProps, TextFieldProps } from '@mui/material';
 import { FormikHelpers, useFormik } from 'formik';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import * as Yup from 'yup';
 
 interface FormValues {
@@ -40,12 +41,24 @@ interface UseLoginFormReturn {
   error?: string;
 }
 
+interface UseLoginFormOptions {
+  redirectAfterLogin?: string;
+  mode?: string
+}
+
 const useLoginForm = (
   authProvider: AuthProvider,
-  mode: 'signin' | 'signup'
+  options?: UseLoginFormOptions
 ): UseLoginFormReturn => {
   const setIsSignUpMode = (_isSignUpMode: boolean) => {};
+  const {mode = 'signin', redirectAfterLogin} = options || {};
   const isSignUpMode = mode === 'signup';
+
+  // Get search params and search for query variable
+  const [searchParams] = useSearchParams();
+  const returnTo = searchParams.get('returnTo');
+  const navigate = useNavigate();
+
   const validationSchema = Yup.object({
     email: Yup.string().email('Invalid email address').required('Required'),
     ...(isSignUpMode && {
@@ -77,6 +90,13 @@ const useLoginForm = (
         } else {
           await authProvider.signIn(values.email, values.password);
         }
+
+                const redirectUrl = returnTo
+          ? returnTo
+          : redirectAfterLogin
+            ? redirectAfterLogin
+            : '/';
+            navigate(redirectUrl);
       } catch (err: any) {
         setErrors({ submit: err.message });
       } finally {
