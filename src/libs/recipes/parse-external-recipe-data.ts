@@ -6,6 +6,7 @@ const parseExternalRecipeData = (data: any): Recipe => {
     cooking: data.cook_time,
     total: data.total_time,
   };
+  // TODO: doesnt work yet, example Paste boursin
   // Total time is prep time + cooking time. If one of the fields is empty, calculate the other field if possible
   if (!timeObject.total) {
     timeObject.total = (timeObject.prep || 0) + (timeObject.cooking || 0);

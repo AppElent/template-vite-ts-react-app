@@ -44,6 +44,9 @@ npm create vite@latest
 
 - TODO: Create mail datasource (with select etc)
 - TODO: Create notion database datasource
+- For recipe site:
+  - TODO: Detail: Moeilijkheidsgraad, tijd, favorite, personen selector,
+  - TODO: Overzicht: tijd,
 
 # Default readme.md
 
