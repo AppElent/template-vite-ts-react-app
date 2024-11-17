@@ -1,44 +1,31 @@
+import SearchBar from '@/components/default/ui/search-bar';
+import RecipeEditDialog from '@/components/recipes/recipe-edit-dialog';
 import useDialog from '@/hooks/use-dialog';
 import useFilter from '@/hooks/use-filter';
+import useRouter from '@/hooks/use-router';
 import Recipe from '@/types/recipe';
 import AddIcon from '@mui/icons-material/Add'; // Import AddIcon
-import ClearIcon from '@mui/icons-material/Clear';
 import {
   Fab,
   FormControl,
   Grid,
-  IconButton,
-  InputAdornment,
   MenuItem,
-  OutlinedInput,
   Stack,
   TextField,
   useMediaQuery,
-  useTheme
+  useTheme,
 } from '@mui/material';
-import PropTypes from 'prop-types';
 import { useCallback, useEffect, useState } from 'react';
 import { useQueryParam } from 'use-query-params';
-import RecipeDialog from './recipe-dialog';
 import RecipeOverviewGalleryView from './recipe-overview-gallery-view';
 import RecipeOverviewListView from './recipe-overview-list-view';
 
-function RecipeOverview({
-  recipes = [],
-  addRecipe,
-  updateRecipe,
-  setRecipe,
-  deleteRecipe,
-}: {
-  recipes: Recipe[];
-  addRecipe: (item: Recipe) => Promise<any>;
-  updateRecipe: (item: Partial<Recipe>, id: string) => Promise<any>;
-  setRecipe: (item: Recipe, id: string) => Promise<any>;
-  deleteRecipe: (id: string) => Promise<any>;
-}) {
+function RecipeOverview({ recipes = [] }: { recipes: Recipe[] }) {
   const [view /*, setView*/] = useState('gallery');
   const dialog = useDialog({ queryKey: 'recipe' });
   const [urlParam] = useQueryParam('url');
+
+  const router = useRouter();
 
   // For mobile, set no minWidth on sort options
   const theme = useTheme();
@@ -72,7 +59,8 @@ function RecipeOverview({
 
   const handleRecipeClick = (recipe: Recipe) => {
     //dialog.setData(recipe);
-    dialog.open(recipe.id);
+    //dialog.open(recipe.id);
+    router.push(`/app/recipes/${recipe.id}`);
   };
 
   const handleSortChange = (event: any) => {
@@ -95,7 +83,7 @@ function RecipeOverview({
 
   return (
     <>
-      {dialog.data && (
+      {/* {dialog.data && (
         <RecipeDialog
           open={dialog.isOpen}
           onClose={() => dialog.close()}
@@ -113,36 +101,23 @@ function RecipeOverview({
           recipeId={dialog.data}
           setRecipeId={dialog.setData}
         />
-      )}
+      )} */}
+      <RecipeEditDialog
+        open={dialog.isOpen}
+        onClose={() => dialog.close()}
+      />
 
       <Stack
         spacing={2}
         mb={2}
       >
-        <OutlinedInput
-          placeholder={`Search recipes`}
-          // startAdornment={
-          //   <InputAdornment position="start">
-          //     <SvgIcon>{/* <SearchMdIcon /> */}</SvgIcon>
-          //   </InputAdornment>
-          // }
-          endAdornment={
-            <InputAdornment position="end">
-              <IconButton
-                aria-label="clear"
-                onClick={() => filterOptions.setSearchQuery('')}
-                onMouseDown={(e) => e.preventDefault()}
-                edge="end"
-              >
-                <ClearIcon />
-              </IconButton>
-            </InputAdornment>
-          }
-          autoFocus
-          value={filterOptions.searchQuery || ''}
-          sx={{ flexGrow: 1 }}
+        <SearchBar
+          onClear={() => filterOptions.setSearchQuery('')}
+          value={filterOptions.searchQuery}
           onChange={(e) => filterOptions.setSearchQuery(e.target.value)}
+          placeholder={`Search recipes`}
         />
+
         {/* <TextField
           label="Max Cooking Time"
           variant="outlined"
@@ -300,12 +275,5 @@ function RecipeOverview({
     </>
   );
 }
-
-RecipeOverview.propTypes = {
-  recipes: PropTypes.array.isRequired,
-  addRecipe: PropTypes.func.isRequired,
-  updateRecipe: PropTypes.func.isRequired,
-  deleteRecipe: PropTypes.func.isRequired,
-};
 
 export default RecipeOverview;

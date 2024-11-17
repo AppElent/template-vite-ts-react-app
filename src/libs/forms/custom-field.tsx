@@ -30,7 +30,7 @@ const getNestedValue = (obj: any, path: string) => {
 const CustomField = ({ field }: { field: FieldConfig }) => {
   const formik = useFormikContext<Recipe>();
   const options = useFormOptions();
-  const [inputValue, setInputValue] = useState(getNestedValue(formik.values, field.name));
+  const [inputValue, setInputValue] = useState(getNestedValue(formik.values, field?.name));
 
   useEffect(() => {
     if (
@@ -39,14 +39,14 @@ const CustomField = ({ field }: { field: FieldConfig }) => {
     ) {
       setInputValue(formik.values[field.name as keyof Recipe]);
     }
-  }, [field.name, formik.values]);
+  }, [field?.name, formik.values]);
   //const fieldDefaults = options?.fieldDefaults?.[type] || {};
 
   const add = useCallback(() => {
     const currentArray = getNestedValue(formik.values, field.name) || [];
     setNestedValue(formik.values, field.name, [...currentArray, '']);
     formik.setFieldValue(field.name, [...currentArray, '']);
-  }, [field.name, formik.values]);
+  }, [field?.name, formik.values]);
 
   const remove = useCallback(
     (index: number) => {
@@ -56,7 +56,7 @@ const CustomField = ({ field }: { field: FieldConfig }) => {
       setNestedValue(formik.values, field.name, newArray);
       formik.setFieldValue(field.name, newArray);
     },
-    [field.name, formik.values]
+    [field?.name, formik.values]
   );
 
   // Debounced function to update Formik's state
@@ -103,11 +103,11 @@ const CustomField = ({ field }: { field: FieldConfig }) => {
       add,
       remove,
       handleChange: handleInputChange,
-      errors: getNestedValue(formik.errors, field.name),
+      errors: getNestedValue(formik.errors, field?.name),
       value: inputValue, //getNestedValue(formik.values, field.name),
-      touched: getNestedValue(formik.touched, field.name),
+      touched: getNestedValue(formik.touched, field?.name),
     }),
-    [add, remove, handleInputChange, formik.errors, formik.touched, field.name, inputValue]
+    [add, remove, handleInputChange, formik.errors, formik.touched, field?.name, inputValue]
   );
 
   const mergedOptions = useMemo(
@@ -142,7 +142,7 @@ const CustomField = ({ field }: { field: FieldConfig }) => {
 
   if (!field) return <></>;
 
-  const fieldDefinition = field.definition ? FieldDefinitions[field.definition] : undefined;
+  const fieldDefinition = field?.definition ? FieldDefinitions[field.definition] : undefined;
   if (!fieldDefinition) {
     return <DefaultTextField {...fieldProps} />;
   }

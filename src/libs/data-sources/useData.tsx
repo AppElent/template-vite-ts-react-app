@@ -101,6 +101,15 @@ const useData = <T,>(key: string, _options = {}, newDataSource?: DataSource<T>) 
       loading: loading[key] || false,
       error: error[key],
       // Public methods
+      actions: {
+        fetchData: (filter?: any) => fetchData(key, filter),
+        get: get || (() => {}),
+        getAll: getAll || (() => {}),
+        add: (item: T) => add(key, item),
+        update: (data, id) => update(key, data, id),
+        set: (data, id) => set(key, data, id),
+        delete: (id) => remove(key, id),
+      },
       fetchData: (filter?: any) => fetchData(key, filter),
       get: get || (() => {}),
       getAll: getAll || (() => {}),

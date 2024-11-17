@@ -1,4 +1,4 @@
-import NoImageAvailable from '@/components/default/no-image-available';
+import NoImageAvailable from '@/components/default/images/no-image-available';
 import Recipe from '@/types/recipe';
 import {
   Paper,

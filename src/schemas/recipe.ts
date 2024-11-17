@@ -2,53 +2,67 @@ import * as Yup from 'yup';
 import { Schema } from '.';
 export const recipeSchema: Schema = {};
 
+// TODO: Fix optional fields with default value... and then undefined values in firestore data
+
 export const recipeYupSchema = Yup.object().shape({
-  owner: Yup.string().required('Owner is required').default(''),
-  name: Yup.string().required('Name is required').min(3, 'Minimum 3 characters').default(''),
-  description: Yup.string().optional().default(''),
+  owner: Yup.string().required('Owner is required').label('Owner'),
+  name: Yup.string()
+    .required('Name is required')
+    .min(3, 'Minimum 3 characters')
+    .default('')
+    .label('Name')
+    .meta({ default: '' }),
+  description: Yup.string().optional().default('').label('Description').meta({ default: '' }),
   time: Yup.object()
     .shape({
-      prep: Yup.number().optional().default(0),
-      cooking: Yup.number().optional().default(0),
-      total: Yup.number().optional().default(0),
+      prep: Yup.number().optional().default(0).label('Preparation Time'),
+      cooking: Yup.number().optional().default(0).label('Cooking Time'),
+      total: Yup.number().optional().default(0).label('Total Time'),
     })
-    .optional(),
-  yields: Yup.object().shape({
-    quantity: Yup.number().optional().default(0),
-    unit: Yup.string().optional().default('servings'),
-  }),
-  yieldsText: Yup.string().optional().default(''),
+    .optional()
+    .label('Time'),
+  yields: Yup.object()
+    .shape({
+      quantity: Yup.number().optional().default(0).label('Quantity'),
+      unit: Yup.string().optional().default('servings').label('Unit'),
+    })
+    .label('Yields'),
+  yieldsText: Yup.string().optional().default('').label('Yields'),
   nutrients: Yup.object()
     .shape({
-      calories: Yup.string().optional().default('0'),
-      fat: Yup.string().optional().default('0'),
-      sugar: Yup.string().optional().default('0'),
-      fiber: Yup.string().optional().default('0'),
-      protein: Yup.string().optional().default('0'),
-      carbs: Yup.string().optional().default('0'),
+      calories: Yup.string().optional().default('0').label('Calories'),
+      fat: Yup.string().optional().default('0').label('Fat'),
+      sugar: Yup.string().optional().default('0').label('Sugar'),
+      fiber: Yup.string().optional().default('0').label('Fiber'),
+      protein: Yup.string().optional().default('0').label('Protein'),
+      carbs: Yup.string().optional().default('0').label('Carbohydrates'),
     })
-    .optional(),
-  image: Yup.string().url('Image must be a valid URL').optional().default(''),
-  images: Yup.array().of(Yup.string().url('Each image must be a valid URL')).optional().default([]),
-  ingredients: Yup.array().of(Yup.string()).optional().default([]),
-  instructions: Yup.array().of(Yup.string()).optional().default([]),
-  comments: Yup.string().optional().default(''),
-  score: Yup.number().optional().default(0),
-  url: Yup.string().url('URL must be a valid URL').optional().default(''),
-  //nutrition: Yup.number().optional(),
-  category: Yup.string().optional().default(''),
-  keywords: Yup.array().of(Yup.string()).optional().default([]),
-  cuisine: Yup.array().of(Yup.string()).optional().default([]),
-  // Date fields
+    .optional()
+    .label('Nutrients'),
+  image: Yup.string().url('Image must be a valid URL').optional().default('').label('Image'),
+  images: Yup.array()
+    .of(Yup.string().url('Each image must be a valid URL'))
+    .optional()
+    .default([])
+    .label('Images'),
+  ingredients: Yup.array().of(Yup.string()).optional().default([]).label('Ingredients'),
+  instructions: Yup.array().of(Yup.string()).optional().default([]).label('Instructions'),
+  comments: Yup.string().optional().default('').label('Comments'),
+  score: Yup.number().optional().default(0).label('Score'),
+  url: Yup.string().url('URL must be a valid URL').optional().default('').label('URL'),
+  category: Yup.string().optional().default('').label('Category'),
+  keywords: Yup.array().of(Yup.string()).optional().default([]).label('Keywords'),
+  cuisine: Yup.array().of(Yup.string()).optional().default([]).label('Cuisine'),
   createdAt: Yup.string()
     .optional()
-    .default(() => new Date().toISOString()),
+    .default(() => new Date().toISOString())
+    .label('Created At'),
   updatedAt: Yup.string()
     .optional()
-    .default(() => new Date().toISOString()),
-  // External fields
-  site: Yup.string().optional().default(''),
-  raw: Yup.mixed().optional().default({}),
+    .default(() => new Date().toISOString())
+    .label('Updated At'),
+  site: Yup.string().optional().default('').label('Site'),
+  raw: Yup.mixed().optional().default({}).label('Raw'),
 });
 
 export interface Recipe2 extends Yup.InferType<typeof recipeYupSchema> {
@@ -57,5 +71,7 @@ export interface Recipe2 extends Yup.InferType<typeof recipeYupSchema> {
   // createdAt?: string | undefined; //TODO: Make dates
   // updatedAt?: string | undefined;
 }
+
+// console.log(extractSchemaLabels(recipeYupSchema));
 
 export const recipeDefaultValues: Partial<Recipe2> = recipeYupSchema.getDefault();

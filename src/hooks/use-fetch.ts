@@ -9,7 +9,7 @@ interface UseFetchResult<T> {
   loading: boolean;
   error: string | null;
   fetched: boolean;
-  fetchData: () => void;
+  fetchData: (url?: string) => void;
 }
 
 function useFetch<T = unknown>(

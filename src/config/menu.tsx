@@ -1,16 +1,18 @@
+import AssignmentRoundedIcon from '@mui/icons-material/AssignmentRounded';
 import PeopleIcon from '@mui/icons-material/People';
 
 const menu = [
-  // {
-  //   id: 'Recipe library',
-  //   children: [
-  //     {
-  //       id: 'Recipes',
-  //       icon: <AssignmentRoundedIcon />,
-  //       href: '/app/recipes',
-  //     },
-  //   ],
-  // },
+  {
+    id: 'Recipes',
+    path: '/recipes',
+    children: [
+      {
+        id: 'Recipes',
+        icon: <AssignmentRoundedIcon />,
+        href: '/app/recipes',
+      },
+    ],
+  },
   {
     id: 'Settings',
     children: [

@@ -1,4 +1,4 @@
-import ImageCropper from '@/components/default/image-cropper';
+import ImageCropper from '@/components/default/images/image-cropper';
 import useDialog from '@/hooks/use-dialog';
 import { useAuth } from '@/libs/auth';
 import FirebaseStorageProvider from '@/libs/storage-providers/providers/FirebaseStorageProvider';

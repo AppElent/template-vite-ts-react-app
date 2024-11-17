@@ -1,3 +1,4 @@
+import { Backdrop, CircularProgress } from '@mui/material';
 import Box from '@mui/material/Box';
 
 export const SplashScreen = () => (
@@ -24,7 +25,12 @@ export const SplashScreen = () => (
         width: 48,
       }}
     > */}
-    <div>Loading</div>
+    <Backdrop
+      sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+      open={true}
+    >
+      <CircularProgress color="inherit" />
+    </Backdrop>
     {/* </Box> */}
   </Box>
 );

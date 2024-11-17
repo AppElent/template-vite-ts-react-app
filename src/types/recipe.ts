@@ -10,7 +10,11 @@ export default interface Recipe {
   prepTime?: number; //todelete
   cookingTime?: number; //todelete
   totalTime?: number; //todelete
-  yields?: string;
+  yields?: {
+    quantity?: number;
+    unit?: string;
+  };
+  yieldsText?: string;
   nutrients?: {
     [key: string]: string;
   };
@@ -32,6 +36,6 @@ export default interface Recipe {
   createdAt?: string;
   updatedAt?: string;
   // Add raw data
-  site: string;
-  raw: any;
+  site?: string;
+  raw?: any;
 }

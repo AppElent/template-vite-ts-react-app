@@ -2,24 +2,18 @@ import { ExternalRecipe } from '@/schemas/externa-recipe';
 import Recipe from '@/types/recipe';
 
 const parseExternalRecipeData = (data: ExternalRecipe): Partial<Recipe> => {
-  const timeObject = (data.prep_time || data.cook_time || data.total_time) && {
-    prep: data.prep_time,
-    cooking: data.cook_time,
-    total: data.total_time,
-  };
+  const timeObject =
+    data.prep_time || data.cook_time || data.total_time
+      ? {
+          prep: data.prep_time,
+          cooking: data.cook_time,
+          total: data.total_time,
+        }
+      : undefined;
   // TODO: doesnt work yet, example Paste boursin
   // Total time is prep time + cooking time. If one of the fields is empty, calculate the other field if possible
-  if (!timeObject.total) {
-    timeObject.total = (timeObject.prep || 0) + (timeObject.cooking || 0);
-  } else if (!timeObject.prep) {
-    // Make sure that prep time is not negative
-    timeObject.prep = Math.max(0, (timeObject.total || 0) - (timeObject.cooking || 0));
-  } else if (!timeObject.cooking) {
-    // Make sure that cooking time is not negative
-    timeObject.cooking = Math.max(0, (timeObject.total || 0) - (timeObject.prep || 0));
-  if(timeObject){
-    // Total time is prep time + cooking time. If one of the fields is empty, calculate the other field if possible
-    if (!timeObject.total) {
+  if (timeObject) {
+    if (!timeObject?.total) {
       timeObject.total = (timeObject.prep || 0) + (timeObject.cooking || 0);
     } else if (!timeObject.prep) {
       // Make sure that prep time is not negative
@@ -29,7 +23,6 @@ const parseExternalRecipeData = (data: ExternalRecipe): Partial<Recipe> => {
       timeObject.cooking = Math.max(0, (timeObject.total || 0) - (timeObject.prep || 0));
     }
   }
-
 
   return {
     ...(data.title && data.title.trim() && { name: data.title }),

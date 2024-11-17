@@ -1,8 +1,8 @@
 // @ts-nocheck
 
-import ImageUploader from '@/components/default/image-uploader';
+import ImageUploader from '@/components/default/images/image-uploader';
 import JsonEditor from '@/components/default/json-editor';
-import LoadingButton from '@/components/default/loading-button';
+import LoadingButton from '@/components/default/ui/loading-button';
 import useFetch from '@/hooks/use-fetch';
 import { useAuth } from '@/libs/auth';
 import CustomField from '@/libs/forms/custom-field';

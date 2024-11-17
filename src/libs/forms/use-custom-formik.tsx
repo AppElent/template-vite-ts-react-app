@@ -3,7 +3,8 @@ import _ from 'lodash';
 import { useMemo } from 'react';
 import { FieldConfig } from '.';
 
-interface UseCustomFormikProps {
+interface UseCustomFormikProps
+  extends Omit<Parameters<typeof useFormik>[0], 'onSubmit' | 'initialValues'> {
   preSave?: (values: any, formik: any) => any;
   onSubmit: (values: any, formikHelpers: any) => Promise<any>;
   validationSchema?: any;
@@ -11,6 +12,7 @@ interface UseCustomFormikProps {
     [key: string]: FieldConfig;
   };
   initialValues?: any;
+  // [key: string]: any;
 }
 
 const useCustomFormik = (props: UseCustomFormikProps) => {

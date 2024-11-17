@@ -29,12 +29,23 @@ export interface DataSourceObject {
 //   dataSource: DataSourceSource<T>;
 // }
 
+export interface DataSourceActions<T> {
+  getAll: (filter?: object) => Promise<T[]>;
+  get: (id?: string) => Promise<T | null>;
+  add: (item: T) => Promise<T>;
+  update: (data: Partial<T>, id?: string) => Promise<void>;
+  set: (data: T, id?: string) => Promise<void>;
+  delete: (id?: string) => Promise<void>;
+}
+
 export interface DataSource<T> {
   // Options supplied to class constructor
   options?: DataSourceInitOptions<T>;
   providerConfig?: any;
   // Provider name
   provider: string;
+  // Actions
+  actions: DataSourceActions<T>;
   // Predefined methods
   getAll: (filter?: object) => Promise<T[]>;
   get: (id?: string) => Promise<T | null>;
