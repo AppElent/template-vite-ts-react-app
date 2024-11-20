@@ -1,4 +1,4 @@
-import { TextFieldProps } from '@mui/material';
+import { AutocompleteProps, TextFieldProps } from '@mui/material';
 import { FormikProps } from 'formik';
 
 export interface FieldConfig {
@@ -15,7 +15,9 @@ export interface FieldConfig {
 
 export interface FieldOptions {
   muiTextFieldProps?: TextFieldProps;
+  muiAutoCompleteProps?: AutocompleteProps<any, any, any, any>;
   editMode?: boolean;
+  debounce?: number;
   [key: string]: any;
 }
 
@@ -57,5 +59,4 @@ export interface RenderFieldDefinitions {
   [key: string]: (config: FieldDefinitionConfig) => any;
 }
 
-export { default as CustomField } from './custom-field';
 export { default as CustomForm } from './custom-form';

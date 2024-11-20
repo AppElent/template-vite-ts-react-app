@@ -1,17 +1,16 @@
-import { Box, Breadcrumbs, Link, Typography } from '@mui/material';
+import { Box, Breadcrumbs, Link, Stack, Typography } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 
-import breadcrumbs, { BreadcrumbItem } from '@/config/breadcrumbs';
+import { PathItem, paths } from '@/config/paths';
 
 import { matchPath } from 'react-router-dom';
 
-const generateBreadcrumbs = (breadcrumbsConfig: BreadcrumbItem[], pathname: string) => {
-  const breadcrumbs: BreadcrumbItem[] = [];
+const generateBreadcrumbs = (breadcrumbsConfig: PathItem[], pathname: string) => {
+  const breadcrumbs: PathItem[] = [];
   let accumulatedPath = '';
 
   // Split the current pathname into segments
   const segments = pathname.split('/').filter(Boolean);
-  console.log(breadcrumbsConfig, breadcrumbs, segments, pathname);
 
   for (const segment of segments) {
     accumulatedPath += `/${segment}`;
@@ -35,8 +34,7 @@ const generateBreadcrumbs = (breadcrumbsConfig: BreadcrumbItem[], pathname: stri
 };
 
 const CustomBreadcrumbs = ({ currentPage }: { currentPage?: string }) => {
-  const items = generateBreadcrumbs(breadcrumbs, window.location.pathname);
-  console.log(items);
+  const items = generateBreadcrumbs(paths, window.location.pathname);
 
   // If currentPage is set, replace the last item with it
   if (currentPage) {
@@ -45,21 +43,29 @@ const CustomBreadcrumbs = ({ currentPage }: { currentPage?: string }) => {
 
   return (
     <>
-      {items.length > 1 && (
+      {items.length > 0 && (
         <Box sx={{ mb: 3 }}>
           <Breadcrumbs aria-label="breadcrumb">
             {items.map((item, index) =>
               item.to ? (
-                <Link
+                <Stack
+                  direction="row"
+                  alignItems="center"
                   key={index}
-                  component={RouterLink}
-                  to={item.to}
-                  //underline="hover"
-                  color="inherit"
                 >
-                  {item.Icon && item.Icon}
-                  {item.label}
-                </Link>
+                  <Box sx={{ mr: 0.5 }}>{item.Icon && item.Icon}</Box>
+                  <Box>
+                    <Link
+                      key={index}
+                      component={RouterLink}
+                      to={item.to}
+                      //underline="hover"
+                      color="inherit"
+                    >
+                      {item.label}
+                    </Link>
+                  </Box>
+                </Stack>
               ) : (
                 <Typography
                   key={index}

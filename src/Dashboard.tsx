@@ -3,11 +3,14 @@ import { SplashScreen } from '@/components/default/splash-screen';
 import config from '@/config';
 import useHttpsRedirect from '@/hooks/use-https-redirect';
 import { AuthConsumer, AuthProvider } from '@/libs/auth';
+import '@/libs/i18n';
 import defaultRoutes from '@/routes/defaultRoutes';
 import { Theme, ThemeProvider } from '@mui/material';
 import { ConfirmProvider } from 'material-ui-confirm';
 import { FC, useEffect } from 'react';
 import { useRoutes } from 'react-router-dom';
+import { Bounce, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { QueryParamProvider } from 'use-query-params';
 import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
 import useRouter from './hooks/use-router';
@@ -65,6 +68,19 @@ const Dashboard: FC<DashboardProps> = ({ theme, routes, authProvider, dataSource
                           open={dialog.isOpen}
                           onClose={() => dialog.close()}
                         /> */}
+                        <ToastContainer
+                          position="top-right"
+                          autoClose={2500}
+                          hideProgressBar={false}
+                          newestOnTop={false}
+                          closeOnClick
+                          rtl={false}
+                          pauseOnFocusLoss
+                          draggable
+                          pauseOnHover
+                          theme="light"
+                          transition={Bounce}
+                        />
                         {element}
                       </ConfirmProvider>
                     </QueryParamProvider>

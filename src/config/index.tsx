@@ -1,7 +1,7 @@
 /**
  * Application configuration interface
  */
-interface AppConfig {
+export interface AppConfig {
   meta: {
     /** Application title */
     title: string;
@@ -53,7 +53,7 @@ interface AppConfig {
  */
 const config: AppConfig = {
   meta: {
-    title: 'Recipe tool',
+    title: 'Food HUB',
     version: 'v0.0.1',
     url: 'recipes.appelent.site',
     copyright: 'AppElent',
@@ -72,7 +72,7 @@ const config: AppConfig = {
     rootRedirect: '/app',
   },
   settings: {
-    logLevel: 'info',
+    logLevel: (localStorage.getItem('logLevel') as AppConfig['settings']['logLevel']) || 'error',
   },
   issueDialog: {
     // The issue dialog needs functions to open and close it
@@ -80,6 +80,15 @@ const config: AppConfig = {
   custom: {
     // All custom elements are optional
   },
+};
+
+export const getLogLevel = () => {
+  return localStorage.getItem('logLevel') as AppConfig['settings']['logLevel'];
+};
+
+export const setLogLevel = (level: AppConfig['settings']['logLevel']) => {
+  localStorage.setItem('logLevel', level);
+  config.settings.logLevel = level;
 };
 
 export default config;

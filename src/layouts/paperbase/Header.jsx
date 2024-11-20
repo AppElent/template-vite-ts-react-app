@@ -1,5 +1,7 @@
+import LanguageSwitch from '@/components/default/language-switch';
 import useRouter from '@/hooks/use-router';
 import { useAuth } from '@/libs/auth';
+import IssueDialog from '@/sections/default/issue-dialog';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import LogoutIcon from '@mui/icons-material/Logout';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -68,6 +70,12 @@ function Header(props) {
             {/* <Grid item>
               <VersionSelector />
             </Grid> */}
+            <Grid item>
+              <IssueDialog />
+            </Grid>
+            <Grid item>
+              <LanguageSwitch />
+            </Grid>
             <Grid item>
               <Tooltip title="Alerts • No alerts">
                 <IconButton color="inherit">

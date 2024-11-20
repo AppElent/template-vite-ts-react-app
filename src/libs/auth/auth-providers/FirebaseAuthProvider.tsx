@@ -9,6 +9,7 @@ import {
   signInWithPopup,
   signOut,
 } from 'firebase/auth';
+import { User } from '..';
 import IAuthProvider, { IAuthProviderOptions } from './IAuthProvider';
 
 class FirebaseAuthProvider extends IAuthProvider {
@@ -54,7 +55,7 @@ class FirebaseAuthProvider extends IAuthProvider {
     return () => onAuthStateChanged(getAuth(), callback);
   }
 
-  getCurrentUser() {
+  getCurrentUser(): User | null {
     const user = getAuth().currentUser;
     if (user) {
       return {
@@ -62,7 +63,6 @@ class FirebaseAuthProvider extends IAuthProvider {
         avatar: user.photoURL || undefined,
         email: user.email || 'user@demo.com',
         name: user.displayName || 'Unknown user',
-        plan: 'Premium',
         raw: user,
       };
     }

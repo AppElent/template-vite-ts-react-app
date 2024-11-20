@@ -45,14 +45,30 @@ export const recipeYupSchema = Yup.object().shape({
     .optional()
     .default([])
     .label('Images'),
-  ingredients: Yup.array().of(Yup.string()).optional().default([]).label('Ingredients'),
-  instructions: Yup.array().of(Yup.string()).optional().default([]).label('Instructions'),
+  ingredients: Yup.array()
+    .of(Yup.string().min(2, 'Min 2 characters'))
+    .optional()
+    .default([''])
+    .label('Ingredients'),
+  instructions: Yup.array()
+    .of(Yup.string().min(3, 'Min 3 characters'))
+    .optional()
+    .default([''])
+    .label('Instructions'),
   comments: Yup.string().optional().default('').label('Comments'),
-  score: Yup.number().optional().default(0).label('Score'),
+  score: Yup.number().optional().default(0).label('Score').nullable(),
   url: Yup.string().url('URL must be a valid URL').optional().default('').label('URL'),
   category: Yup.string().optional().default('').label('Category'),
-  keywords: Yup.array().of(Yup.string()).optional().default([]).label('Keywords'),
-  cuisine: Yup.array().of(Yup.string()).optional().default([]).label('Cuisine'),
+  keywords: Yup.array()
+    .of(Yup.string().min(2, 'Min 2 characters'))
+    .optional()
+    .default([])
+    .label('Keywords'),
+  cuisine: Yup.array()
+    .of(Yup.string().min(2, 'Min 2 characters'))
+    .optional()
+    .default([])
+    .label('Cuisine'),
   createdAt: Yup.string()
     .optional()
     .default(() => new Date().toISOString())
@@ -61,16 +77,13 @@ export const recipeYupSchema = Yup.object().shape({
     .optional()
     .default(() => new Date().toISOString())
     .label('Updated At'),
-  site: Yup.string().optional().default('').label('Site'),
-  raw: Yup.mixed().optional().default({}).label('Raw'),
+  site: Yup.string().optional().nullable().default('').label('Site'),
+  raw: Yup.mixed().optional().nullable().default({}).label('Raw'),
 });
 
-export interface Recipe2 extends Yup.InferType<typeof recipeYupSchema> {
-  // using interface instead of type generally gives nicer editor feedback
-  randomString?: string;
-  // createdAt?: string | undefined; //TODO: Make dates
-  // updatedAt?: string | undefined;
-}
+export type Recipe2 = Yup.InferType<typeof recipeYupSchema>;
+
+export type RecipeTemplate = Omit<Recipe2, 'id'>;
 
 // console.log(extractSchemaLabels(recipeYupSchema));
 

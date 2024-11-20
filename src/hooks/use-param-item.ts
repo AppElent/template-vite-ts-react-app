@@ -16,7 +16,6 @@ const useParamItem = <T extends Record<string, any>>({
 }: UseParamItemProps<T>) => {
   const params = useParams();
   const item = useMemo(() => {
-    console.log(items);
     const idParam = params[id];
     if (!idParam) {
       throw new Error(`useParamItem: ${id} is required`);
@@ -27,7 +26,6 @@ const useParamItem = <T extends Record<string, any>>({
     }
     return foundItem;
   }, [items, params]);
-  console.log(items);
   return item;
 };
 

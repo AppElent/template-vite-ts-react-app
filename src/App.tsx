@@ -38,6 +38,7 @@ function App() {
   return (
     <>
       <ScrollToTop />
+
       <Dashboard
         theme={theme}
         authProvider={firebaseProvider}

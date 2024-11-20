@@ -1,11 +1,13 @@
 import { Suspense } from 'react';
 import { Outlet, RouteObject } from 'react-router-dom';
 
-import Account from '@/pages/default/Account';
+import Account from '@/pages/default/account';
 import Settings from '@/pages/default/Settings';
+import TestAuthProviders from '@/pages/default/test/auth-providers';
 import DataSources from '@/pages/default/test/data-sources';
+import DataSources2 from '@/pages/default/test/data-sources/index2';
 import FileUploads from '@/pages/default/test/file-uploads';
-import TestAuthProviders from '@/pages/default/test/test-auth-provider';
+import Forms from '@/pages/default/test/forms';
 
 const appRoutes: RouteObject[] = [
   {
@@ -33,12 +35,20 @@ const appRoutes: RouteObject[] = [
         element: <DataSources />,
       },
       {
+        path: 'data-sources2',
+        element: <DataSources2 />,
+      },
+      {
         path: 'file-uploads',
         element: <FileUploads />,
       },
       {
         path: 'auth-providers',
         element: <TestAuthProviders />,
+      },
+      {
+        path: 'forms',
+        element: <Forms />,
       },
     ],
   },

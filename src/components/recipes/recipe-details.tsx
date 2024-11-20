@@ -17,9 +17,9 @@ import {
   Rating,
   Typography,
 } from '@mui/material';
+import RecipeEditDialog from '../../sections/recipes/recipe-edit-dialog';
 import NoImageAvailable from '../default/images/no-image-available';
 import ImageList from '../default/ui/image-list';
-import RecipeEditDialog from './recipe-edit-dialog';
 
 // Sample recipe object (same as before)
 const sampleRecipe = {
@@ -118,8 +118,6 @@ const sampleRecipe = {
 // TODO: add image viewer and set image as default
 
 const RecipeDetails = ({ recipe = sampleRecipe }: { recipe?: Recipe }) => {
-  console.log(recipe);
-
   const dialog = useDialog();
 
   const handleEdit = () => {

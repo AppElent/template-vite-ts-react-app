@@ -1,4 +1,4 @@
-import { ExternalRecipe } from '@/schemas/externa-recipe';
+import { ExternalRecipe } from '@/schemas/external-recipe';
 import Recipe from '@/types/recipe';
 
 const parseExternalRecipeData = (data: ExternalRecipe): Partial<Recipe> => {

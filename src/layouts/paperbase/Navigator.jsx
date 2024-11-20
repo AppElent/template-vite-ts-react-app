@@ -19,8 +19,9 @@ import ListItemText from '@mui/material/ListItemText';
 
 //import { OPTIONS } from '../../App';
 import config from '@/config';
-import menu from '@/config/menu';
+import { getPath, menu } from '@/config/paths';
 import useRouter from '@/hooks/use-router';
+import { useTranslation } from 'react-i18next';
 
 const categories = [
   {
@@ -71,6 +72,10 @@ export default function Navigator(props) {
   const router = useRouter();
   const mainItems = menu || categories;
   const title = config?.meta?.title;
+  const { t } = useTranslation();
+
+  const homePath = getPath('home');
+  console.log('homePath', homePath);
 
   const onLinkClick = (href) => {
     router.push(href);
@@ -88,8 +93,8 @@ export default function Navigator(props) {
         <ListItem sx={{ ...item, ...itemCategory, fontSize: 22, color: '#fff' }}>{title}</ListItem>
         <ListItem disablePadding>
           <ListItemButton
-            selected={(config?.paths?.index || '/') === window.location.pathname}
-            onClick={() => onLinkClick(config?.paths?.index || '/')}
+            selected={(homePath?.to || '/') === window.location.pathname}
+            onClick={() => onLinkClick(homePath?.to || '/')}
             sx={item}
           >
             <ListItemIcon>
@@ -98,29 +103,43 @@ export default function Navigator(props) {
             <ListItemText>Home</ListItemText>
           </ListItemButton>
         </ListItem>
-        {mainItems.map(({ id, children }) => (
+        {mainItems.map(({ id, label, translationKey, children }) => (
           <Box
             key={id}
             sx={{ bgcolor: '#101F33' }}
           >
             <ListItem sx={{ py: 2, px: 3 }}>
-              <ListItemText sx={{ color: '#fff' }}>{id}</ListItemText>
+              <ListItemText sx={{ color: '#fff' }}>
+                {translationKey ? t(translationKey, { defaultValue: label }) : label}
+              </ListItemText>
             </ListItem>
-            {children.map(({ id: childId, href, icon }) => (
-              <ListItem
-                disablePadding
-                key={childId}
-              >
-                <ListItemButton
-                  selected={href === window.location.pathname}
-                  onClick={() => onLinkClick(href || '/')}
-                  sx={item}
+            {children.map(
+              ({
+                id: childId,
+                label: childLabel,
+                translationKey: childTranslationKey,
+                to,
+                Icon,
+              }) => (
+                <ListItem
+                  disablePadding
+                  key={childId}
                 >
-                  <ListItemIcon>{icon}</ListItemIcon>
-                  <ListItemText>{childId}</ListItemText>
-                </ListItemButton>
-              </ListItem>
-            ))}
+                  <ListItemButton
+                    selected={to === window.location.pathname}
+                    onClick={() => onLinkClick(to || '/')}
+                    sx={item}
+                  >
+                    <ListItemIcon>{Icon}</ListItemIcon>
+                    <ListItemText>
+                      {childTranslationKey
+                        ? t(childTranslationKey, { defaultValue: childLabel })
+                        : childLabel}
+                    </ListItemText>
+                  </ListItemButton>
+                </ListItem>
+              )
+            )}
             <Divider sx={{ mt: 2 }} />
           </Box>
         ))}

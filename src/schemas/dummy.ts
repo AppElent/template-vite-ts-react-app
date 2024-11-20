@@ -29,10 +29,7 @@ export const dummyYupSchema = Yup.object().shape({
     .optional(),
 });
 
-export interface Dummy extends Yup.InferType<typeof dummyYupSchema> {
-  // using interface instead of type generally gives nicer editor feedback
-  randomString?: string;
-}
+export type Dummy = Yup.InferType<typeof dummyYupSchema>;
 
 export default interface DummyBackup {
   name: string;

@@ -1,22 +1,30 @@
 import PropTypes from 'prop-types';
 import { createContext, useCallback, useContext, useEffect, useReducer } from 'react';
+import { AuthState, User } from '.';
 
-export const initialState = {
+export const initialState: AuthState = {
   isAuthenticated: false,
   isInitialized: false,
   user: null,
   raw: null,
   options: { login: null },
   provider: null,
+  signIn: async () => ({}) as User,
+  signUp: async () => ({}) as User,
+  signOut: async () => {},
+  // signUp: (_email: string, _password: string) => Promise<User>,
+  // signInWithEmailAndPassword: async () => Promise<void>,
+  // signInWithGoogle: async () => Promise<void>,
+  // signOut: async () => any,
 };
 
-const AuthContext = createContext({
+const AuthContext = createContext<AuthState>({
   ...initialState,
-  issuer: 'FIREBASE',
-  createUserWithEmailAndPassword: () => Promise.resolve(),
-  signInWithEmailAndPassword: () => Promise.resolve(),
-  signInWithGoogle: () => Promise.resolve(),
-  signOut: () => Promise.resolve(),
+  // provider: 'FIREBASE',
+  // createUserWithEmailAndPassword: () => Promise.resolve(),
+  // signInWithEmailAndPassword: () => Promise.resolve(),
+  // signInWithGoogle: () => Promise.resolve(),
+  // signOut: () => Promise.resolve(),
 });
 
 export const AuthConsumer = AuthContext.Consumer;

@@ -63,7 +63,8 @@ const useCustomFormik = (props: UseCustomFormikProps) => {
 
   const formik = useFormik({
     ...formikProps,
-    initialValues: initialValues,
+    initialValues,
+    validationSchema,
     onSubmit: async (values, formikHelpers) => {
       try {
         console.log('Form Submitted:', values);
@@ -95,6 +96,16 @@ const useCustomFormik = (props: UseCustomFormikProps) => {
     // Submit
     await formik.handleSubmit(e);
   };
+
+  // Overwrite default formik handleChange with a debounced version
+  // const debouncedHandleChange = useMemo(
+  //   () =>
+  //     _.debounce((value) => {
+  //       console.log('test');
+  //       formik.handleChange(value);
+  //     }, 500),
+  //   [formik.handleChange]
+  // );
 
   return { ...formik, handleSubmit: customHandleSubmit };
 };

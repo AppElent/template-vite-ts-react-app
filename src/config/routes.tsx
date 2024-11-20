@@ -1,11 +1,10 @@
 import { Suspense } from 'react';
 import { Outlet, RouteObject } from 'react-router-dom';
 
-import AuthGuard from '@/guards/auth-guard';
 import PaperbaseLayout from '@/layouts/paperbase/Layout';
-import HomePage from '@/pages/home-page';
-import RecipeDetailsPage from '@/pages/recipe-details-page';
-import RecipeOverviewPage from '@/pages/recipe-overview-page';
+import HomePage from '@/pages/home';
+import RecipeDetailsPage from '@/pages/recipes/recipe-details';
+import RecipeOverviewPage from '@/pages/recipes/recipe-overview';
 import appRoutes from '@/routes/appRoutes';
 import defaultRoutes from '@/routes/defaultRoutes';
 
@@ -22,13 +21,13 @@ const routes: RouteObject[] = [
   {
     path: 'app',
     element: (
-      <AuthGuard options={{ shouldBeAuthenticated: true, login: '/login' }}>
-        <PaperbaseLayout settings={LayoutSettings}>
-          <Suspense>
-            <Outlet />
-          </Suspense>
-        </PaperbaseLayout>
-      </AuthGuard>
+      // <AuthGuard options={{ shouldBeAuthenticated: true, login: '/login' }}>
+      <PaperbaseLayout settings={LayoutSettings}>
+        <Suspense>
+          <Outlet />
+        </Suspense>
+      </PaperbaseLayout>
+      // </AuthGuard>
     ),
     children: [
       {

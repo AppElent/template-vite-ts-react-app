@@ -1,0 +1,31 @@
+{
+  "data": {
+    "RECIPE_KEYWORDS": [
+      "snel",
+      "makkelijk",
+      "gemakkelijk",
+      "gezond",
+      "vegetarisch",
+      "vegan",
+      "glutenvrij",
+      "koolhydraatarm",
+      "vetarm",
+      "laag in calorieën",
+      "hoog in proteïne",
+      "hoog in vezels",
+      "kindvriendelijk",
+      "budget vriendelijk"
+    ],
+    "RECIPE_CATEGORIES": ["ontbijt", "lunch", "diner", "desert", "snack", "appetizer", "avondeten"]
+  },
+  "pages": {
+    "home": {
+      "description": "Welkom bij FoodHub! Jouw one-stop shop voor alles wat met eten te maken heeft.",
+      "featured": "Uitgelichte Recepten",
+      "categories": "Blader door recepten per categorie."
+    }
+  },
+  "menu": {
+    "recipes": "Recepten"
+  }
+}
