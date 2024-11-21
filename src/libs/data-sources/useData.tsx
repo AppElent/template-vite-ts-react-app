@@ -2,11 +2,29 @@ import { useContext, useEffect, useMemo } from 'react';
 import { DataSource } from '.';
 import { DataContext } from './DataProvider';
 
-const useData = <T,>(key: string, _options = {}, newDataSource?: DataSource<T>) => {
+interface UseDataPropsOptions {
+  datasource?: any;
+  addDatasourceWhenNotAvailable?: boolean;
+  [key: string]: any;
+}
+
+// interface UseDataReturn<T> {
+//   // TODO: implement
+//   [key: string]: any;
+// }
+
+const defaultOptions: UseDataPropsOptions = {
+  addDatasourceWhenNotAvailable: true,
+};
+
+const useData = <T,>(key: string, options: UseDataPropsOptions = defaultOptions): DataSource<T> => {
   const context = useContext(DataContext);
   if (!context) {
     throw new Error('useData must be used within a DataProvider');
   }
+
+  const mergedOptions = { ...defaultOptions, ...(options || {}) };
+  const { datasource: newDataSource, addDatasourceWhenNotAvailable } = mergedOptions || {};
 
   const dataSource = useMemo(() => context.dataSources[key], [key, context]);
 
@@ -36,10 +54,10 @@ const useData = <T,>(key: string, _options = {}, newDataSource?: DataSource<T>) 
   }, [key, dataSource, subscribeToData, subscriptions, context.dataSources]);
 
   useEffect(() => {
-    if (newDataSource && !context.dataSources[key]) {
+    if (newDataSource && !context.dataSources[key] && addDatasourceWhenNotAvailable) {
       addDataSource(key, newDataSource);
     }
-  }, [newDataSource, key, addDataSource, context.dataSources]);
+  }, [newDataSource, key, addDataSource, context.dataSources, addDatasourceWhenNotAvailable]);
 
   const { get, getAll } = dataSource || {};
 
@@ -109,16 +127,18 @@ const useData = <T,>(key: string, _options = {}, newDataSource?: DataSource<T>) 
         update: (data, id) => update(key, data, id),
         set: (data, id) => set(key, data, id),
         delete: (id) => remove(key, id),
+        validate: dataSource?.validate,
+        getDummyData: dataSource?.getDummyData,
       },
-      fetchData: (filter?: any) => fetchData(key, filter),
-      get: get || (() => {}),
-      getAll: getAll || (() => {}),
-      add: (item: T) => add(key, item),
-      update: (data, id) => update(key, data, id),
-      set: (data, id) => set(key, data, id),
-      delete: (id) => remove(key, id),
-      validate: dataSource?.validate,
-      getDummyData: dataSource?.getDummyData,
+      // fetchData: (filter?: any) => fetchData(key, filter),
+      // get: get || (() => {}),
+      // getAll: getAll || (() => {}),
+      // add: (item: T) => add(key, item),
+      // update: (data, id) => update(key, data, id),
+      // set: (data, id) => set(key, data, id),
+      // delete: (id) => remove(key, id),
+      // validate: dataSource?.validate,
+      // getDummyData: dataSource?.getDummyData,
       // Raw datasource info
       dataSource,
       provider: dataSource?.provider,

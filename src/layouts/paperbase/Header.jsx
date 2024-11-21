@@ -1,4 +1,5 @@
-import LanguageSwitch from '@/components/default/language-switch';
+import LanguageSwitch from '@/components/default/layout/language-switch';
+import UserMenu from '@/components/default/layout/user-menu';
 import useRouter from '@/hooks/use-router';
 import { useAuth } from '@/libs/auth';
 import IssueDialog from '@/sections/default/issue-dialog';
@@ -99,7 +100,7 @@ function Header(props) {
                 open={open}
                 onClose={handleClose}
                 anchorOrigin={{
-                  vertical: 'top',
+                  vertical: 'bottom',
                   horizontal: 'right',
                 }}
                 transformOrigin={{
@@ -126,6 +127,9 @@ function Header(props) {
                   Logout
                 </MenuItem>
               </Menu>
+            </Grid>
+            <Grid item>
+              <UserMenu />
             </Grid>
           </Grid>
         </Toolbar>

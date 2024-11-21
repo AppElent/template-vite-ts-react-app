@@ -84,20 +84,19 @@ const datasources = {
 
 const DataSource = (props: any) => {
   const { datasourceName, dataSource: newDataSource } = props;
-  const datasource = useData<Dummy>(datasourceName, {}, newDataSource);
+  const datasource = useData<Dummy>(datasourceName, { datasource: newDataSource });
   const handleAdd = async () => {
-    const newItem = datasource.getDummyData(); //getDummyTestData(1) as Dummy;
-    console.log(newItem);
-    await datasource.add(newItem);
+    const newItem = datasource.actions.getDummyData(); //getDummyTestData(1) as Dummy;
+    await datasource.actions.add(newItem);
   };
 
   const handleGetAll = async () => {
-    const items = await datasource?.getAll();
+    const items = await datasource?.actions.getAll();
     console.log(items);
   };
 
   const handleGet = async () => {
-    const item = await datasource?.get();
+    const item = await datasource?.actions.get();
     console.log(item);
   };
 
@@ -110,7 +109,7 @@ const DataSource = (props: any) => {
           <br />
           Loading: {datasource.loading ? 'true' : 'false'}
           <br />
-          Error: {datasource.error ? 'true' : 'false'}
+          Error: {datasource.error ? `${datasource.error.message}` : 'false'}
           <br />
           Data:
           {datasource.data && (
@@ -125,7 +124,7 @@ const DataSource = (props: any) => {
               <Button
                 variant="contained"
                 color="primary"
-                onClick={() => datasource.fetchData()}
+                onClick={() => datasource.actions.fetchData()}
               >
                 Fetch data dummy2
               </Button>

@@ -4,10 +4,11 @@ import { Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import LatestRecipes from './_components/latest-recipes';
 import RecipeCarroussel from './_components/recipe-carroussel';
+import Recipe from '@/types/recipe';
 // TODO: Fix and implement the horizontal scroll card list component
 
 const HomePage = () => {
-  const { data: recipes } = useData('recipes');
+  const { data: recipes } = useData<Recipe[]>('recipes');
   const { t } = useTranslation('foodhub');
 
   return (

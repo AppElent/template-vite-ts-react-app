@@ -2,9 +2,9 @@ import generateTestData from '@/utils/generate-test-data';
 import * as Yup from 'yup';
 
 export const issueYupSchema = Yup.object().shape({
-  title: Yup.string().required('Title is required'),
-  description: Yup.string().required('Description is required'),
-  images: Yup.array().of(Yup.string()).optional(),
+  title: Yup.string().required('Title is required').default(''),
+  description: Yup.string().required('Description is required').default(''),
+  images: Yup.array().of(Yup.string()).optional().default([]),
 });
 
 export type Issue = Yup.InferType<typeof issueYupSchema>;

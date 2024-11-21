@@ -1,4 +1,4 @@
-import DefaultPage from '../../DefaultPage';
+import DefaultPage from '@/pages/default/DefaultPage';
 
 const Forms = () => {
   return <DefaultPage></DefaultPage>;

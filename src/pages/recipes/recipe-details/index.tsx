@@ -5,7 +5,7 @@ import DefaultPage from '@/pages/default/DefaultPage';
 import Recipe from '@/types/recipe';
 
 const RecipeDetailsPage = () => {
-  const { data: recipes } = useData('recipes');
+  const { data: recipes } = useData<Recipe[]>('recipes');
   const recipe = useParamItem<Recipe>({
     items: recipes || [],
   });

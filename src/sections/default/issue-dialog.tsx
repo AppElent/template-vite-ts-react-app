@@ -1,21 +1,46 @@
 import CustomDialog from '@/components/default/custom-dialog';
+import FormButton from '@/components/default/forms/FormButton';
 import TextField from '@/components/default/forms/TextField';
+import { db } from '@/config/firebase';
+import { useData } from '@/libs/data-sources';
+import FirestoreDataSource from '@/libs/data-sources/data-sources/FirestoreDataSource';
 import { CustomForm } from '@/libs/forms';
 import useCustomFormik from '@/libs/forms/use-custom-formik';
-import { issueFields, issueYupSchema } from '@/schemas/issue';
+import { Issue, issueFields, issueYupSchema } from '@/schemas/issue';
 import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 import { Button, DialogContent, DialogTitle, IconButton, Tooltip } from '@mui/material';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { toast } from 'react-toastify';
+
+const issueDatasource = new FirestoreDataSource<Issue>(
+  {
+    target: 'issues',
+    targetMode: 'collection',
+    subscribe: false,
+    YupValidationSchema: issueYupSchema,
+    //mockOptions: { schema: iss },
+  },
+  { db }
+);
 
 const IssueDialog = () => {
-  //const data = useData('issues');
+  const { t } = useTranslation();
+  const datasource = useData<Issue>('issues', { datasource: issueDatasource });
   const [dialogData, setDialogData] = useState<string | undefined>(undefined);
   const formik = useCustomFormik({
     initialValues: { title: '', description: '' },
     validationSchema: issueYupSchema,
     onSubmit: async (values, _formikHelpers) => {
       console.log(values);
-      return;
+      try {
+        await datasource.actions.add(values);
+        toast.success(t('notifications.submitSuccess', { resource: 'Issue' }));
+        formik.resetForm();
+      } catch (e) {
+        toast.error(t('notifications.submitError', { resource: 'Issue' }));
+        console.error(e);
+      }
     },
   });
 
@@ -50,12 +75,15 @@ const IssueDialog = () => {
                 name="description"
                 field={issueFields.description}
               />
+              <FormButton>Submit</FormButton>
               <Button
-                type="submit"
                 color="primary"
-                variant="contained"
+                onClick={async () => {
+                  datasource.actions.getAll().then((d: any) => console.log(d));
+                }}
+                variant="outlined"
               >
-                Submit
+                Get issues
               </Button>
             </CustomForm>
           </DialogContent>

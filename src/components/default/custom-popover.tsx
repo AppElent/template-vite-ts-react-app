@@ -1,22 +1,11 @@
-import Box from '@mui/material/Box';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import MenuItem from '@mui/material/MenuItem';
 import Popover, { PopoverProps } from '@mui/material/Popover';
-import Typography from '@mui/material/Typography';
 
-interface CustomPopoverProps extends PopoverProps {
-  handleClick: (id: string) => void;
-  options: {
-    id: string;
-    label: string;
-    transLationKey?: string;
-    icon: string;
-  }[];
-}
+// interface CustomPopoverProps extends PopoverProps {
+//   children: React.ReactNode;
+// }
 
-export const CustomPopover = (props: CustomPopoverProps) => {
-  const { handleClick, options, ...other } = props;
+export const CustomPopover = (props: PopoverProps) => {
+  const { children, ...other } = props;
   //const popover = usePopover();
 
   return (
@@ -33,10 +22,11 @@ export const CustomPopover = (props: CustomPopoverProps) => {
       }}
       //onClose={popover.handleClose}
       //open={popover.open}
-      PaperProps={{ sx: { width: 220 } }}
+      //PaperProps={{ sx: { width: 220 } }}
       {...other}
     >
-      {options.map((option) => {
+      {children}
+      {/* {options.map((option) => {
         return (
           <MenuItem
             onClick={() => handleClick(option.id)}
@@ -60,7 +50,7 @@ export const CustomPopover = (props: CustomPopoverProps) => {
             <ListItemText primary={<Typography variant="subtitle2">{option.label}</Typography>} />
           </MenuItem>
         );
-      })}
+      })} */}
     </Popover>
   );
 };

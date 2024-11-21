@@ -75,7 +75,6 @@ export default function Navigator(props) {
   const { t } = useTranslation();
 
   const homePath = getPath('home');
-  console.log('homePath', homePath);
 
   const onLinkClick = (href) => {
     router.push(href);

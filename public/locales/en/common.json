@@ -70,20 +70,16 @@
     "list": "List",
     "create": "Create",
     "edit": "Edit",
-    "show": "Show"
-  },
-  "buttons": {
-    "create": "Create",
+    "show": "Show",
+    "submit": "Submit",
     "save": "Save",
     "logout": "Logout",
     "delete": "Delete",
-    "edit": "Edit",
     "cancel": "Cancel",
     "confirm": "Are you sure?",
     "filter": "Filter",
     "clear": "Clear",
     "refresh": "Refresh",
-    "show": "Show",
     "undo": "Undo",
     "import": "Import",
     "clone": "Clone",
@@ -96,7 +92,7 @@
   },
   "warnWhenUnsavedChanges": "Are you sure you want to leave? You have unsaved changes.",
   "notifications": {
-    "success": "Successful",
+    "success": "Success",
     "error": "Error (status code: {{statusCode}})",
     "undoable": "You have {{seconds}} seconds to undo",
     "createSuccess": "Successfully created {{resource}}",
@@ -105,17 +101,13 @@
     "deleteError": "Error when deleting {{resource}} (status code: {{statusCode}})",
     "editSuccess": "Successfully edited {{resource}}",
     "editError": "Error when editing {{resource}} (status code: {{statusCode}})",
+    "submitSuccess": "Successfully submitted {{resource}}",
+    "submitError": "Error when submitting {{resource}} (status code: {{statusCode}})",
     "importProgress": "Importing: {{processed}}/{{total}}",
     "savedSuccess": "Saved Successfully",
     "savedError": "Error saving"
   },
   "loading": "Loading",
-  "tags": {
-    "clone": "Clone"
-  },
-  "dashboard": {
-    "title": "Dashboard"
-  },
   "posts": {
     "posts": "Posts",
     "fields": {

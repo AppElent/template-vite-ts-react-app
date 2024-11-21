@@ -4,10 +4,11 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import { useTranslation } from 'react-i18next';
 
+import { ListItemIcon, ListItemText, MenuItem, Typography } from '@mui/material';
 import { t } from 'i18next';
 import { useCallback } from 'react';
 import { toast } from 'react-toastify';
-import CustomPopover from './custom-popover';
+import CustomPopover from '../custom-popover';
 
 interface LanguageOptions {
   [key: string]: {
@@ -54,6 +55,13 @@ const LanguageSwitch = () => {
     [popover, i18n]
   );
 
+  const options = Object.keys(languageOptions).map((key) => ({
+    id: key,
+    label: languageOptions[key].label,
+    translationKey: languageOptions[key].translationKey,
+    icon: languageOptions[key].icon,
+  }));
+
   return (
     <>
       <Tooltip title="Language">
@@ -82,14 +90,40 @@ const LanguageSwitch = () => {
         anchorEl={popover.anchorRef.current}
         onClose={popover.handleClose}
         open={popover.open}
-        handleClick={handleClick}
-        options={Object.keys(languageOptions).map((key) => ({
-          id: key,
-          label: languageOptions[key].label,
-          translationKey: languageOptions[key].translationKey,
-          icon: languageOptions[key].icon,
-        }))}
-      />
+        // onClick={handleClick}
+        // options={Object.keys(languageOptions).map((key) => ({
+        //   id: key,
+        //   label: languageOptions[key].label,
+        //   translationKey: languageOptions[key].translationKey,
+        //   icon: languageOptions[key].icon,
+        // }))}
+      >
+        {options.map((option) => {
+          return (
+            <MenuItem
+              onClick={() => handleClick(option.id)}
+              key={option.id}
+            >
+              <ListItemIcon>
+                <Box
+                  sx={{
+                    width: 28,
+                    '& img': {
+                      width: '100%',
+                    },
+                  }}
+                >
+                  <img
+                    alt={option.label}
+                    src={option.icon}
+                  />
+                </Box>
+              </ListItemIcon>
+              <ListItemText primary={<Typography variant="subtitle2">{option.label}</Typography>} />
+            </MenuItem>
+          );
+        })}
+      </CustomPopover>
     </>
   );
 };

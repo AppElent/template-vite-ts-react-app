@@ -2,8 +2,6 @@ import { faker } from '@faker-js/faker';
 import * as yup from 'yup';
 import { DataSourceInitOptions, FilterObject } from '..';
 
-//type YupSchema<T extends yup.AnyObject> = yup.ObjectSchema<T>;
-
 interface validateOptions {
   full: boolean;
 }
@@ -131,6 +129,25 @@ class BaseDataSource<T> {
   validate = async (data: Partial<T>, options?: validateOptions): Promise<void> => {
     await this.#validateSchema(data, options);
     await this.#validateYupSchema(data, options);
+  };
+
+  /**
+   * Cleans the data by removing undefined values.
+   * @param {Partial<T>} data - The data to clean.
+   * @returns {Partial<T>} - The cleaned data.
+   */
+  // TODO: finish implementation
+  cleanValues = (data: Partial<T>): Partial<T> => {
+    const isObject = ['collection', 'document'].includes(this.options.targetMode || '');
+    const cleanedData: any = isObject ? {} : data;
+    if (isObject) {
+      for (const [key, value] of Object.entries(data)) {
+        if (value !== undefined || !this.options.cleanValues?.removeUndefined) {
+          cleanedData[key] = value;
+        }
+      }
+    }
+    return cleanedData;
   };
 
   /**

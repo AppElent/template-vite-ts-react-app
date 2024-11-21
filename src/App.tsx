@@ -22,9 +22,9 @@ const dataSources = {
       YupValidationSchema: recipeYupSchema,
       subscribe: true,
       targetFilter: {
-        filters: [
-          { field: 'owner', operator: '==', value: () => firebaseProvider.getCurrentUser()?.id },
-        ],
+        // filters: [
+        //   { field: 'owner', operator: '==', value: () => firebaseProvider.getCurrentUser()?.id },
+        // ],
         orderBy: [{ field: 'name', direction: 'asc' }],
       },
     },
