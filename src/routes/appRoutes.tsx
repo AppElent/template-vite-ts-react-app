@@ -43,7 +43,7 @@ type CustomRouteObject = RouteObject & {
   category?: string;
 };
 
-export const generatePathsFromRoutes = (routes: CustomRouteObject[]): PathItem[] => {
+export const generatePathsFromRoutes = (_routes: CustomRouteObject[]): PathItem[] => {
   return [];
 };
 
