@@ -1,15 +1,18 @@
 // @ts-nocheck
 
 import AutocompleteChipList from '@/components/default/forms/AutocompleteChipList';
+import CancelButton from '@/components/default/forms/CancelButton';
+import Images from '@/components/default/forms/Images';
 import List from '@/components/default/forms/List';
 import Rating from '@/components/default/forms/Rating';
+import SubmitButton from '@/components/default/forms/SubmitButton';
 import TextField from '@/components/default/forms/TextField';
 import JsonEditor from '@/components/default/json-editor';
 import GridLayout from '@/components/default/ui/grid-layout';
-import RecipeImageList from '@/components/recipes/recipe-image-list';
 import { getLogLevel } from '@/config';
 import { RECIPE_FIELDS } from '@/data/recipe-data';
 import useFetch from '@/hooks/use-fetch';
+import useGuid from '@/hooks/use-guid';
 import useQueryParamAction from '@/hooks/use-query-param-action';
 import useRouter from '@/hooks/use-router';
 import { useAuth } from '@/libs/auth';
@@ -19,9 +22,9 @@ import useCustomFormik from '@/libs/forms/use-custom-formik';
 import { getCuisineSuggestions, getKeywordSuggestions } from '@/libs/recipes/get-recipe-fields';
 import parseExternalRecipeData from '@/libs/recipes/parse-external-recipe-data';
 import FirebaseStorageProvider from '@/libs/storage-providers/providers/FirebaseStorageProvider';
+import { ExternalRecipe } from '@/schemas/external-recipe';
 import { recipeYupSchema } from '@/schemas/recipe';
 import Recipe from '@/types/recipe';
-import { createGuid } from '@/utils/create-guid';
 import CloseIcon from '@mui/icons-material/Close';
 import SaveIcon from '@mui/icons-material/Save';
 import {
@@ -37,9 +40,7 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material';
-import { useEffect, useMemo, useState } from 'react';
-import ImageUploader from '../../components/default/images/image-uploader';
-import ImageViewerDialog from '../../components/default/images/image-viewer-dialog';
+import { useEffect, useMemo } from 'react';
 import LoadingButton from '../../components/default/ui/loading-button';
 
 interface RecipeEditDialogProps {
@@ -53,6 +54,10 @@ const RecipeEditDialog = ({ recipe, open, onClose }: RecipeEditDialogProps) => {
   // Theme and media query
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
+
+  // Generate new ID
+  const id = useGuid();
+  const recipeId = recipe?.id || id;
 
   const { data: recipes, actions: recipeActions } = useData('recipes');
 
@@ -70,12 +75,7 @@ const RecipeEditDialog = ({ recipe, open, onClose }: RecipeEditDialogProps) => {
   // Router instance
   const router = useRouter();
 
-  const { set: setRecipe, delete: deleteRecipe, add: addRecipe } = recipeActions;
-
-  // Image section
-  //const [, setImage] = useState(recipe?.image || null);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [uploadFileName] = useState<string | null>(createGuid());
+  const { set: setRecipe, delete: deleteRecipe } = recipeActions;
 
   const initialValues = useMemo(() => {
     return {
@@ -85,7 +85,6 @@ const RecipeEditDialog = ({ recipe, open, onClose }: RecipeEditDialogProps) => {
   }, [recipe, auth.user]);
 
   // Get fields and suggestions
-  // const fields = useMemo(() => recipes && getRecipeFields(recipes), [recipes]);
   const fields = RECIPE_FIELDS;
   const keywordSuggestions = useMemo(() => recipes && getKeywordSuggestions(recipes), [recipes]);
   const cuisineSuggestions = useMemo(() => recipes && getCuisineSuggestions(recipes), [recipes]);
@@ -96,13 +95,31 @@ const RecipeEditDialog = ({ recipe, open, onClose }: RecipeEditDialogProps) => {
     validationSchema: recipeYupSchema,
     enableReinitialize: true,
     onSubmit: async (values: Recipe) => {
-      if (!recipe) {
-        const newRecipe = (await addRecipe(values)) as Recipe;
-        router.push(`/app/recipes/${newRecipe.id}`);
-      } else {
-        await setRecipe(values, recipe?.id);
+      const filesToUpload = formik.values.images.filter((url) => url.startsWith('blob:'));
+      if (filesToUpload.length > 0) {
+        const storageClass = new FirebaseStorageProvider();
+        for (const url of filesToUpload) {
+          const file = await fetch(url).then((r) => r.blob());
+          const filename = url.split('/').pop();
+          const imageUrl = await storageClass.uploadFile(
+            file,
+            `uploads/recipes/${recipeId}/${filename}`
+          );
+          // Replace blob url in images with real url
+          await formik.setFieldValue('images', [
+            ...formik.values.images.filter((img) => img !== url),
+            imageUrl,
+          ]);
+          //formik.setFieldValue('images', [...formik.values.images, imageUrl]);
+        }
       }
-      onClose();
+      // Save
+      await setRecipe(values, recipeId);
+      // Redirect to recipe page
+      if (!recipe) {
+        router.push(`/app/recipes/${recipeId}`);
+      }
+      //onClose();
     },
   });
 
@@ -116,22 +133,12 @@ const RecipeEditDialog = ({ recipe, open, onClose }: RecipeEditDialogProps) => {
     loading,
     error: fetchUrlError,
     fetchData,
-  } = useFetch<any>(`https://api-python.appelent.site/recipes/scrape?url=${formik?.values.url}`, {
-    autoFetch: false,
-  });
-
-  //Receive URL from query params. If set, update formik state with the URL
-  // const [urlParam, setUrlParam] = useQueryParam('url', StringParam);
-  // useEffect(() => {
-  //   const fetchDataAndUpdateFormik = async () => {
-  //     await formik.setFieldValue('url', urlParam);
-  //     await fetchData(`https://api-python.appelent.site/recipes/scrape?url=${urlParam}`);
-  //     setUrlParam(undefined, 'replaceIn');
-  //   };
-  //   if (urlParam && formik.values.url !== urlParam && !loading) {
-  //     fetchDataAndUpdateFormik();
-  //   }
-  // }, [urlParam, formik?.values?.url, fetchData, setUrlParam, loading]);
+  } = useFetch<ExternalRecipe>(
+    `https://api-python.appelent.site/recipes/scrape?url=${formik?.values.url}`,
+    {
+      autoFetch: false,
+    }
+  );
 
   useEffect(() => {
     if (externalRecipeData) {
@@ -222,10 +229,7 @@ const RecipeEditDialog = ({ recipe, open, onClose }: RecipeEditDialogProps) => {
                 </Box>
               )}
               <TextField field={fields.name} />
-              {/* <CustomField field={fields.name} /> */}
-              {/* <CustomField field={fields.score} /> */}
               <Rating field={fields.score} />
-              {/* <CustomField field={fields.description} /> */}
               <Grid
                 container
                 spacing={2}
@@ -252,7 +256,6 @@ const RecipeEditDialog = ({ recipe, open, onClose }: RecipeEditDialogProps) => {
                       <LoadingButton
                         variant="contained"
                         isLoading={loading}
-                        //href="#" //{formik.values.url}
                         onClick={() => {
                           fetchData();
                         }}
@@ -272,12 +275,10 @@ const RecipeEditDialog = ({ recipe, open, onClose }: RecipeEditDialogProps) => {
                 </Typography>
               )}
 
-              {/* <CustomField field={fields.cuisine} /> */}
               <AutocompleteChipList
                 field={fields.cuisine}
                 suggestions={cuisineSuggestions}
               />
-              {/* <CustomField field={fields.ingredients} /> */}
               <List field={fields.ingredients} />
               <List field={fields.instructions} />
 
@@ -289,31 +290,36 @@ const RecipeEditDialog = ({ recipe, open, onClose }: RecipeEditDialogProps) => {
                   <TextField field={fields.totalTime} />,
                 ]}
               />
-              {/* <GridLayout
-                items={[
-                  <CustomField field={fields.prepTime} />,
-                  <CustomField field={fields.cookTime} />,
-                  <CustomField field={fields.totalTime} />,
-                ]}
-              />
-              {/* <CustomField field={fields.prepTime} />
-              <CustomField field={fields.cookTime} />
-              <CustomField field={fields.totalTime} /> */}
               <TextField field={fields.category} />
-              {/* <CustomField field={fields.keywords} /> */}
               <AutocompleteChipList
                 field={fields.keywords}
                 suggestions={keywordSuggestions}
               />
               <TextField field={fields.yieldsText} />
               <TextField field={fields.calories} />
-              {formik?.values?.images && formik?.values?.images?.length > 0 && (
-                <RecipeImageList
-                  images={formik.values.images}
-                  setSelectedImage={setSelectedImage}
-                />
-              )}
-              {recipe ? (
+              <Images
+                field={fields.images}
+                uploadImage={async (file) => {
+                  console.log(file);
+                  const storageClass = new FirebaseStorageProvider();
+                  const url = await storageClass.uploadFile(
+                    file,
+                    `uploads/recipes/${recipeId}/${file.name}`
+                  );
+                  return url;
+                }}
+                deleteImage={async (url) => {
+                  const storageClass = new FirebaseStorageProvider();
+                  await storageClass.deleteFile(url);
+                }}
+                getFavorite={(url) => {
+                  return formik.values.image === url;
+                }}
+                setFavorite={(url) => {
+                  formik.setFieldValue('image', url);
+                }}
+              />
+              {/* {recipe ? (
                 <ImageUploader
                   originalFileName={`/uploads/recipes/${recipe?.id || createGuid()}/${uploadFileName}.jpg`}
                   uploadFile={async (file, filename) => {
@@ -342,7 +348,7 @@ const RecipeEditDialog = ({ recipe, open, onClose }: RecipeEditDialogProps) => {
                 />
               ) : (
                 <Box>Note: After saving the recipe, pictures can be uploaded</Box>
-              )}
+              )} */}
               {getLogLevel() === 'debug' && (
                 <JsonEditor
                   data={{ recipe, formik: formik?.values }}
@@ -351,25 +357,28 @@ const RecipeEditDialog = ({ recipe, open, onClose }: RecipeEditDialogProps) => {
               )}
             </DialogContent>
             <DialogActions>
-              <Button
-                onClick={onClose}
+              <CancelButton onClick={onClose}>Cancel</CancelButton>
+              {/* <Button
+                onClick={() => {
+                  formik.resetForm();
+                  onClose();
+                }}
                 color="secondary"
               >
                 Cancel
-              </Button>
-              <Button
+              </Button> */}
+              <SubmitButton>Save</SubmitButton>
+              <SubmitButton onClick={onClose}>Save and close</SubmitButton>
+              {/* <Button
                 type="submit"
                 color="primary"
               >
                 Save
-              </Button>
+              </Button> */}
               {!recipe && (
                 <Button
                   onClick={() => {
-                    if (recipe?.id) {
-                      deleteRecipe(recipe.id);
-                    }
-
+                    deleteRecipe(recipe.id);
                     formik.resetForm();
                     onClose();
                   }}
@@ -382,20 +391,6 @@ const RecipeEditDialog = ({ recipe, open, onClose }: RecipeEditDialogProps) => {
           </CustomForm>
         </Dialog>
       )}
-      {/* Full Image Dialog */}
-      <ImageViewerDialog
-        image={selectedImage || undefined}
-        onClose={() => setSelectedImage(null)}
-        actions={[
-          {
-            label: 'Set as main image',
-            onClick: (src?: string) => {
-              formik.setValues({ ...formik.values, image: src });
-              setSelectedImage(null);
-            },
-          },
-        ]}
-      />
     </>
   );
 };

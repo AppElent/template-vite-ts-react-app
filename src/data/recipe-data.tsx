@@ -148,4 +148,8 @@ export const RECIPE_FIELDS = {
     type: 'object',
     label: 'Calories',
   },
+  images: {
+    name: 'images',
+    label: 'Images',
+  },
 };

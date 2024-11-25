@@ -3,14 +3,9 @@ import UserMenu from '@/components/default/layout/user-menu';
 import useRouter from '@/hooks/use-router';
 import { useAuth } from '@/libs/auth';
 import IssueDialog from '@/sections/default/issue-dialog';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import LogoutIcon from '@mui/icons-material/Logout';
 import MenuIcon from '@mui/icons-material/Menu';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import SettingsIcon from '@mui/icons-material/Settings';
-import { ListItemIcon, Menu, MenuItem } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
-import Avatar from '@mui/material/Avatar';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import Toolbar from '@mui/material/Toolbar';
@@ -84,7 +79,7 @@ function Header(props) {
                 </IconButton>
               </Tooltip>
             </Grid>
-            <Grid item>
+            {/* <Grid item>
               <IconButton
                 color="inherit"
                 sx={{ p: 0.5 }}
@@ -127,7 +122,7 @@ function Header(props) {
                   Logout
                 </MenuItem>
               </Menu>
-            </Grid>
+            </Grid> */}
             <Grid item>
               <UserMenu />
             </Grid>

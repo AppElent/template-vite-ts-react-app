@@ -2,25 +2,28 @@ import { useFormButton } from '@/libs/forms';
 import { ButtonProps, Button as DefaultButton } from '@mui/material';
 import _ from 'lodash';
 
-const FormButton = (props: ButtonProps) => {
+const CancelButton = (props: ButtonProps) => {
   const { formik, options } = useFormButton();
+  const { onClick } = props;
 
   const newProps = _.merge({}, options, props);
 
-  const disabled = formik.isSubmitting || !formik.isValid || !formik.dirty;
+  const disabled = formik.isSubmitting;
 
   return (
     <DefaultButton
-      type="submit"
-      color="primary"
-      variant="contained"
+      color="secondary"
+      variant="outlined"
       disabled={disabled}
-      onSubmit={formik.handleSubmit}
+      onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+        formik.resetForm();
+        if (onClick) onClick(e);
+      }}
       {...newProps.muiButtonProps}
     >
-      Submit
+      Cancel
     </DefaultButton>
   );
 };
 
-export default FormButton;
+export default CancelButton;

@@ -43,8 +43,8 @@ const Card = styled(MuiCard)(({ theme }) => ({
 
 const SignInContainer = styled(Stack)(({ theme }) => ({
   padding: 20,
-  minHeight: '100vh',
-  minWidth: '100vw',
+  minHeight: '80vhvh',
+  //minWidth: '100vw',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
@@ -71,14 +71,14 @@ export default function SignIn(props) {
   const returnTo = searchParams.get('returnTo');
   const { /*issuer,*/ signInWithEmailAndPassword, signUp /*, signInWithGoogle*/, provider } =
     useAuth();
-  
+
   const { mode, paths, ...themeProps } = props;
-  const { authProvider, formik, fields, buttons } = useLoginForm(provider, {mode, redirectAfterLogin: config.paths.auth.redirectAfterLogin});
+  const { authProvider, formik, fields, buttons } = useLoginForm(provider, {
+    mode,
+    redirectAfterLogin: config.paths.auth.redirectAfterLogin,
+  });
 
-  console.log(buttons, fields);
   const { text: loginButtonText, ...loginButtonProps } = buttons.login;
-
-  console.log(formik);
 
   // const initialValues =
   //   mode === 'signin'

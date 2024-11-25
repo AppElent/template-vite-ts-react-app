@@ -2,6 +2,8 @@ import RecipeCard from '@/components/recipes/recipe-card';
 import Recipe from '@/types/recipe';
 import { Grid } from '@mui/material';
 
+//TODO: make a normal component not a page one
+
 const RecipeOverviewGalleryView = ({
   recipes,
   handleRecipeClick,

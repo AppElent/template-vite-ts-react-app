@@ -1,5 +1,5 @@
 import CustomDialog from '@/components/default/custom-dialog';
-import FormButton from '@/components/default/forms/FormButton';
+import FormButton from '@/components/default/forms/SubmitButton';
 import TextField from '@/components/default/forms/TextField';
 import { db } from '@/config/firebase';
 import { useData } from '@/libs/data-sources';

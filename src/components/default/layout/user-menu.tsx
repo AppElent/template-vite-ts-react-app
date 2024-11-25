@@ -7,6 +7,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { Avatar, IconButton, ListItemIcon, MenuItem, Tooltip } from '@mui/material';
 import CustomPopover from '../custom-popover';
+import GuestAvatar from '../guest-avatar';
 
 const menuItemsAuthenticated = [
   {
@@ -67,10 +68,14 @@ const UserMenu = () => {
           onClick={popover.handleOpen}
           ref={popover.anchorRef}
         >
-          <Avatar
-            src={auth?.user?.avatar || '/static/images/avatar/1.jpg'}
-            alt={auth.user?.name || 'A'}
-          />
+          {!auth.user ? (
+            <GuestAvatar />
+          ) : (
+            <Avatar
+              src={auth?.user?.avatar || '/static/images/avatar/1.jpg'}
+              alt={auth.user?.name || 'A'}
+            />
+          )}
         </IconButton>
       </Tooltip>
 

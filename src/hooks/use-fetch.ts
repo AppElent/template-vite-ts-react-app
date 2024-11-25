@@ -9,7 +9,7 @@ interface UseFetchResult<T> {
   loading: boolean;
   error: string | null;
   fetched: boolean;
-  fetchData: (url?: string) => void;
+  fetchData: (url?: string) => Promise<any>;
 }
 
 function useFetch<T = unknown>(
@@ -40,6 +40,7 @@ function useFetch<T = unknown>(
         }
         const result: T = await response.json();
         setData(result);
+        return result;
       } catch (err) {
         setError((err as Error).message);
       } finally {

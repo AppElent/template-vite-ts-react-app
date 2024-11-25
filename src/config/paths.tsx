@@ -41,7 +41,7 @@ const menuCategories: MenuCategory[] = [
   },
 ];
 
-export const paths = [
+export const paths: PathItem[] = [
   {
     id: 'home',
     label: 'Home',
