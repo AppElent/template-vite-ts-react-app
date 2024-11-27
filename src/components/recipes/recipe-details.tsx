@@ -17,43 +17,44 @@ import {
   Rating,
   Typography,
 } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import RecipeEditDialog from '../../sections/recipes/recipe-edit-dialog';
 import NoImageAvailable from '../default/images/no-image-available';
 import ImageList from '../default/ui/image-list';
 
 // Sample recipe object (same as before)
-const sampleRecipe = {
-  name: 'Delicious Pasta',
-  description: 'A quick and easy pasta dish perfect for weeknight dinners.',
-  time: { prep: 10, cooking: 20, total: 30 },
-  yields: { quantity: 4, unit: 'servings' },
-  nutrients: {
-    calories: '400',
-    fat: '10g',
-    sugar: '2g',
-    fiber: '3g',
-    protein: '15g',
-    carbs: '65g',
-  },
-  image: '/placeholder.svg?height=400&width=600',
-  ingredients: [
-    '300g spaghetti',
-    '2 cloves of garlic, minced',
-    '1/4 cup olive oil',
-    'Salt and pepper to taste',
-  ],
-  instructions: [
-    'Boil the spaghetti according to package instructions.',
-    'In a pan, heat olive oil and sauté minced garlic until fragrant.',
-    'Drain the pasta and add it to the pan with garlic oil.',
-    'Season with salt and pepper, toss well, and serve hot.',
-  ],
-  category: 'Main Course',
-  keywords: ['pasta', 'quick', 'easy', 'Italian'],
-  cuisine: ['Italian'],
-  createdAt: '2023-05-01T12:00:00Z',
-  updatedAt: '2023-05-15T14:30:00Z',
-};
+// const sampleRecipe = {
+//   name: 'Delicious Pasta',
+//   description: 'A quick and easy pasta dish perfect for weeknight dinners.',
+//   time: { prep: 10, cooking: 20, total: 30 },
+//   yields: { quantity: 4, unit: 'servings' },
+//   nutrients: {
+//     calories: '400',
+//     fat: '10g',
+//     sugar: '2g',
+//     fiber: '3g',
+//     protein: '15g',
+//     carbs: '65g',
+//   },
+//   image: '/placeholder.svg?height=400&width=600',
+//   ingredients: [
+//     '300g spaghetti',
+//     '2 cloves of garlic, minced',
+//     '1/4 cup olive oil',
+//     'Salt and pepper to taste',
+//   ],
+//   instructions: [
+//     'Boil the spaghetti according to package instructions.',
+//     'In a pan, heat olive oil and sauté minced garlic until fragrant.',
+//     'Drain the pasta and add it to the pan with garlic oil.',
+//     'Season with salt and pepper, toss well, and serve hot.',
+//   ],
+//   category: 'Main Course',
+//   keywords: ['pasta', 'quick', 'easy', 'Italian'],
+//   cuisine: ['Italian'],
+//   createdAt: '2023-05-01T12:00:00Z',
+//   updatedAt: '2023-05-15T14:30:00Z',
+// };
 
 // Custom theme (same as before)
 // const theme = createTheme({
@@ -117,12 +118,17 @@ const sampleRecipe = {
 
 // TODO: add image viewer and set image as default
 
-const RecipeDetails = ({ recipe = sampleRecipe }: { recipe?: Recipe }) => {
+const RecipeDetails = ({ recipe }: { recipe?: Recipe }) => {
   const dialog = useDialog();
+  const { t } = useTranslation();
 
   const handleEdit = () => {
     dialog.open();
   };
+
+  if (!recipe) {
+    return <Paper>No recipe found</Paper>;
+  }
 
   return (
     <Paper
@@ -168,7 +174,7 @@ const RecipeDetails = ({ recipe = sampleRecipe }: { recipe?: Recipe }) => {
             startIcon={<EditIcon />}
             onClick={handleEdit}
           >
-            Edit
+            {t('common:actions.edit')}
           </Button>
         </Box>
         {recipe.description && (
@@ -245,7 +251,7 @@ const RecipeDetails = ({ recipe = sampleRecipe }: { recipe?: Recipe }) => {
                   gutterBottom
                   color="primary"
                 >
-                  Ingredients
+                  {t('foodhub:schemas.recipe.ingredients')}
                 </Typography>
                 <List>
                   {recipe.ingredients.map((ingredient, index) => (
@@ -278,7 +284,7 @@ const RecipeDetails = ({ recipe = sampleRecipe }: { recipe?: Recipe }) => {
                   gutterBottom
                   color="primary"
                 >
-                  Instructions
+                  {t('foodhub:schemas.recipe.instructions')}
                 </Typography>
                 <List>
                   {recipe.instructions.map((instruction, index) => (
@@ -321,7 +327,7 @@ const RecipeDetails = ({ recipe = sampleRecipe }: { recipe?: Recipe }) => {
                   gutterBottom
                   color="primary"
                 >
-                  Nutritional Information
+                  {t('foodhub:schemas.recipe.nutrients.value')}
                 </Typography>
                 <List dense>
                   {Object.entries(recipe.nutrients).map(([key, value]) => (
@@ -357,7 +363,7 @@ const RecipeDetails = ({ recipe = sampleRecipe }: { recipe?: Recipe }) => {
                     color="primary"
                     fontWeight="600"
                   >
-                    Category
+                    {t('foodhub:schemas.recipe.category')}
                   </Typography>
                   <Chip
                     label={recipe.category}
@@ -377,7 +383,7 @@ const RecipeDetails = ({ recipe = sampleRecipe }: { recipe?: Recipe }) => {
                     color="primary"
                     fontWeight="600"
                   >
-                    Cuisine
+                    {t('foodhub:schemas.recipe.cuisine')}
                   </Typography>
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 3 }}>
                     {recipe.cuisine.map((item) => (
@@ -402,7 +408,7 @@ const RecipeDetails = ({ recipe = sampleRecipe }: { recipe?: Recipe }) => {
                     color="primary"
                     fontWeight="600"
                   >
-                    Keywords
+                    {t('foodhub:schemas.recipe.keywords')}
                   </Typography>
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                     {recipe.keywords.map((keyword) => (
@@ -425,7 +431,8 @@ const RecipeDetails = ({ recipe = sampleRecipe }: { recipe?: Recipe }) => {
                   variant="body2"
                   color="text.secondary"
                 >
-                  Created: {new Date(recipe.createdAt).toLocaleDateString()}
+                  {t('foodhub:schemas.recipe.createdAt')}:{' '}
+                  {new Date(recipe.createdAt).toLocaleDateString()}
                 </Typography>
               )}
               {recipe.updatedAt && (
@@ -433,7 +440,8 @@ const RecipeDetails = ({ recipe = sampleRecipe }: { recipe?: Recipe }) => {
                   variant="body2"
                   color="text.secondary"
                 >
-                  Last updated: {new Date(recipe.updatedAt).toLocaleDateString()}
+                  {t('foodhub:schemas.recipe.updatedAt')}:{' '}
+                  {new Date(recipe.updatedAt).toLocaleDateString()}
                 </Typography>
               )}
             </Box>

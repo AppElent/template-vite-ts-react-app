@@ -4,17 +4,24 @@ import { TextField as DTextField, TextFieldProps } from '@mui/material';
 import _ from 'lodash';
 
 interface CustomTextFieldProps {
-  name: string;
+  name?: string;
   field?: FieldConfig;
   muiTextFieldProps?: TextFieldProps;
 }
 
 const TextField = ({ name, field: fieldConfig, ...props }: CustomTextFieldProps) => {
-  const fieldName = fieldConfig ? fieldConfig.name : name;
-  const data = useFormField(fieldName, fieldConfig);
+  if (!name && !fieldConfig) {
+    throw new Error('Either name or field must be provided');
+  }
+  const fieldName = name || fieldConfig?.name;
+  const data = useFormField(fieldName as string, fieldConfig);
   const { options, field, meta } = data;
 
   const newProps = _.merge({}, options, props);
+
+  // const label = fieldConfig?.translationKey
+  //   ? t(fieldConfig?.translationKey, { defaultValue: fieldConfig?.label || fieldName })
+  //   : fieldConfig?.label || name;)
 
   return (
     <DTextField

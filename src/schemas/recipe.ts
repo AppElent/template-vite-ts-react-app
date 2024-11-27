@@ -1,18 +1,22 @@
+import { RECIPE_FIELDS } from '@/data/recipe-data';
 import * as Yup from 'yup';
-import { Schema } from '.';
+import { extractFieldDefinitionFromYupSchema, Schema } from '.';
 export const recipeSchema: Schema = {};
 
 // TODO: Fix optional fields with default value... and then undefined values in firestore data
-
 export const recipeYupSchema = Yup.object().shape({
   owner: Yup.string().required('Owner is required').label('Owner'),
   name: Yup.string()
-    .required('Name is required')
-    .min(3, 'Minimum 3 characters')
+    .required()
+    .min(3)
     .default('')
     .label('Name')
-    .meta({ default: '' }),
-  description: Yup.string().optional().default('').label('Description').meta({ default: '' }),
+    .meta({ default: '', translationKey: 'foodhub:schemas.recipe.name' }),
+  description: Yup.string()
+    .optional()
+    .default('')
+    .label('Description')
+    .meta({ default: '', translationKey: 'foodhub:schemas.recipe.description' }),
   time: Yup.object()
     .shape({
       prep: Yup.number().optional().default(0).label('Preparation Time'),
@@ -88,3 +92,9 @@ export type RecipeTemplate = Omit<Recipe2, 'id'>;
 // console.log(extractSchemaLabels(recipeYupSchema));
 
 export const recipeDefaultValues: Partial<Recipe2> = recipeYupSchema.getDefault();
+
+export const recipeFields = extractFieldDefinitionFromYupSchema(recipeYupSchema, RECIPE_FIELDS);
+
+// console.log(recipeYupSchema.describe());
+// console.log(recipeYupSchema.fields);
+// console.log(extractFieldDefinitionFromYupSchema(recipeYupSchema, RECIPE_FIELDS));

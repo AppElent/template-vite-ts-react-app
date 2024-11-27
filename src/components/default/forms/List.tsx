@@ -23,7 +23,7 @@ import { FieldArray, useField } from 'formik';
 import _ from 'lodash';
 
 type CustomListProps = {
-  name: string;
+  name?: string;
   field?: FieldConfig;
   muiListProps?: ListProps;
   muiListItemProps?: ListItemProps;
@@ -78,8 +78,11 @@ const ListItem = ({ name, index, remove, ...props }: CustomListItemProps) => {
  * @returns {JSX.Element} The rendered List component
  */
 const List = ({ name, field: fieldConfig, ...props }: CustomListProps) => {
-  const fieldName = name ? name : fieldConfig?.name || '';
-  const data = useFormField(fieldName);
+  if (!name && !fieldConfig) {
+    throw new Error('Either name or field must be provided');
+  }
+  const fieldName = name || fieldConfig?.name;
+  const data = useFormField(fieldName as string);
   const { options, field, helpers } = data;
 
   const newProps = _.merge({}, options, props);
@@ -100,7 +103,7 @@ const List = ({ name, field: fieldConfig, ...props }: CustomListProps) => {
   };
 
   return (
-    <FieldArray name={fieldName}>
+    <FieldArray name={fieldName as string}>
       {({ remove, push }) => (
         <>
           <Stack

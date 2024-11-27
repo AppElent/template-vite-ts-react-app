@@ -9,7 +9,7 @@ import {
 import BaseStorageProvider, { StorageClassOptions } from './BaseStorageProvider';
 
 class FirebaseStorageProvider extends BaseStorageProvider {
-  constructor(options: StorageClassOptions, providerOptions?: any) {
+  constructor(options?: StorageClassOptions, providerOptions?: any) {
     super(options, providerOptions);
   }
   async uploadFile(file: File, path: string): Promise<string> {

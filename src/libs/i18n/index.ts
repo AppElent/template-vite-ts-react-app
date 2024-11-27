@@ -4,6 +4,8 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import Backend from 'i18next-http-backend'; // adding lazy loading for translations, more information here: https://github.com/i18next/i18next-http-backend
 import { initReactI18next } from 'react-i18next';
 import { i18nextPlugin } from 'translation-check';
+import { setLocale } from 'yup';
+import { en, nl } from 'yup-locales';
 
 // /**
 //  * Default localization settings. the locales are retrieved from the public URL. Namespaces are common and application specific
@@ -24,6 +26,11 @@ import { i18nextPlugin } from 'translation-check';
 //     fallbackLng: ['en'],
 //     supportedLngs: ['en', 'nl'],
 //   });
+
+const languages = {
+  en,
+  nl,
+};
 
 const customSaveMissingKeys = (
   key: string,
@@ -84,7 +91,24 @@ const initI18n = () => {
 
 if (!i18n.isInitialized) {
   initI18n();
+  const lng = i18n.language || localStorage.getItem('i18nextLng') || 'en';
+  setLocale(languages[lng as keyof typeof languages]);
+  // console.log(languages[i18n.language as keyof typeof languages]);
+  // console.log(nl);
+  // console.log(i18n.language);
+  // const locale = languages[(i18n.language as keyof typeof languages) || 'en'];
+  // console.log(i18n, locale);
+  // setLocale(locale);
 }
+// console.log('i18n start', i18n);
+// const locale = languages[(i18n.language as keyof typeof languages) || 'en'];
+// console.log(locale);
+// setLocale(locale);
+
+// Listen for language changes
+i18n.on('languageChanged', (lng: keyof typeof languages) => {
+  setLocale(languages[lng]);
+});
 
 // i18n
 //   .use(Backend) // Load translations dynamically if needed

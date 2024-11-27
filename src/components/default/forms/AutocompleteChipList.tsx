@@ -12,7 +12,7 @@ import _ from 'lodash';
 import { useMemo } from 'react';
 
 interface AutocompleteChipListProps {
-  name: string;
+  name?: string;
   field?: FieldConfig;
   suggestions?: string[];
   muiAutocompleteProps?: Partial<AutocompleteProps<any, any, any, any>>;
@@ -26,8 +26,11 @@ const AutocompleteChipList = ({
   suggestions,
   ...props
 }: AutocompleteChipListProps) => {
-  const fieldName = fieldConfig ? fieldConfig.name : name;
-  const data = useFormField(fieldName);
+  if (!name && !fieldConfig) {
+    throw new Error('Either name or field must be provided');
+  }
+  const fieldName = name || fieldConfig?.name;
+  const data = useFormField(fieldName as string);
   const { options, field, helpers, meta } = data;
 
   // Merge custom props with default props

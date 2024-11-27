@@ -1,6 +1,17 @@
 // @ts-nocheck
 
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  useMediaQuery,
+  useTheme,
+} from '@mui/material';
 import { useCallback, useState } from 'react';
 import Cropper from 'react-easy-crop';
 
@@ -52,6 +63,10 @@ const ImageCropper = ({ imageUrl, filename, onSave, dialog, cropperProps }: Imag
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
 
+  // Theme and media query
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
+
   const getFileName = (path: string): string => {
     return path.split('/').pop() || 'unknown-filename.jpg';
   };
@@ -80,8 +95,19 @@ const ImageCropper = ({ imageUrl, filename, onSave, dialog, cropperProps }: Imag
         onClose={() => dialog?.close()}
         maxWidth="md"
         fullWidth
+        fullScreen={fullScreen}
       >
-        <DialogTitle>Crop Image</DialogTitle>
+        <DialogTitle
+          style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+        >
+          <Box>Crop Image</Box>
+          <IconButton
+            onClick={dialog?.close} // Add your close handler here
+            style={{ marginLeft: 'auto' }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
         <DialogContent>
           {imageUrl && (
             <div style={{ position: 'relative', width: '100%', height: 400 }}>
@@ -107,6 +133,7 @@ const ImageCropper = ({ imageUrl, filename, onSave, dialog, cropperProps }: Imag
           <Button
             onClick={saveCroppedImage}
             color="primary"
+            variant="contained"
           >
             Save Image
           </Button>

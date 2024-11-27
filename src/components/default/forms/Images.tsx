@@ -1,45 +1,70 @@
 import { FieldConfig } from '@/libs/forms';
 import useFormField from '@/libs/forms/use-form-field';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
+import CropIcon from '@mui/icons-material/Crop';
 import DeleteIcon from '@mui/icons-material/Delete';
 import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
-import { Box, Button, Card, CardActions, CardMedia, IconButton, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Card,
+  CardActions,
+  CardMedia,
+  IconButton,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 import _ from 'lodash';
+import { useState } from 'react';
+import ImageCropper from '../images/image-cropper';
 
 interface ImagesProps {
-  name: string;
+  name?: string;
   field?: FieldConfig;
   uploadImage: (file: File) => Promise<string>;
   deleteImage?: (url: string) => Promise<void>;
   postProcess?: () => Promise<any>;
   getFavorite?: (url: string) => boolean;
   setFavorite?: (url: string) => void;
+  cropImage: (url: string) => Promise<string>;
 }
 
 const Images = ({
   name,
   field: fieldConfig,
+  // favorite: {
+  //   get: getFavorite,
+  //   set: setFavorite
+  // },
   uploadImage,
   deleteImage,
   postProcess,
   getFavorite,
   setFavorite,
+  cropImage,
   ...props
 }: ImagesProps) => {
-  const fieldName = fieldConfig ? fieldConfig.name : name;
-  const data = useFormField(fieldName, fieldConfig);
+  if (!name && !fieldConfig) {
+    throw new Error('Either name or field must be provided');
+  }
+  const fieldName = name || fieldConfig?.name;
+  const data = useFormField(fieldName as string, fieldConfig);
   const { options, field, helpers } = data;
+  const [cropperUrl, setCropperUrl] = useState<string | undefined>(undefined);
 
   // Set images variable
-  const images = field.value || [];
+  let images = field.value || [];
+  // If images is not an array, set it to an empty array
+  if (!Array.isArray(images)) {
+    images = [images];
+  }
 
   const newProps = _.merge({}, options, props);
 
   const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       // Determine if these are the first images uploaded
-      const isFirstUpload = images.length === 0;
       const filesArray = Array.from(event.target.files);
       // for (const file of filesArray) {
       //   const url = await uploadImage(file);
@@ -58,12 +83,6 @@ const Images = ({
       const uniqueImages = [...new Set([...images, ...newImages])];
 
       helpers.setValue(uniqueImages);
-      //setImages((prev) => [...prev, ...newImages]);
-
-      // Set first image as starred
-      if (isFirstUpload && setFavorite) {
-        setFavorite(newImages[0]);
-      }
     }
   };
 
@@ -139,36 +158,85 @@ const Images = ({
               image={image}
               alt="Uploaded Image"
             />
-            <CardActions>
+            <CardActions style={{ justifyContent: 'flex-end' }}>
+              {/* Crop image */}
+              {!!cropImage && (
+                <Tooltip
+                  title="Crop Image"
+                  placement="top"
+                >
+                  <IconButton
+                    color="primary"
+                    onClick={() => setCropperUrl(image)}
+                    // disabled={image.isDefault}
+                  >
+                    <CropIcon />
+                  </IconButton>
+                </Tooltip>
+              )}
+
               {/* Set Favorite */}
               {getFavorite && (
-                <IconButton
-                  // color={image.isDefault ? 'primary' : 'default'}
-                  onClick={() => handleSetFavorite(image)}
-                  //disabled={image}
+                <Tooltip
+                  title="Set as Favorite"
+                  placement="top"
                 >
-                  {getFavorite(image) ? (
-                    <StarIcon style={{ color: '#faaf00' }} />
-                  ) : (
-                    <StarBorderIcon />
-                  )}
-                </IconButton>
+                  <IconButton
+                    // color={image.isDefault ? 'primary' : 'default'}
+                    onClick={() => handleSetFavorite(image)}
+                    //disabled={image}
+                  >
+                    {getFavorite(image) ? (
+                      <StarIcon style={{ color: '#faaf00' }} />
+                    ) : (
+                      <StarBorderIcon />
+                    )}
+                  </IconButton>
+                </Tooltip>
               )}
 
               {/* Delete */}
               {deleteImage && (
-                <IconButton
-                  color="error"
-                  onClick={() => handleDelete(image)}
-                  // disabled={image.isDefault}
+                <Tooltip
+                  title="Delete"
+                  placement="top"
                 >
-                  <DeleteIcon />
-                </IconButton>
+                  <IconButton
+                    color="error"
+                    onClick={() => handleDelete(image)}
+                    // disabled={image.isDefault}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </Tooltip>
               )}
             </CardActions>
           </Card>
         ))}
       </Box>
+      {cropperUrl && (
+        <ImageCropper
+          dialog={{ isOpen: !!cropperUrl, close: () => setCropperUrl(undefined) }}
+          imageUrl={cropperUrl || ''}
+          // Filename is same as original URL, but with _cropped appended before the extension
+          filename={cropperUrl}
+          onSave={async (file, _path) => {
+            // const url = await uploadImage(file);
+            // const newValue = field.value || [];
+            // helpers.setValue([...newValue, url]);
+            // setCropperUrl(undefined);
+            // return url;
+            const url = URL.createObjectURL(file);
+            const imagesWithoutUrl = images.filter((img: string) => img !== cropperUrl);
+            const newValues = [...new Set([...imagesWithoutUrl, url])];
+            helpers.setValue(newValues);
+            return url;
+          }}
+          cropperProps={{
+            aspect: 16 / 9,
+          }}
+        />
+      )}
     </Box>
   );
 };

@@ -34,14 +34,41 @@ export interface DataSourceObject {
 
 export interface DataSourceActions<T> {
   fetchData: (filter?: FilterObject<T>) => Promise<void>;
-  getAll: (filter?: FilterObject<T>) => Promise<T[]>;
+  getAll: (filter?: FilterObject<T>) => Promise<T[] | null>;
   get: (id?: string) => Promise<T | null>;
   add: (item: T) => Promise<T>;
-  update: (data: Partial<T>, id?: string) => Promise<void>;
-  set: (data: T, id?: string) => Promise<void>;
+  update: (data: Partial<T>, id?: string) => Promise<T>;
+  set: (data: T, id?: string) => Promise<T>;
   delete: (id?: string) => Promise<void>;
-  validate: (data: T) => Promise<void>;
+  validate: (data: T) => Promise<boolean>;
   getDummyData: () => T;
+}
+
+export interface UseDataReturn<T> {
+  // Options supplied to class constructor
+  options?: DataSourceInitOptions<T>;
+  providerConfig?: any;
+  // Data state
+  data: T;
+  loading: boolean;
+  error: any;
+  // Provider name
+  provider: string;
+  // Actions
+  actions: DataSourceActions<T>;
+  // Predefined methods
+  // getAll: (filter?: object) => Promise<T[]>;
+  // get: (id?: string) => Promise<T | null>;
+  // add: (item: T) => Promise<T>;
+  // update: (data: Partial<T>, id?: string) => Promise<void>;
+  // set: (data: T, id?: string) => Promise<void>;
+  // delete: (id?: string) => Promise<void>;
+  // Raw datasource info
+  dataSource: any;
+  // Custom props
+  custom?: {
+    [key: string]: any;
+  };
 }
 
 export interface DataSource<T> {

@@ -1,9 +1,9 @@
 import { Box, Breadcrumbs, Link, Stack, Typography } from '@mui/material';
-import { Link as RouterLink } from 'react-router-dom';
 
 import { PathItem, paths } from '@/config/paths';
 
-import { matchPath } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { Link as RouterLink, matchPath } from 'react-router-dom';
 
 const generateBreadcrumbs = (breadcrumbsConfig: PathItem[], pathname: string) => {
   const breadcrumbs: PathItem[] = [];
@@ -34,6 +34,7 @@ const generateBreadcrumbs = (breadcrumbsConfig: PathItem[], pathname: string) =>
 };
 
 const CustomBreadcrumbs = ({ currentPage }: { currentPage?: string }) => {
+  const { t } = useTranslation();
   const items = generateBreadcrumbs(paths, window.location.pathname);
 
   // If currentPage is set, replace the last item with it
@@ -46,8 +47,9 @@ const CustomBreadcrumbs = ({ currentPage }: { currentPage?: string }) => {
       {items.length > 0 && (
         <Box sx={{ mb: 3 }}>
           <Breadcrumbs aria-label="breadcrumb">
-            {items.map((item, index) =>
-              item.to ? (
+            {items.map((item, index) => {
+              const value = item.translationKey ? t(item.translationKey) : item.label;
+              return item.to ? (
                 <Stack
                   direction="row"
                   alignItems="center"
@@ -62,20 +64,27 @@ const CustomBreadcrumbs = ({ currentPage }: { currentPage?: string }) => {
                       //underline="hover"
                       color="inherit"
                     >
-                      {item.label}
+                      {value}
                     </Link>
                   </Box>
                 </Stack>
               ) : (
-                <Typography
+                <Stack
+                  direction="row"
+                  alignItems="center"
                   key={index}
-                  color="textPrimary"
                 >
-                  {/* {item.Icon && item.Icon} */}
-                  {item.label}
-                </Typography>
-              )
-            )}
+                  <Box sx={{ mr: 0.5 }}>{item.Icon && item.Icon}</Box>
+                  <Typography
+                    key={index}
+                    color="textPrimary"
+                  >
+                    {/* {item.Icon && item.Icon} */}
+                    {value}
+                  </Typography>
+                </Stack>
+              );
+            })}
           </Breadcrumbs>
         </Box>
       )}

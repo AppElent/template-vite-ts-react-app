@@ -48,19 +48,6 @@ const useCustomFormik = (props: UseCustomFormikProps) => {
     return values;
   }, [fields, formikProps.initialValues, validationSchema]);
 
-  //   // Log changes to dependencies
-  //   useEffect(() => {
-  //     console.log('fields changed:', fields);
-  //   }, [fields]);
-
-  //   useEffect(() => {
-  //     console.log('formikProps.initialValues changed:', formikProps.initialValues);
-  //   }, [formikProps.initialValues]);
-
-  //   useEffect(() => {
-  //     console.log('validationSchema changed:', validationSchema);
-  //   }, [validationSchema]);
-
   const formik = useFormik({
     ...formikProps,
     initialValues,

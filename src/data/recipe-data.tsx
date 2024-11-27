@@ -1,3 +1,4 @@
+import { FieldConfig } from '@/libs/forms';
 import { InputAdornment } from '@mui/material';
 
 // List of recipe categories
@@ -20,46 +21,32 @@ export const RECIPE_KEYWORDS = [
   'budget-friendly',
 ];
 
-export const RECIPE_FIELDS = {
-  name: {
-    name: 'name',
-    label: 'Name',
-  },
-  description: {
-    name: 'description',
-    label: 'Description',
-  },
+export const RECIPE_FIELDS: {
+  [key: string]: Partial<FieldConfig>;
+} = {
+  // name: {
+  //   name: 'name',
+  //   label: 'Name',
+  // },
+  // description: {
+  //   name: 'description',
+  //   label: 'Description',
+  // },
   cuisine: {
-    name: 'cuisine',
-    label: 'Cuisine',
-    definition: 'tag_list',
     custom: {
       suggestions: RECIPE_CATEGORIES,
     },
   },
-  ingredients: {
-    name: 'ingredients',
-    label: 'Ingredients',
-    definition: 'list',
-    custom: {
-      header: true,
-    },
-  },
+  // ingredients: {
+  //   name: 'ingredients',
+  //   label: 'Ingredients',
+  // },
   instructions: {
-    name: 'instructions',
-    label: 'Instructions',
-    definition: 'list',
-    //initialValue: [recipe?.instructions || ['']],
     custom: {
-      numbered: true,
-      header: true,
       reorderable: true,
     },
   },
-  prepTime: {
-    name: 'time.prep',
-    label: 'Prep Time',
-    type: 'number',
+  'time.prep': {
     custom: {
       muiTextFieldProps: {
         slotProps: {
@@ -70,10 +57,7 @@ export const RECIPE_FIELDS = {
       },
     },
   },
-  cookTime: {
-    name: 'time.cooking',
-    label: 'Cooking Time',
-    type: 'number',
+  'time.cooking': {
     custom: {
       muiTextFieldProps: {
         slotProps: {
@@ -84,10 +68,7 @@ export const RECIPE_FIELDS = {
       },
     },
   },
-  totalTime: {
-    name: 'time.total',
-    label: 'Total Time',
-    type: 'number',
+  'time.total': {
     custom: {
       muiTextFieldProps: {
         slotProps: {
@@ -98,30 +79,29 @@ export const RECIPE_FIELDS = {
       },
     },
   },
-  comments: {
-    name: 'comments',
-    label: 'Comments',
-  },
-  score: {
-    name: 'score',
-    label: 'Score',
-    type: 'number',
-    definition: 'rating',
-  },
-  url: {
-    name: 'url',
-    label: 'URL',
-    type: 'url',
-  },
-  nutrition: {
-    name: 'nutrition',
-    label: 'Nutrition info',
-    type: 'number',
-  },
-  category: {
-    name: 'category',
-    label: 'Category',
-  },
+  // comments: {
+  //   name: 'comments',
+  //   label: 'Comments',
+  // },
+  // score: {
+  //   name: 'score',
+  //   label: 'Score',
+  //   type: 'number',
+  // },
+  // url: {
+  //   name: 'url',
+  //   label: 'URL',
+  //   type: 'url',
+  // },
+  // nutrition: {
+  //   name: 'nutrition',
+  //   label: 'Nutrition info',
+  //   type: 'number',
+  // },
+  // category: {
+  //   name: 'category',
+  //   label: 'Category',
+  // },
   yieldsQty: {
     name: 'yields.quantity',
     label: 'Quantity',
@@ -136,20 +116,16 @@ export const RECIPE_FIELDS = {
     label: 'Number of Servings',
   },
   keywords: {
-    name: 'keywords',
-    label: 'Keywords',
-    definition: 'tag_list', //TODO: make list of keywords
     custom: {
       suggestions: RECIPE_KEYWORDS,
     },
   },
-  calories: {
-    name: 'nutrients.calories',
-    type: 'object',
-    label: 'Calories',
-  },
-  images: {
-    name: 'images',
-    label: 'Images',
-  },
+  // calories: {
+  //   name: 'nutrients.calories',
+  //   label: 'Calories',
+  // },
+  // images: {
+  //   name: 'images',
+  //   label: 'Images',
+  // },
 };

@@ -69,7 +69,10 @@
     "list": "Lijst",
     "create": "Scheppen",
     "edit": "Bewerken",
-    "show": "Tonen"
+    "show": "Tonen",
+    "cancel": "Annuleren",
+    "addItem": "{{resource}} toevoegen",
+    "editItem": "{{resource}} bewerken"
   },
   "buttons": {
     "create": "Scheppen",

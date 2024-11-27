@@ -9,6 +9,7 @@ import {
 } from 'formik';
 import _ from 'lodash';
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FieldConfig, FieldOptions } from '.';
 import { useFormOptions } from './custom-form';
 
@@ -18,9 +19,11 @@ interface UseFormFieldsReturn {
   field: FieldInputProps<any>;
   meta: FieldMetaProps<any>;
   helpers: FieldHelperProps<any>;
+  fieldConfig?: FieldConfig;
 }
 
 const useFormField = (name: string, fieldConfig?: FieldConfig): UseFormFieldsReturn => {
+  const { t } = useTranslation();
   const formik = useFormikContext();
   const options = useFormOptions();
   const [field, meta, helpers] = useField(name);
@@ -46,6 +49,14 @@ const useFormField = (name: string, fieldConfig?: FieldConfig): UseFormFieldsRet
     [field.name, helpers]
   );
 
+  // Translate label
+  const label = fieldConfig?.translationKey
+    ? t(fieldConfig?.translationKey, { defaultValue: fieldConfig?.label || name })
+    : fieldConfig?.label || name;
+  if (fieldConfig && label !== fieldConfig?.label) {
+    fieldConfig.label = label;
+  }
+
   // If debounce is set, return the debounced handler
   if (debounceValue > 0) {
     return {
@@ -64,7 +75,7 @@ const useFormField = (name: string, fieldConfig?: FieldConfig): UseFormFieldsRet
     };
   }
 
-  return { formik, options, field, meta, helpers };
+  return { formik, options, field, meta, helpers, fieldConfig };
 };
 
 export default useFormField;
