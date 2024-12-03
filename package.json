@@ -21,7 +21,7 @@
     "npm-check": "npm-check"
   },
   "dependencies": {
-    "@andypf/json-viewer": "^2.1.5",
+    "@andypf/json-viewer": "^2.1.7",
     "@emotion/styled": "^11.13.0",
     "@faker-js/faker": "^9.2.0",
     "@hello-pangea/dnd": "^17.0.0",
