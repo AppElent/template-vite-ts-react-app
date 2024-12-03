@@ -10,10 +10,14 @@ import { recipeYupSchema } from '@/schemas/recipe';
 import theme from '@/theme/paperbase/theme';
 import './App.css';
 import config from './config';
+import { getPath } from './config/paths';
 import Dashboard from './Dashboard';
 import { Recipe } from './schemas/recipe';
 
-const firebaseProvider = new FirebaseAuthProvider({ login: '/login', logout: '/logout' });
+const firebaseProvider = new FirebaseAuthProvider({
+  login: getPath('login').to,
+  logout: '/logout',
+});
 
 const devFilter = import.meta.env.DEV ? 'ja' : 'ZMG16rhpzbdKd8LXUIiNOD7Jul23';
 

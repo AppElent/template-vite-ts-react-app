@@ -1,23 +1,35 @@
 import { Button, Card, CardContent, CardHeader, TextField } from '@mui/material';
-import { useState } from 'react';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 
 interface PasswordCardProps {
-  setPassword: (password: string) => void;
+  setPassword: (oldPassword: string, newPassword: string) => Promise<void>;
 }
 
+// Yup validation schema for password
+const validationSchema = Yup.object().shape({
+  currentPassword: Yup.string().required(),
+  newPassword: Yup.string().required(),
+  confirmPassword: Yup.string().required(),
+});
+
 const PasswordCard = ({ setPassword }: PasswordCardProps) => {
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const formik = useFormik({
+    initialValues: {
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: '',
+    },
+    validationSchema,
+    onSubmit: (values) => {
+      if (values.newPassword !== values.confirmPassword) {
+        alert('Passwords do not match');
+        return;
+      }
 
-  const handleChangePassword = () => {
-    if (newPassword !== confirmPassword) {
-      alert('Passwords do not match');
-      return;
-    }
-
-    setPassword(newPassword);
-  };
+      setPassword(values.currentPassword, values.newPassword);
+    },
+  });
 
   return (
     <Card>
@@ -28,8 +40,7 @@ const PasswordCard = ({ setPassword }: PasswordCardProps) => {
           label="Current Password"
           type="password"
           variant="outlined"
-          value={currentPassword}
-          onChange={(e) => setCurrentPassword(e.target.value)}
+          {...formik.getFieldProps('currentPassword')}
           margin="normal"
         />
         <TextField
@@ -37,8 +48,7 @@ const PasswordCard = ({ setPassword }: PasswordCardProps) => {
           label="New Password"
           type="password"
           variant="outlined"
-          value={newPassword}
-          onChange={(e) => setNewPassword(e.target.value)}
+          {...formik.getFieldProps('newPassword')}
           margin="normal"
         />
         <TextField
@@ -46,15 +56,15 @@ const PasswordCard = ({ setPassword }: PasswordCardProps) => {
           label="Confirm New Password"
           type="password"
           variant="outlined"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
+          {...formik.getFieldProps('confirmPassword')}
           margin="normal"
         />
         <Button
           variant="contained"
           color="primary"
           sx={{ mt: 2 }}
-          onClick={handleChangePassword}
+          disabled={formik.isSubmitting || !formik.isValid || !formik.dirty}
+          onClick={() => formik.handleSubmit()}
         >
           Change Password
         </Button>

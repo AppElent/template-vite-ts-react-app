@@ -1,6 +1,6 @@
 import { CameraAlt as CameraAltIcon } from '@mui/icons-material';
 import { Avatar, Button, Card, CardContent, CardHeader, Grid, TextField } from '@mui/material';
-import { useState } from 'react';
+import { useFormik } from 'formik';
 
 interface ProfileCardProps {
   profile: any;
@@ -8,22 +8,27 @@ interface ProfileCardProps {
 }
 
 const ProfileCard = ({ profile, setProfile }: ProfileCardProps) => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [avatarUrl, setAvatarUrl] = useState('/placeholder.svg?height=100&width=100');
+  const formik = useFormik({
+    initialValues: {
+      name: profile?.name,
+      email: profile?.email,
+      avatarUrl: profile?.avatarUrl,
+    },
+    onSubmit: async (values: any) => {
+      setProfile(values);
+    },
+  });
 
   const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        setAvatarUrl(e.target?.result as string);
+        formik.setFieldValue('avatarUrl', e.target?.result as string);
       };
       reader.readAsDataURL(file);
     }
   };
-
-  console.log(profile, setProfile); // TODO: implement
 
   return (
     <Card>
@@ -36,7 +41,7 @@ const ProfileCard = ({ profile, setProfile }: ProfileCardProps) => {
         >
           <Grid item>
             <Avatar
-              src={avatarUrl}
+              src={formik.values?.avatarUrl}
               alt="Profile Avatar"
               sx={{ width: 100, height: 100 }}
             />
@@ -64,22 +69,22 @@ const ProfileCard = ({ profile, setProfile }: ProfileCardProps) => {
           fullWidth
           label="Name"
           variant="outlined"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          {...formik.getFieldProps('name')}
           margin="normal"
         />
         <TextField
           fullWidth
           label="Email"
           variant="outlined"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          {...formik.getFieldProps('email')}
           margin="normal"
         />
         <Button
           variant="contained"
           color="primary"
           sx={{ mt: 2 }}
+          onClick={(_e) => formik.handleSubmit()}
+          disabled={formik.isSubmitting || !formik.dirty || !formik.isValid}
         >
           Save Changes
         </Button>

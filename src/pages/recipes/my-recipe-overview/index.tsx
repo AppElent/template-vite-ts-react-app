@@ -10,7 +10,7 @@ interface RecipeWithOwner extends Recipe {
 
 const MyRecipeOverviewPage = () => {
   const { data } = useData<RecipeWithOwner[]>('recipes');
-  const auth = useAuth();
+  const auth = useAuth({ redirectUnauthenticated: true });
   console.log(auth);
 
   const myRecipes = data?.filter((recipe) => recipe.owner === auth.user?.id);

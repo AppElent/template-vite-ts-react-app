@@ -1,12 +1,20 @@
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AuthContext } from './context';
 
 interface UseAuthOptions {
-  redirectUnauthenticated?: string;
+  redirectUnauthenticated?: boolean;
 }
 
-const useAuth = (_options?: UseAuthOptions) => {
+const useAuth = (options?: UseAuthOptions) => {
   const context = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!context.isAuthenticated && options?.redirectUnauthenticated) {
+      navigate(context.options?.login);
+    }
+  }, [context]);
 
   return context;
 };

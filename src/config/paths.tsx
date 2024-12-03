@@ -38,6 +38,8 @@ const menuCategories: MenuCategory[] = [
   },
 ];
 
+console.log(paths);
+
 // export const paths2: PathItem[] = [
 //   {
 //     id: 'home',

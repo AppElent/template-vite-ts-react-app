@@ -1,4 +1,4 @@
-import { GoogleIcon, SitemarkIcon } from '@/components/default/auth/CustomIcons';
+import { GoogleIcon } from '@/components/default/auth/CustomIcons';
 import ForgotPassword from '@/components/default/auth/ForgotPassword';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -101,7 +101,10 @@ export default function SignIn(props) {
       >
         <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
         <Card variant="outlined">
-          <SitemarkIcon />
+          <img
+            src={'/app/default_logo_transparent.png'}
+            style={{ width: '50%', height: 'auto' }}
+          />
           <Typography
             component="h1"
             variant="h4"

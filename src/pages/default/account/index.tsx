@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { AppConfig, setLogLevel } from '@/config';
 import { useAuth } from '@/libs/auth';
 import useCustomFormik from '@/libs/forms/use-custom-formik';
@@ -8,7 +10,7 @@ import PasswordCard from './components/password-card';
 import ProfileCard from './components/profile-card';
 
 const Account = () => {
-  const auth = useAuth();
+  const auth = useAuth({ redirectUnauthenticated: true });
   const formik = useCustomFormik({
     initialValues: {
       email: '',
@@ -18,6 +20,8 @@ const Account = () => {
       console.log('submit', values);
     },
   });
+
+  console.log(auth);
 
   console.log('formik', formik);
 
@@ -34,8 +38,8 @@ const Account = () => {
           md={6}
         >
           <ProfileCard
-            profile={{}}
-            setProfile={() => {}}
+            profile={auth?.user}
+            setProfile={async (values) => await auth.updateProfile(values)}
           />
         </Grid>
         <Grid
@@ -44,8 +48,9 @@ const Account = () => {
           md={6}
         >
           <PasswordCard
-            setPassword={(password) => {
-              console.log(password);
+            setPassword={async (oldPassword, newPassword) => {
+              console.log(oldPassword, newPassword);
+              await auth.updatePassword(oldPassword, newPassword);
             }}
           />
         </Grid>

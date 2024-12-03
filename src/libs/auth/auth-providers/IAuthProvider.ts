@@ -51,6 +51,14 @@ class IAuthProvider {
     throw new Error('Method not implemented.');
   }
 
+  updateProfile(_profile: any) {
+    throw new Error('Method not implemented.');
+  }
+
+  updatePassword(_oldPassword: string, _newPassword: string) {
+    throw new Error('Method not implemented.');
+  }
+
   resetPassword(_email: string) {
     throw new Error('Method not implemented.');
   }

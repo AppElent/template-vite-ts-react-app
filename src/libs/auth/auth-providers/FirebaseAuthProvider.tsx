@@ -2,15 +2,22 @@
 
 import {
   createUserWithEmailAndPassword,
+  EmailAuthProvider,
   getAuth,
   GoogleAuthProvider,
   onAuthStateChanged,
+  reauthenticateWithCredential,
+  sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
+  updatePassword,
+  updateProfile,
 } from 'firebase/auth';
 import { User } from '..';
 import IAuthProvider, { IAuthProviderOptions } from './IAuthProvider';
+
+// TODO: Implement return [result, error] pattern
 
 class FirebaseAuthProvider extends IAuthProvider {
   constructor(options: IAuthProviderOptions, providerOptions?: any) {
@@ -55,6 +62,15 @@ class FirebaseAuthProvider extends IAuthProvider {
     return () => onAuthStateChanged(getAuth(), callback);
   }
 
+  reauthenticate = async (password: string) => {
+    const user = getAuth().currentUser;
+    if (!user) {
+      throw new Error('User not found');
+    }
+    const credential = EmailAuthProvider.credential(user.email as string, password);
+    await reauthenticateWithCredential(user, credential);
+  };
+
   getCurrentUser(): User | null {
     const user = getAuth().currentUser;
     if (user) {
@@ -69,9 +85,30 @@ class FirebaseAuthProvider extends IAuthProvider {
     return null;
   }
 
-  //   async resetPassword(email) {
-  //     return sendPasswordResetEmail(this.auth, email);
-  //   }
+  async updateProfile(user: User): Promise<User> {
+    const currentUser = getAuth().currentUser;
+    if (!currentUser) {
+      throw new Error('User not found');
+    }
+    await updateProfile(currentUser, {
+      displayName: user.name,
+      photoURL: user.avatar,
+    });
+    return user;
+  }
+
+  updatePassword = async (oldpassword: string, newPassword: string) => {
+    const currentUser = getAuth().currentUser;
+    if (!currentUser) {
+      throw new Error('User not found');
+    }
+    await this.reauthenticate(oldpassword);
+    await updatePassword(currentUser, newPassword);
+  };
+
+  async setPasswordResetMail(email: string) {
+    await sendPasswordResetEmail(getAuth(), email);
+  }
 }
 
 export default FirebaseAuthProvider;

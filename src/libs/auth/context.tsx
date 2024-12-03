@@ -2,6 +2,8 @@ import PropTypes from 'prop-types';
 import { createContext, useCallback, useEffect, useReducer } from 'react';
 import { AuthState, User } from '.';
 
+//const TemplateProvider = new IAuthProvider({ login: '/login', logout: '/logout' });
+
 export const initialState: AuthState = {
   isAuthenticated: false,
   isInitialized: false,
@@ -12,6 +14,7 @@ export const initialState: AuthState = {
   signIn: async () => ({}) as User,
   signUp: async () => ({}) as User,
   signOut: async () => {},
+  //...TemplateProvider
   // signUp: (_email: string, _password: string) => Promise<User>,
   // signInWithEmailAndPassword: async () => Promise<void>,
   // signInWithGoogle: async () => Promise<void>,
@@ -90,6 +93,10 @@ export const AuthProvider = (props: any) => {
         signInWithEmailAndPassword: provider.signIn,
         signInWithGoogle: provider.signInWithGoogle,
         signOut: provider.signOut,
+        getCurrentUser: provider.getCurrentUser,
+        updateProfile: provider.updateProfile,
+        updatePassword: provider.updatePassword,
+        resetPassword: provider.resetPassword,
         options: provider.options,
         provider,
       }}

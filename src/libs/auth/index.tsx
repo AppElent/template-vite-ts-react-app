@@ -37,4 +37,9 @@ export interface AuthState {
   signIn: (email: string, password: string) => Promise<User>;
   signInWithGoogle?: () => Promise<void>;
   signOut: () => Promise<void>;
+  onAuthStateChanged?: (user: any) => () => void;
+  getCurrentUser?: () => User | null;
+  updateProfile?: (profile: User) => Promise<User>;
+  updatePassword?: (oldPassword: string, newPassword: string) => Promise<void>;
+  sendPasswordResetEmail?: (email: string) => Promise<void>;
 }
