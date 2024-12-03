@@ -1,66 +1,34 @@
 import { Suspense } from 'react';
-import { Outlet, RouteObject } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 
-import { PathItem } from '@/config/paths';
 import Account from '@/pages/default/account';
-import Settings from '@/pages/default/Settings';
-import SignIn from '@/pages/default/SignIn';
-import TestAuthProviders from '@/pages/default/test/auth-providers';
-import DataSources from '@/pages/default/test/data-sources';
-import DataSources2 from '@/pages/default/test/data-sources/index2';
 import FileUploads from '@/pages/default/test/file-uploads';
-import Forms from '@/pages/default/test/forms';
-import Translations from '@/pages/default/test/translations';
 
-// export const appPaths: PathItem[] = [
-//   {
-//     id: 'account',
-//     label: 'Account',
-//     Icon: <></>,
-//     to: '/app/account',
-//     category: 'settings',
-//   },
-//   {
-//     id: 'login',
-//     label: 'Login',
-//     Icon: <></>,
-//     to: '/app/login',
-//   },
-//   {
-//     id: 'signup',
-//     label: 'Signup',
-//     Icon: <></>,
-//     to: '/app/signup',
-//   },
-// ];
+import { CustomRouteObject } from '@/config/routing';
+import PeopleIcon from '@mui/icons-material/People';
+import QuizIcon from '@mui/icons-material/Quiz';
 
-// TODO: convert routeobject to paths
-
-type CustomRouteObject = RouteObject & {
-  id: string;
-  label: string;
-  translationKey?: string;
-  category?: string;
-};
-
-export const generatePathsFromRoutes = (_routes: CustomRouteObject[]): PathItem[] => {
-  return [];
-};
-
-const appRoutes: RouteObject[] = [
+const appRoutes: CustomRouteObject[] = [
   {
+    id: 'account',
+    label: 'Account',
+    Icon: <PeopleIcon fontSize="inherit" />,
+    category: 'settings',
     path: 'account',
     element: <Account />,
   },
   {
-    path: 'settings',
-    element: <Settings />,
-  },
-  {
+    id: 'profile',
+    label: 'Profile',
+    Icon: <PeopleIcon fontSize="inherit" />,
+    category: 'settings',
     path: 'profile',
-    element: <div></div>,
+    element: <div>Profile</div>,
   },
   {
+    id: 'testPages',
+    label: 'Test pages',
+    Icon: <QuizIcon />,
     path: 'test',
     element: (
       <Suspense>
@@ -68,48 +36,83 @@ const appRoutes: RouteObject[] = [
       </Suspense>
     ),
     children: [
-      { index: true, element: <div>Test pages</div> },
+      { id: 'testPagesIndex', index: true, element: <div>Test pages</div> },
       {
+        id: 'testDataSources',
+        label: 'Data sources',
+        Icon: <QuizIcon />,
+        category: 'test',
         path: 'data-sources',
-        element: <DataSources />,
+        // element: <DataSources />,
       },
       {
-        path: 'data-sources2',
-        element: <DataSources2 />,
-      },
-      {
+        id: 'testFileUploads',
+        label: 'File uploads',
+        Icon: <QuizIcon />,
+        category: 'test',
         path: 'file-uploads',
         element: <FileUploads />,
       },
       {
+        id: 'testAuthProviders',
+        label: 'Auth providers',
+        Icon: <QuizIcon />,
+        category: 'test',
         path: 'auth-providers',
-        element: <TestAuthProviders />,
+        // element: <TestAuthProviders />,
       },
       {
+        id: 'testForms',
+        label: 'Forms',
+        Icon: <QuizIcon />,
+        category: 'test',
         path: 'forms',
-        element: <Forms />,
+        // element: <Forms />,
       },
       {
+        id: 'testTranslations',
+        label: 'Translations',
+        Icon: <QuizIcon />,
+        category: 'test',
         path: 'translations',
-        element: <Translations />,
+        // element: <Translations />,
       },
     ],
   },
   {
+    id: 'terms',
+    label: 'Terms and conditions',
+    Icon: <PeopleIcon fontSize="inherit" />,
     path: 'terms',
-    element: <div>Terms and conditions</div>,
+    // element: <div>Terms and conditions</div>,
   },
   {
+    id: 'privacy',
+    label: 'Privacy statement',
+    Icon: <PeopleIcon fontSize="inherit" />,
     path: 'privacy',
-    element: <div>Privacy</div>,
+    // element: <div>Privacy</div>,
   },
   {
+    id: 'login',
+    label: 'Login',
+    Icon: <PeopleIcon fontSize="inherit" />,
     path: 'login',
-    element: <SignIn mode="signin" />,
+    // element: <SignIn mode="signin" />,
   },
   {
+    id: 'signup',
+    label: 'Signup',
+    Icon: <PeopleIcon fontSize="inherit" />,
     path: 'signup',
-    element: <SignIn mode="signup" />,
+    // element: <SignIn mode="signup" />,
+  },
+  {
+    id: '404',
+    label: '404',
+    Icon: <PeopleIcon fontSize="inherit" />,
+    path: '*',
+    // element: <NotFound />,
   },
 ];
 

@@ -1,24 +1,16 @@
 import SearchBar from '@/components/default/ui/search-bar';
+import RecipeOverviewGalleryView from '@/components/recipes/recipe-gallery-view';
 import useDialog from '@/hooks/use-dialog';
 import useFilter from '@/hooks/use-filter';
+import useIsMobile from '@/hooks/use-is-mobile';
 import useQueryParamAction from '@/hooks/use-query-param-action';
 import useRouter from '@/hooks/use-router';
+import { Recipe } from '@/schemas/recipe';
 import RecipeEditDialog from '@/sections/recipes/recipe-edit-dialog';
-import Recipe from '@/types/recipe';
 import AddIcon from '@mui/icons-material/Add'; // Import AddIcon
-import {
-  Fab,
-  FormControl,
-  Grid,
-  MenuItem,
-  Stack,
-  TextField,
-  useMediaQuery,
-  useTheme,
-} from '@mui/material';
+import { Fab, FormControl, Grid, MenuItem, Stack, TextField } from '@mui/material';
 import { useCallback, useState } from 'react';
-import RecipeOverviewGalleryView from './recipe-overview-gallery-view';
-import RecipeOverviewListView from './recipe-overview-list-view';
+import RecipeOverviewListView from './recipe-list-view';
 
 function RecipeOverview({ recipes = [] }: { recipes: Recipe[] }) {
   const [view /*, setView*/] = useState('gallery');
@@ -34,8 +26,7 @@ function RecipeOverview({ recipes = [] }: { recipes: Recipe[] }) {
   const router = useRouter();
 
   // For mobile, set no minWidth on sort options
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isMobile = useIsMobile();
 
   const handleAddRecipe = useCallback(() => {
     //dialog.setData(undefined); // Clear dialog data for new recipe
@@ -54,7 +45,8 @@ function RecipeOverview({ recipes = [] }: { recipes: Recipe[] }) {
   const handleRecipeClick = (recipe: Recipe) => {
     //dialog.setData(recipe);
     //dialog.open(recipe.id);
-    router.push(`/app/recipes/${recipe.id}`);
+    console.log(window.location.pathname);
+    router.push(`${window.location.pathname}/${recipe.id}`);
   };
 
   const handleSortChange = (event: any) => {

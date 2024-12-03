@@ -1,6 +1,7 @@
 import CompositeAuthProvider from './auth-providers/CompositeAuthProvider';
 import FirebaseAuthProvider from './auth-providers/FirebaseAuthProvider';
-import { AuthConsumer, AuthProvider, useAuth } from './context';
+import { AuthConsumer, AuthProvider } from './context';
+import useAuth from './use-auth';
 import useLoginForm from './use-login-form';
 
 export {

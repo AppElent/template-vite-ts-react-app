@@ -56,10 +56,10 @@ const useCustomFormik = (props: UseCustomFormikProps) => {
       try {
         console.log('Form Submitted:', values);
         // Submit
-        onSubmit(values, formikHelpers);
+        await onSubmit(values, formikHelpers);
       } catch (e) {
         console.error(e);
-        formik.resetForm();
+        await formik.resetForm();
         return e;
       } finally {
         formik.setSubmitting(false);
@@ -72,7 +72,6 @@ const useCustomFormik = (props: UseCustomFormikProps) => {
     if (e) {
       e.preventDefault();
     }
-    console.log('Form Submitted:', formik.values);
     const values = formik.values;
 
     // Run presave function

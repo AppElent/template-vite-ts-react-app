@@ -1,5 +1,5 @@
 import NoImageAvailable from '@/components/default/images/no-image-available';
-import Recipe from '@/types/recipe';
+import { Recipe } from '@/schemas/recipe';
 import {
   Paper,
   Table,
@@ -24,7 +24,6 @@ const RecipeOverviewListView = ({
           <TableRow>
             <TableCell>Image</TableCell>
             <TableCell>Recipe Name</TableCell>
-            <TableCell>Cooking Time</TableCell>
             <TableCell>Ingredients</TableCell>
           </TableRow>
         </TableHead>
@@ -47,7 +46,6 @@ const RecipeOverviewListView = ({
                 )}
               </TableCell>
               <TableCell>{recipe.name}</TableCell>
-              <TableCell>{recipe.cookingTime} mins</TableCell>
               <TableCell>{recipe.ingredients?.join(', ')}</TableCell>
             </TableRow>
           ))}

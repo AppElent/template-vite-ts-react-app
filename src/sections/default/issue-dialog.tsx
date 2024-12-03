@@ -1,10 +1,10 @@
 import CustomDialog from '@/components/default/custom-dialog';
-import FormButton from '@/components/default/forms/SubmitButton';
-import TextField from '@/components/default/forms/TextField';
 import { db } from '@/config/firebase';
 import { useData } from '@/libs/data-sources';
 import FirestoreDataSource from '@/libs/data-sources/data-sources/FirestoreDataSource';
 import { CustomForm } from '@/libs/forms';
+import FormButton from '@/libs/forms/components/SubmitButton';
+import TextField from '@/libs/forms/components/TextField';
 import useCustomFormik from '@/libs/forms/use-custom-formik';
 import { Issue, issueFields, issueYupSchema } from '@/schemas/issue';
 import ReportProblemIcon from '@mui/icons-material/ReportProblem';

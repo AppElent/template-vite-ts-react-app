@@ -43,7 +43,11 @@ const Account = () => {
           xs={12}
           md={6}
         >
-          <PasswordCard setPassword={() => {}} />
+          <PasswordCard
+            setPassword={(password) => {
+              console.log(password);
+            }}
+          />
         </Grid>
 
         <Grid

@@ -174,7 +174,7 @@ function Copyright() {
 
 const drawerWidth = 256;
 
-export default function Paperbase({ settings, children }) {
+export default function Paperbase({ children }) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const isSmUp = useMediaQuery(theme.breakpoints.up('sm'));
 

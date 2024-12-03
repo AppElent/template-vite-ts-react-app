@@ -5,6 +5,7 @@ export const recipeSchema: Schema = {};
 
 // TODO: Fix optional fields with default value... and then undefined values in firestore data
 export const recipeYupSchema = Yup.object().shape({
+  id: Yup.string().optional().default('').label('ID'),
   owner: Yup.string().required('Owner is required').label('Owner'),
   name: Yup.string()
     .required()
@@ -43,12 +44,8 @@ export const recipeYupSchema = Yup.object().shape({
     })
     .optional()
     .label('Nutrients'),
-  image: Yup.string().url('Image must be a valid URL').optional().default('').label('Image'),
-  images: Yup.array()
-    .of(Yup.string().url('Each image must be a valid URL'))
-    .optional()
-    .default([])
-    .label('Images'),
+  image: Yup.string().optional().default('').label('Image'),
+  images: Yup.array().of(Yup.string()).optional().default([]).label('Images'),
   ingredients: Yup.array()
     .of(Yup.string().min(2, 'Min 2 characters'))
     .optional()
@@ -61,7 +58,7 @@ export const recipeYupSchema = Yup.object().shape({
     .label('Instructions'),
   comments: Yup.string().optional().default('').label('Comments'),
   score: Yup.number().optional().default(0).label('Score').nullable(),
-  url: Yup.string().url('URL must be a valid URL').optional().default('').label('URL'),
+  url: Yup.string().url().optional().default('').label('URL'),
   category: Yup.string().optional().default('').label('Category'),
   keywords: Yup.array()
     .of(Yup.string().min(2, 'Min 2 characters'))
@@ -85,13 +82,13 @@ export const recipeYupSchema = Yup.object().shape({
   raw: Yup.mixed().optional().nullable().default({}).label('Raw'),
 });
 
-export type Recipe2 = Yup.InferType<typeof recipeYupSchema>;
+export type Recipe = Yup.InferType<typeof recipeYupSchema>;
 
-export type RecipeTemplate = Omit<Recipe2, 'id'>;
+export type RecipeTemplate = Omit<Recipe, 'id'>;
 
 // console.log(extractSchemaLabels(recipeYupSchema));
 
-export const recipeDefaultValues: Partial<Recipe2> = recipeYupSchema.getDefault();
+export const recipeDefaultValues: Partial<Recipe> = recipeYupSchema.getDefault();
 
 export const recipeFields = extractFieldDefinitionFromYupSchema(recipeYupSchema, RECIPE_FIELDS);
 

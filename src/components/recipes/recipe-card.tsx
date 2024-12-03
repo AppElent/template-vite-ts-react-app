@@ -1,4 +1,4 @@
-import Recipe from '@/types/recipe';
+import { Recipe } from '@/schemas/recipe';
 import { AccessTime as AccessTimeIcon, Restaurant as RestaurantIcon } from '@mui/icons-material';
 import { Card, CardContent, CardMedia, Chip, Rating, Typography } from '@mui/material';
 import NoImageAvailable from '../default/images/no-image-available';

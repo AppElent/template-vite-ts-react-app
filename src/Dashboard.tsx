@@ -13,6 +13,7 @@ import { Bounce, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { QueryParamProvider } from 'use-query-params';
 import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
+import ErrorBoundary from './components/default/error-boundary';
 import useRouter from './hooks/use-router';
 import { DataProvider, DataSourceObject } from './libs/data-sources';
 
@@ -50,46 +51,48 @@ const Dashboard: FC<DashboardProps> = ({ theme, routes, authProvider, dataSource
   return (
     <>
       <ThemeProvider theme={theme}>
-        <AuthProvider provider={authProvider}>
-          <AuthConsumer>
-            {(auth) => {
-              // Check if splashscreen should be shown
-              const showSlashScreen = !auth.isInitialized;
-              if (showSlashScreen) return <SplashScreen />;
+        <ErrorBoundary>
+          <AuthProvider provider={authProvider}>
+            <AuthConsumer>
+              {(auth) => {
+                // Check if splashscreen should be shown
+                const showSlashScreen = !auth.isInitialized;
+                if (showSlashScreen) return <SplashScreen />;
 
-              return (
-                <>
-                  <DataProvider dataSources={dataSources || {}}>
-                    <QueryParamProvider adapter={ReactRouter6Adapter}>
-                      <ConfirmProvider>
-                        <Seo />
-                        {/* <IssueDialog
+                return (
+                  <>
+                    <DataProvider dataSources={dataSources || {}}>
+                      <QueryParamProvider adapter={ReactRouter6Adapter}>
+                        <ConfirmProvider>
+                          <Seo />
+                          {/* <IssueDialog
                           onSave={(values) => console.log(values)}
                           open={dialog.isOpen}
                           onClose={() => dialog.close()}
                         /> */}
-                        <ToastContainer
-                          position="top-right"
-                          autoClose={2500}
-                          hideProgressBar={false}
-                          newestOnTop={false}
-                          closeOnClick
-                          rtl={false}
-                          pauseOnFocusLoss
-                          draggable
-                          pauseOnHover
-                          theme="light"
-                          transition={Bounce}
-                        />
-                        {element}
-                      </ConfirmProvider>
-                    </QueryParamProvider>
-                  </DataProvider>
-                </>
-              );
-            }}
-          </AuthConsumer>
-        </AuthProvider>
+                          <ToastContainer
+                            position="top-right"
+                            autoClose={2500}
+                            hideProgressBar={false}
+                            newestOnTop={false}
+                            closeOnClick
+                            rtl={false}
+                            pauseOnFocusLoss
+                            draggable
+                            pauseOnHover
+                            theme="light"
+                            transition={Bounce}
+                          />
+                          {element}
+                        </ConfirmProvider>
+                      </QueryParamProvider>
+                    </DataProvider>
+                  </>
+                );
+              }}
+            </AuthConsumer>
+          </AuthProvider>
+        </ErrorBoundary>
       </ThemeProvider>
     </>
   );

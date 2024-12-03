@@ -1,7 +1,8 @@
 import { Box, Breadcrumbs, Link, Stack, Typography } from '@mui/material';
 
-import { PathItem, paths } from '@/config/paths';
+import paths, { PathItem } from '@/config/paths';
 
+import useIsMobile from '@/hooks/use-is-mobile';
 import { useTranslation } from 'react-i18next';
 import { Link as RouterLink, matchPath } from 'react-router-dom';
 
@@ -35,6 +36,7 @@ const generateBreadcrumbs = (breadcrumbsConfig: PathItem[], pathname: string) =>
 
 const CustomBreadcrumbs = ({ currentPage }: { currentPage?: string }) => {
   const { t } = useTranslation();
+  const isMobile = useIsMobile();
   const items = generateBreadcrumbs(paths, window.location.pathname);
 
   // If currentPage is set, replace the last item with it
@@ -46,7 +48,10 @@ const CustomBreadcrumbs = ({ currentPage }: { currentPage?: string }) => {
     <>
       {items.length > 0 && (
         <Box sx={{ mb: 3 }}>
-          <Breadcrumbs aria-label="breadcrumb">
+          <Breadcrumbs
+            aria-label="breadcrumb"
+            maxItems={isMobile ? 2 : 8}
+          >
             {items.map((item, index) => {
               const value = item.translationKey ? t(item.translationKey) : item.label;
               return item.to ? (

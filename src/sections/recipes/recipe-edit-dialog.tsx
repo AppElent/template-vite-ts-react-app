@@ -1,23 +1,25 @@
 // @ts-nocheck
 
-import AutocompleteChipList from '@/components/default/forms/AutocompleteChipList';
-import CancelButton from '@/components/default/forms/CancelButton';
-import Image from '@/components/default/forms/Image';
-import Images from '@/components/default/forms/Images';
-import List from '@/components/default/forms/List';
-import Rating from '@/components/default/forms/Rating';
-import SubmitButton from '@/components/default/forms/SubmitButton';
-import TextField from '@/components/default/forms/TextField';
 import JsonEditor from '@/components/default/json-editor';
 import GridLayout from '@/components/default/ui/grid-layout';
 import { getLogLevel } from '@/config';
 import useFetch from '@/hooks/use-fetch';
 import useGuid from '@/hooks/use-guid';
+import useIsMobile from '@/hooks/use-is-mobile';
 import useQueryParamAction from '@/hooks/use-query-param-action';
 import useRouter from '@/hooks/use-router';
 import { useAuth } from '@/libs/auth';
 import { useData } from '@/libs/data-sources';
 import { CustomForm } from '@/libs/forms';
+import AutocompleteChipList from '@/libs/forms/components/AutocompleteChipList';
+import CancelButton from '@/libs/forms/components/CancelButton';
+import Errors from '@/libs/forms/components/Errors';
+import Image from '@/libs/forms/components/Image';
+import Images from '@/libs/forms/components/Images';
+import List from '@/libs/forms/components/List';
+import Rating from '@/libs/forms/components/Rating';
+import SubmitButton from '@/libs/forms/components/SubmitButton';
+import TextField from '@/libs/forms/components/TextField';
 import useCustomFormik from '@/libs/forms/use-custom-formik';
 import { getCuisineSuggestions, getKeywordSuggestions } from '@/libs/recipes/get-recipe-fields';
 import parseExternalRecipeData from '@/libs/recipes/parse-external-recipe-data';
@@ -37,8 +39,6 @@ import {
   Grid,
   IconButton,
   Typography,
-  useMediaQuery,
-  useTheme,
 } from '@mui/material';
 import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -53,8 +53,8 @@ interface RecipeEditDialogProps {
 const RecipeEditDialog = ({ recipe, open, onClose }: RecipeEditDialogProps) => {
   const auth = useAuth();
   // Theme and media query
-  const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
+  // const theme = useTheme();
+  const fullScreen = useIsMobile();
   // Translation
   const { t } = useTranslation();
 
@@ -79,6 +79,25 @@ const RecipeEditDialog = ({ recipe, open, onClose }: RecipeEditDialogProps) => {
   const router = useRouter();
 
   const { set: setRecipe, delete: deleteRecipe } = recipeActions;
+
+  // Delete all images that are uploaded to firebasestorage
+  const deleteRecipeAndImages = async (recipeId: string) => {
+    const storageClass = new FirebaseStorageProvider();
+
+    // Check images and image url
+    const images = recipe?.images || [];
+    if (recipe?.image) {
+      images.push(recipe.image);
+    }
+    for (const url of images) {
+      // Check if image url is manually uploaded to firebasestorage
+      if (url.startsWith('https://firebasestorage.googleapis.com')) {
+        await storageClass.deleteFile(url);
+      }
+    }
+    await deleteRecipe(recipeId);
+    onClose();
+  };
 
   const initialValues = useMemo(() => {
     return {
@@ -111,13 +130,29 @@ const RecipeEditDialog = ({ recipe, open, onClose }: RecipeEditDialogProps) => {
             `uploads/recipes/${recipeId}/${filename}`
           );
           // Replace blob url in images with real url
-          await formik.setFieldValue('images', [
-            ...formik.values.images.filter((img: string) => img !== url),
-            imageUrl,
-          ]);
-          //formik.setFieldValue('images', [...formik.values.images, imageUrl]);
+          values.images = [...formik.values.images.filter((img: string) => img !== url), imageUrl];
+
+          // If image is the same as the one being uploaded, replace it
+          if (values.image === url) {
+            values.image = imageUrl;
+          }
         }
       }
+
+      // If values.image is a blob url, upload it
+      if (values.image && values.image.startsWith('blob:')) {
+        const storageClass = new FirebaseStorageProvider();
+        const blob = await fetch(values.image).then((r) => r.blob());
+        const filename = values.image.split('/').pop();
+        const file = new File([blob], filename || 'file', { type: blob.type });
+
+        const imageUrl = await storageClass.uploadFile(
+          file,
+          `uploads/recipes/${recipeId}/${filename}`
+        );
+        values.image = imageUrl;
+      }
+
       // Save
       await setRecipe(values, recipeId);
       // Redirect to recipe page
@@ -271,7 +306,7 @@ const RecipeEditDialog = ({ recipe, open, onClose }: RecipeEditDialogProps) => {
                           fetchData();
                         }}
                       >
-                        t('get-recipe-information')
+                        {t('foodhub:pages.edit-recipe.get-recipe-information')}
                       </LoadingButton>
                     </Box>
                   )}
@@ -333,36 +368,8 @@ const RecipeEditDialog = ({ recipe, open, onClose }: RecipeEditDialogProps) => {
                   return '';
                 }}
               />
-              {/* {recipe ? (
-                <ImageUploader
-                  originalFileName={`/uploads/recipes/${recipe?.id || createGuid()}/${uploadFileName}.jpg`}
-                  uploadFile={async (file, filename) => {
-                    // Save the original file to storage
-                    const storageClass = new FirebaseStorageProvider({} as any, { instance: {} });
-                    const originalFileUrl = await storageClass.uploadFile(file, filename);
-                    formik.setFieldValue('image', originalFileUrl);
-                    const currentImages = formik.values.images || [];
-                    formik.setFieldValue('images', [...currentImages, originalFileUrl]);
-                    return originalFileUrl;
-                  }}
-                  //multiple={true}
-                  // crop={{
-                  //   path: `/uploads/recipes/${recipe?.id || createGuid()}/${uploadFileName}-cropped.jpg`,
-                  //   uploadFile: async (file, filename) => {
-                  //     // Save the original file to storage
-                  //     const storageClass = new FirebaseStorageProvider({} as any, { instance: {} });
-                  //     const originalFileUrl = await storageClass.uploadFile(file, filename);
-                  //     // update state with the type url
-                  //     formik.setFieldValue('image', originalFileUrl);
-                  //     return originalFileUrl;
-                  //   },
-                  //   props: { aspect: 16 / 9 },
-                  // }}
-                  // TODO: fix crop
-                />
-              ) : (
-                <Box>Note: After saving the recipe, pictures can be uploaded</Box>
-              )} */}
+
+              <Errors fields={fields} />
               {getLogLevel() === 'debug' && (
                 <JsonEditor
                   data={{ recipe, formik: formik?.values }}
@@ -371,6 +378,19 @@ const RecipeEditDialog = ({ recipe, open, onClose }: RecipeEditDialogProps) => {
               )}
             </DialogContent>
             <DialogActions>
+              {!!recipe && (
+                <Button
+                  onClick={() => {
+                    deleteRecipeAndImages(recipe.id);
+                    formik.resetForm();
+                    onClose();
+                  }}
+                  variant="outlined"
+                  color="error"
+                >
+                  Delete
+                </Button>
+              )}
               <CancelButton onClick={onClose}>Cancel</CancelButton>
               {/* <Button
                 onClick={() => {
@@ -389,18 +409,6 @@ const RecipeEditDialog = ({ recipe, open, onClose }: RecipeEditDialogProps) => {
               >
                 Save
               </Button> */}
-              {!!recipe && (
-                <Button
-                  onClick={() => {
-                    deleteRecipe(recipe.id);
-                    formik.resetForm();
-                    onClose();
-                  }}
-                  color="error"
-                >
-                  Delete
-                </Button>
-              )}
             </DialogActions>
           </CustomForm>
         </Dialog>

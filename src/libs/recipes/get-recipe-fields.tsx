@@ -1,9 +1,9 @@
-import Recipe from '@/types/recipe';
+import { Recipe } from '@/schemas/recipe';
 
 export const getKeywordSuggestions = (recipes: Recipe[]) => {
   // Get all unique values from recipe keywords
   return recipes.reduce((acc: any, recipe: Recipe) => {
-    recipe.keywords?.forEach((keyword: string) => {
+    recipe.keywords?.forEach((keyword) => {
       if (!acc.includes(keyword)) {
         acc.push(keyword);
       }

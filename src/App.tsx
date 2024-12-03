@@ -11,21 +11,21 @@ import theme from '@/theme/paperbase/theme';
 import './App.css';
 import config from './config';
 import Dashboard from './Dashboard';
-import { Recipe2 } from './schemas/recipe';
+import { Recipe } from './schemas/recipe';
 
 const firebaseProvider = new FirebaseAuthProvider({ login: '/login', logout: '/logout' });
 
+const devFilter = import.meta.env.DEV ? 'ja' : 'ZMG16rhpzbdKd8LXUIiNOD7Jul23';
+
 const dataSources = {
-  recipes: new FirestoreDataSource<Recipe2>(
+  recipes: new FirestoreDataSource<Recipe>(
     {
       target: 'recipes',
       targetMode: 'collection',
       YupValidationSchema: recipeYupSchema,
       subscribe: true,
       targetFilter: {
-        // filters: [
-        //   { field: 'owner', operator: '==', value: () => firebaseProvider.getCurrentUser()?.id },
-        // ],
+        filters: [{ field: 'owner', operator: '!=', value: devFilter }],
         orderBy: [{ field: 'name', direction: 'asc' }],
       },
     },

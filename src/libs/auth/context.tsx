@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { createContext, useCallback, useContext, useEffect, useReducer } from 'react';
+import { createContext, useCallback, useEffect, useReducer } from 'react';
 import { AuthState, User } from '.';
 
 export const initialState: AuthState = {
@@ -18,7 +18,7 @@ export const initialState: AuthState = {
   // signOut: async () => any,
 };
 
-const AuthContext = createContext<AuthState>({
+export const AuthContext = createContext<AuthState>({
   ...initialState,
   // provider: 'FIREBASE',
   // createUserWithEmailAndPassword: () => Promise.resolve(),
@@ -28,8 +28,6 @@ const AuthContext = createContext<AuthState>({
 });
 
 export const AuthConsumer = AuthContext.Consumer;
-
-export const useAuth = () => useContext(AuthContext);
 
 const reducer = (state: any, action: any) => {
   if (action.type === 'AUTH_STATE_CHANGED') {

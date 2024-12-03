@@ -1,7 +1,7 @@
-import { theme } from '@/config/theme';
-import Recipe from '@/types/recipe';
+import useIsMobile from '@/hooks/use-is-mobile';
+import { Recipe } from '@/schemas/recipe';
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
-import { Box, IconButton, Typography, useMediaQuery } from '@mui/material';
+import { Box, IconButton, Typography } from '@mui/material';
 import { useState } from 'react';
 
 interface RecipeCarrousselProps {
@@ -10,7 +10,7 @@ interface RecipeCarrousselProps {
 
 const RecipeCarroussel = ({ recipes }: RecipeCarrousselProps) => {
   const [carouselIndex, setCarouselIndex] = useState(0);
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMobile = useIsMobile();
 
   const handleCarouselNext = () => {
     setCarouselIndex((prevIndex) => (prevIndex + 1) % recipes.length);
@@ -72,13 +72,27 @@ const RecipeCarroussel = ({ recipes }: RecipeCarrousselProps) => {
         }}
       /> */}
       <IconButton
-        sx={{ position: 'absolute', left: 20, color: 'white' }}
+        sx={{
+          position: 'absolute',
+          left: 20,
+          color: 'white',
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.7)' },
+          boxShadow: 3,
+        }}
         onClick={handleCarouselPrev}
       >
         <ChevronLeft />
       </IconButton>
       <IconButton
-        sx={{ position: 'absolute', right: 20, color: 'white' }}
+        sx={{
+          position: 'absolute',
+          right: 20,
+          color: 'white',
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.7)' },
+          boxShadow: 3,
+        }}
         onClick={handleCarouselNext}
       >
         <ChevronRight />

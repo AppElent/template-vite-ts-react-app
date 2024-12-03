@@ -4,33 +4,7 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import Backend from 'i18next-http-backend'; // adding lazy loading for translations, more information here: https://github.com/i18next/i18next-http-backend
 import { initReactI18next } from 'react-i18next';
 import { i18nextPlugin } from 'translation-check';
-import { setLocale } from 'yup';
-import { en, nl } from 'yup-locales';
-
-// /**
-//  * Default localization settings. the locales are retrieved from the public URL. Namespaces are common and application specific
-//  *
-//  */
-// i18n
-//   .use(Backend)
-//   .use(initReactI18next)
-//   .use(LanguageDetector) // Detect user language
-//   .init({
-//     //supportedLngs: ["en", "de"],
-//     backend: {
-//       loadPath: '/locales/{{lng}}/{{ns}}.json', // locale files path
-//     },
-//     ns: ['satisfactory'],
-//     lng: 'en',
-//     defaultNS: 'common',
-//     fallbackLng: ['en'],
-//     supportedLngs: ['en', 'nl'],
-//   });
-
-const languages = {
-  en,
-  nl,
-};
+import { LocaleObject, setLocale } from 'yup';
 
 const customSaveMissingKeys = (
   key: string,
@@ -89,26 +63,108 @@ const initI18n = () => {
     });
 };
 
+const localeSettings: LocaleObject = {
+  mixed: {
+    default: 'common:errors.default',
+    required: ({ path }) => ({ key: 'common:errors.fieldRequired', values: { field: path } }),
+    defined: ({ path }) => ({ key: 'common:errors.fieldDefined', values: { field: path } }),
+    notNull: ({ path }) => ({ key: 'common:errors.fieldNotNull', values: { field: path } }),
+    oneOf: ({ path, values }) => ({
+      key: 'common:errors.fieldOneOf',
+      values: { field: path, values },
+    }),
+    notOneOf: ({ path, values }) => ({
+      key: 'common:errors.fieldNotOneOf',
+      values: { field: path, values },
+    }),
+  },
+  string: {
+    // email: 'field_invalid_email',
+    // url: 'field_invalid_url',
+    length: ({ path, length }) => ({
+      key: 'common:errors.stringLength',
+      values: { field: path, length },
+    }),
+    min: ({ min, path }) => ({
+      key: 'common:errors.fieldMin',
+      values: { length: min, field: path },
+    }),
+    max: ({ max, path }) => ({
+      key: 'common:errors.fieldMax',
+      values: { length: max, field: path },
+    }),
+    email: ({ path }) => ({ key: 'common:errors.fieldEmail', values: { field: path } }),
+    url: ({ path }) => ({ key: 'common:errors.fieldUrl', values: { field: path } }),
+    uuid: ({ path }) => ({ key: 'common:errors.fieldUuid', values: { field: path } }),
+    trim: ({ path }) => ({ key: 'common:errors.fieldTrim', values: { field: path } }),
+    lowercase: ({ path }) => ({ key: 'common:errors.fieldLowercase', values: { field: path } }),
+    uppercase: ({ path }) => ({ key: 'common:errors.fieldUppercase', values: { field: path } }),
+  },
+  number: {
+    min: ({ min, path }) => ({
+      key: 'common:errors.fieldMinValue',
+      values: { length: min, field: path },
+    }),
+    max: ({ max, path }) => ({
+      key: 'common:errors.fieldMaxValue',
+      values: { length: max, field: path },
+    }),
+    lessThan: ({ path, less }) => ({
+      key: 'common:errors.fieldMinValueLength',
+      values: { field: path, length: less },
+    }),
+    moreThan: ({ path, more }) => ({
+      key: 'common:errors.fieldMaxValueLength',
+      values: { field: path, length: more },
+    }),
+    positive: ({ path }) => ({ key: 'common:errors.fieldPositive', values: { field: path } }),
+    negative: ({ path }) => ({ key: 'common:errors.fieldNegative', values: { field: path } }),
+    integer: ({ path }) => ({ key: 'common:errors.fieldInteger', values: { field: path } }),
+  },
+  date: {
+    min: ({ min, path }) => ({
+      key: 'common:errors.fieldMinDate',
+      values: { length: min, field: path },
+    }),
+    max: ({ max, path }) => ({
+      key: 'common:errors.fieldMaxDate',
+      values: { length: max, field: path },
+    }),
+  },
+  boolean: {
+    isValue: ({ path, value }) => ({
+      key: 'common:errors.fieldBoolean',
+      values: { field: path, value },
+    }),
+  },
+  object: {
+    noUnknown: ({ path }) => ({ key: 'common:errors.fieldNoUnknown', values: { field: path } }),
+  },
+  array: {
+    min: ({ min, path }) => ({
+      key: 'common:errors.fieldMinArray',
+      values: { length: min, field: path },
+    }),
+    max: ({ max, path }) => ({
+      key: 'common:errors.fieldMaxArray',
+      values: { length: max, field: path },
+    }),
+    length: ({ length, path }) => ({
+      key: 'common:errors.fieldLengthArray',
+      values: { length, field: path },
+    }),
+  },
+  // use functions to generate an error object that includes the value from the schema
+  // number: {
+  //   min: ({ min }) => ({ key: 'field_too_short', values: { min } }),
+  //   max: ({ max }) => ({ key: 'field_too_big', values: { max } }),
+  // },
+};
+
 if (!i18n.isInitialized) {
   initI18n();
-  const lng = i18n.language || localStorage.getItem('i18nextLng') || 'en';
-  setLocale(languages[lng as keyof typeof languages]);
-  // console.log(languages[i18n.language as keyof typeof languages]);
-  // console.log(nl);
-  // console.log(i18n.language);
-  // const locale = languages[(i18n.language as keyof typeof languages) || 'en'];
-  // console.log(i18n, locale);
-  // setLocale(locale);
+  setLocale(localeSettings);
 }
-// console.log('i18n start', i18n);
-// const locale = languages[(i18n.language as keyof typeof languages) || 'en'];
-// console.log(locale);
-// setLocale(locale);
-
-// Listen for language changes
-i18n.on('languageChanged', (lng: keyof typeof languages) => {
-  setLocale(languages[lng]);
-});
 
 // i18n
 //   .use(Backend) // Load translations dynamically if needed
@@ -136,7 +192,5 @@ i18n.on('languageChanged', (lng: keyof typeof languages) => {
 //     },
 //     returnObjects: true,
 //   });
-
-// console.log(showTranslations(en_common));
 
 export default initI18n;

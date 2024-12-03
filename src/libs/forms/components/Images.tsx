@@ -17,7 +17,7 @@ import {
 } from '@mui/material';
 import _ from 'lodash';
 import { useState } from 'react';
-import ImageCropper from '../images/image-cropper';
+import ImageCropper from '../../../components/default/images/image-cropper';
 
 interface ImagesProps {
   name?: string;

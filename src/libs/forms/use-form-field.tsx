@@ -57,6 +57,17 @@ const useFormField = (name: string, fieldConfig?: FieldConfig): UseFormFieldsRet
     fieldConfig.label = label;
   }
 
+  // If meta.error is a string, return, otherwise translate the error
+  let newError: any = meta.error;
+  if (newError && !(typeof newError === 'string')) {
+    console.log(newError);
+    newError = t(newError?.key, { ...newError?.values, field: label });
+  }
+  const newMeta = {
+    ...meta,
+    error: newError,
+  };
+
   // If debounce is set, return the debounced handler
   if (debounceValue > 0) {
     return {
@@ -70,12 +81,12 @@ const useFormField = (name: string, fieldConfig?: FieldConfig): UseFormFieldsRet
           debouncedHandleChange(e.target.value);
         },
       },
-      meta,
+      meta: newMeta,
       helpers,
     };
   }
 
-  return { formik, options, field, meta, helpers, fieldConfig };
+  return { formik, options, field, meta: newMeta, helpers, fieldConfig };
 };
 
 export default useFormField;

@@ -1,5 +1,5 @@
 import { ExternalRecipe } from '@/schemas/external-recipe';
-import Recipe from '@/types/recipe';
+import { Recipe } from '@/schemas/recipe';
 
 const parseExternalRecipeData = (data: ExternalRecipe): Partial<Recipe> => {
   const timeObject =
@@ -38,9 +38,9 @@ const parseExternalRecipeData = (data: ExternalRecipe): Partial<Recipe> => {
       data.yields.trim() && {
         yieldsText: data.yields,
       }), //TODO: make object instead of string
-    ...(data.nutrients && {
-      nutrients: data.nutrients,
-    }),
+    // ...(data.nutrients && {
+    //   nutrients: data.nutrients,
+    // }), //TODO: add nutrients
     ...(data.image && data.image.trim() && { image: data.image }),
     ...(data.ingredients &&
       data.ingredients.length > 0 && {

@@ -80,60 +80,6 @@ export default function SignIn(props) {
 
   const { text: loginButtonText, ...loginButtonProps } = buttons.login;
 
-  // const initialValues =
-  //   mode === 'signin'
-  //     ? {
-  //         email: 'demo@demo.com',
-  //         password: 'demo123',
-  //         submit: null,
-  //       }
-  //     : {};
-
-  // const validationSchema =
-  //   mode === 'signin'
-  //     ? Yup.object({
-  //         email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
-  //         password: Yup.string().max(255).required('Password is required'),
-  //       })
-  //     : Yup.object({
-  //         email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
-  //         confirmEmail: Yup.string().oneOf([Yup.ref('email'), null], 'Email must match'),
-  //         password: Yup.string().max(255).required('Password is required'),
-  //         confirmPassword: Yup.string().oneOf([Yup.ref('password'), null], 'Passwords must match'),
-  //       });
-
-  // const formik = useFormik({
-  //   initialValues,
-  //   validationSchema,
-  //   onSubmit: async (values, helpers) => {
-  //     try {
-  //       if (mode === 'signin') {
-  //         await signInWithEmailAndPassword(values.email, values.password);
-  //       } else {
-  //         await signUp(values.email, values.password);
-  //       }
-
-  //       const redirectUrl = returnTo
-  //         ? returnTo
-  //         : config.auth?.redirectAfterLogin
-  //           ? config.auth?.redirectAfterLogin
-  //           : '/';
-
-  //       if (isMounted()) {
-  //         router.push(redirectUrl);
-  //       }
-  //     } catch (err) {
-  //       console.error(err);
-
-  //       if (isMounted()) {
-  //         helpers.setStatus({ success: false });
-  //         helpers.setErrors({ submit: err.message });
-  //         helpers.setSubmitting(false);
-  //       }
-  //     }
-  //   },
-  // });
-
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
@@ -143,15 +89,6 @@ export default function SignIn(props) {
   const handleClose = () => {
     setOpen(false);
   };
-
-  // const handleSubmit = (event) => {
-  //   event.preventDefault();
-  //   const data = new FormData(event.currentTarget);
-  //   console.log({
-  //     email: data.get('email'),
-  //     password: data.get('password'),
-  //   });
-  // };
 
   return (
     // <AppTheme {...themeProps}>

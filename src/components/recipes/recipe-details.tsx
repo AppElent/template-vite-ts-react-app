@@ -1,5 +1,7 @@
 import useDialog from '@/hooks/use-dialog';
-import Recipe from '@/types/recipe';
+import useIsMobile from '@/hooks/use-is-mobile';
+import { useAuth } from '@/libs/auth';
+import { Recipe } from '@/schemas/recipe';
 import {
   AccessTime as AccessTimeIcon,
   Edit as EditIcon,
@@ -15,6 +17,7 @@ import {
   ListItemText,
   Paper,
   Rating,
+  Stack,
   Typography,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
@@ -22,105 +25,16 @@ import RecipeEditDialog from '../../sections/recipes/recipe-edit-dialog';
 import NoImageAvailable from '../default/images/no-image-available';
 import ImageList from '../default/ui/image-list';
 
-// Sample recipe object (same as before)
-// const sampleRecipe = {
-//   name: 'Delicious Pasta',
-//   description: 'A quick and easy pasta dish perfect for weeknight dinners.',
-//   time: { prep: 10, cooking: 20, total: 30 },
-//   yields: { quantity: 4, unit: 'servings' },
-//   nutrients: {
-//     calories: '400',
-//     fat: '10g',
-//     sugar: '2g',
-//     fiber: '3g',
-//     protein: '15g',
-//     carbs: '65g',
-//   },
-//   image: '/placeholder.svg?height=400&width=600',
-//   ingredients: [
-//     '300g spaghetti',
-//     '2 cloves of garlic, minced',
-//     '1/4 cup olive oil',
-//     'Salt and pepper to taste',
-//   ],
-//   instructions: [
-//     'Boil the spaghetti according to package instructions.',
-//     'In a pan, heat olive oil and sauté minced garlic until fragrant.',
-//     'Drain the pasta and add it to the pan with garlic oil.',
-//     'Season with salt and pepper, toss well, and serve hot.',
-//   ],
-//   category: 'Main Course',
-//   keywords: ['pasta', 'quick', 'easy', 'Italian'],
-//   cuisine: ['Italian'],
-//   createdAt: '2023-05-01T12:00:00Z',
-//   updatedAt: '2023-05-15T14:30:00Z',
-// };
-
-// Custom theme (same as before)
-// const theme = createTheme({
-//   palette: {
-//     primary: {
-//       main: '#FF8585',
-//       light: '#FFA5A5',
-//       dark: '#FF6B6B',
-//       contrastText: '#fff',
-//     },
-//     secondary: {
-//       main: '#4CAF50',
-//       light: '#81C784',
-//       dark: '#388E3C',
-//       contrastText: '#fff',
-//     },
-//     text: {
-//       primary: '#333333',
-//       secondary: '#666666',
-//     },
-//     background: {
-//       default: '#FFFFFF',
-//       paper: '#FFFFFF',
-//     },
-//   },
-//   typography: {
-//     h4: {
-//       fontWeight: 700,
-//       color: '#333333',
-//     },
-//     h6: {
-//       fontWeight: 600,
-//       color: '#333333',
-//     },
-//   },
-//   components: {
-//     MuiChip: {
-//       styleOverrides: {
-//         root: {
-//           borderRadius: '8px',
-//         },
-//         outlined: {
-//           borderColor: '#FF8585',
-//           color: '#FF8585',
-//           '&:hover': {
-//             backgroundColor: 'rgba(255, 133, 133, 0.04)',
-//           },
-//         },
-//       },
-//     },
-//     MuiPaper: {
-//       styleOverrides: {
-//         root: {
-//           borderRadius: '12px',
-//           boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
-//         },
-//       },
-//     },
-//   },
-// });
-
 // TODO: add image viewer and set image as default
 
 const RecipeDetails = ({ recipe }: { recipe?: Recipe }) => {
   const dialog = useDialog();
   const { t } = useTranslation();
+  // Get user
+  const { user } = useAuth();
+
+  // is mobile
+  const isMobile = useIsMobile();
 
   const handleEdit = () => {
     dialog.open();
@@ -161,22 +75,27 @@ const RecipeDetails = ({ recipe }: { recipe?: Recipe }) => {
       )}
 
       <Box sx={{ p: 4 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Stack
+          direction={isMobile ? 'column' : 'row'}
+          sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}
+        >
           <Typography
             variant="h4"
             component="h1"
           >
             {recipe.name}
           </Typography>
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<EditIcon />}
-            onClick={handleEdit}
-          >
-            {t('common:actions.edit')}
-          </Button>
-        </Box>
+          {user?.id === recipe.owner && (
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<EditIcon />}
+              onClick={handleEdit}
+            >
+              {t('common:actions.edit')}
+            </Button>
+          )}
+        </Stack>
         {recipe.description && (
           <Typography
             variant="body1"
@@ -450,7 +369,7 @@ const RecipeDetails = ({ recipe }: { recipe?: Recipe }) => {
         <Paper>
           <Box sx={{ maxWidth: '350px', overflow: 'hidden' }}>
             <ImageList
-              images={recipe.images || []}
+              images={(recipe.images as string[]) || []}
               onClick={() => {}}
             />
           </Box>

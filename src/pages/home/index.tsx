@@ -1,6 +1,6 @@
 import { useData } from '@/libs/data-sources';
 import DefaultPage from '@/pages/default/DefaultPage';
-import Recipe from '@/types/recipe';
+import { Recipe } from '@/schemas/recipe';
 import { Typography } from '@mui/material';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -27,9 +27,15 @@ const HomePage = () => {
     [recipes]
   );
 
+  const carrousselRecipes = useMemo(() => {
+    return recipes
+      ?.filter((recipe) => recipe.image && recipe?.score && recipe?.score > 3)
+      .slice(0, 6);
+  }, [recipes]);
+
   return (
     <DefaultPage>
-      <RecipeCarroussel recipes={recipes || []} />
+      <RecipeCarroussel recipes={carrousselRecipes || []} />
       <Typography
         align="center"
         variant="h6"

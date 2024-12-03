@@ -62,10 +62,14 @@
       "description": "Welcome to FoodHub! Your one-stop shop for all things food.",
       "featured": "Featured Recipes",
       "categories": "Browse recipes by category."
+    },
+    "edit-recipe": {
+      "get-recipe-information": "Get recipe information"
     }
   },
   "menu": {
-    "recipes": "Recipes"
-  },
-  "get-recipe-information": "Get recipe information"
+    "recipes": "Recipes",
+    "allrecipes": "All Recipes",
+    "myRecipes": "My Recipes"
+  }
 }

@@ -74,22 +74,10 @@
     "addItem": "{{resource}} toevoegen",
     "editItem": "{{resource}} bewerken"
   },
-  "buttons": {
-    "create": "Scheppen",
-    "save": "Redden",
-    "logout": "Logout",
-    "delete": "Verwijderen",
-    "edit": "Bewerken",
-    "cancel": "Annuleren",
-    "confirm": "Weet je het zeker?",
-    "filter": "Filter",
-    "clear": "Duidelijk",
-    "refresh": "Opfrissen",
-    "show": "Tonen",
-    "undo": "Ongedaan maken",
-    "import": "Importeren",
-    "clone": "Kloon",
-    "notAccessTitle": "Je hebt geen toegangsrechten"
+  "errors": {
+    "fieldMin": "{{field}} moet op zijn minst {{length}} tekens zijn",
+    "title_one": "Fout",
+    "title_other": "Fouten"
   },
   "warnWhenUnsavedChanges": "Weet je zeker dat je weg wilt? U hebt niet-opgeslagen wijzigingen.",
   "notifications": {
@@ -105,42 +93,5 @@
     "importProgress": "Importeren: {{processed}}/{{total}}"
   },
   "loading": "Laden",
-  "tags": {
-    "clone": "Kloon"
-  },
-  "dashboard": {
-    "title": "Dashboard"
-  },
-  "posts": {
-    "posts": "Berichten",
-    "fields": {
-      "id": "Legitimatiebewijs",
-      "title": "Titel",
-      "category": "Categorie",
-      "status": {
-        "title": "Status",
-        "published": "Gepubliceerd",
-        "draft": "Concept",
-        "rejected": "Afgekeurd"
-      },
-      "content": "Tevreden",
-      "createdAt": "Gemaakt op"
-    },
-    "titles": {
-      "create": "Bericht maken",
-      "edit": "Bericht bewerken",
-      "list": "Berichten",
-      "show": "Toon bericht"
-    }
-  },
-  "table": {
-    "actions": "Acties"
-  },
-  "misc": {
-    "noImageAvailable": "Geen afbeelding beschikbaar"
-  },
-  "menu": {
-    "settings": "Instellingen",
-    "testpages": "Test pagina's"
-  }
+  "buttons": {}
 }

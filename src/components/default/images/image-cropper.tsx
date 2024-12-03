@@ -1,5 +1,6 @@
 // @ts-nocheck
 
+import useIsMobile from '@/hooks/use-is-mobile';
 import CloseIcon from '@mui/icons-material/Close';
 import {
   Box,
@@ -9,8 +10,6 @@ import {
   DialogContent,
   DialogTitle,
   IconButton,
-  useMediaQuery,
-  useTheme,
 } from '@mui/material';
 import { useCallback, useState } from 'react';
 import Cropper from 'react-easy-crop';
@@ -64,8 +63,7 @@ const ImageCropper = ({ imageUrl, filename, onSave, dialog, cropperProps }: Imag
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
 
   // Theme and media query
-  const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
+  const fullScreen = useIsMobile();
 
   const getFileName = (path: string): string => {
     return path.split('/').pop() || 'unknown-filename.jpg';
