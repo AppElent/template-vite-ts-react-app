@@ -36,6 +36,10 @@ const menuCategories: MenuCategory[] = [
     label: 'Test pages',
     showInMenu: debug,
   },
+  {
+    id: 'satisfactory',
+    label: 'Satisfactory',
+  },
 ];
 
 // export const paths2: PathItem[] = [

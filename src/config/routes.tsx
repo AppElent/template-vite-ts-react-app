@@ -13,6 +13,7 @@ import HomePage from '@/pages/home';
 import MyRecipeOverviewPage from '@/pages/recipes/my-recipe-overview';
 import RecipeDetailsPage from '@/pages/recipes/recipe-details';
 import RecipeOverviewPage from '@/pages/recipes/recipe-overview';
+import Test from '@/pages/satisfactory/test';
 import { CustomRouteObject, routes as routesImport } from './routing';
 // import HomePage from '@/pages/home';
 // import MyRecipeOverviewPage from '@/pages/recipes/my-recipe-overview';
@@ -94,6 +95,8 @@ const routeElements: { [key: string]: JSX.Element } = {
   myRecipesIndex: <MyRecipeOverviewPage />,
   recipeDetails: <RecipeDetailsPage />,
   myRecipeDetails: <RecipeDetailsPage />,
+  // Satisfactory pages
+  satisfactoryIndex: <Test />,
   // Test pages
   testDataSources: <DataSources />,
   testFileUploads: <FileUploads />,

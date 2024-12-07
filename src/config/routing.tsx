@@ -73,6 +73,20 @@ export const routes: CustomRouteObject[] = [
           },
         ],
       },
+      {
+        id: 'satisfactory',
+        label: 'Satisfactory',
+        Icon: <FlatwareIcon fontSize="inherit" />,
+        category: 'satisfactory',
+        path: 'satisfactory',
+        element: <Outlet />,
+        children: [
+          {
+            id: 'satisfactoryIndex',
+            index: true,
+          },
+        ],
+      },
       // {
       //   path: 'recipes/:id',
       //   element: <RecipeDetailsPage />,
