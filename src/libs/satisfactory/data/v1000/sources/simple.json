@@ -1,34 +1,40 @@
 {
   "belts": [
     {
-      "name": "Conveyor Belt",
+      "name": "Conveyor Belt Mk.1",
       "key_name": "belt1",
-      "rate": 60
+      "rate": 60,
+      "className": "Desc_ConveyorBeltMk1_C"
     },
     {
       "name": "Conveyor Belt Mk.2",
       "key_name": "belt2",
-      "rate": 120
+      "rate": 120,
+      "className": "Desc_ConveyorBeltMk2_C"
     },
     {
       "name": "Conveyor Belt Mk.3",
       "key_name": "belt3",
-      "rate": 270
+      "rate": 270,
+      "className": "Desc_ConveyorBeltMk3_C"
     },
     {
       "name": "Conveyor Belt Mk.4",
       "key_name": "belt4",
-      "rate": 480
+      "rate": 480,
+      "className": "Desc_ConveyorBeltMk4_C"
     },
     {
       "name": "Conveyor Belt Mk.5",
       "key_name": "belt5",
-      "rate": 780
+      "rate": 780,
+      "className": "Desc_ConveyorBeltMk5_C"
     },
     {
       "name": "Conveyor Belt Mk.6",
       "key_name": "belt6",
-      "rate": 1200
+      "rate": 1200,
+      "className": "Desc_ConveyorBeltMk6_C"
     }
   ],
   "buildings": [
@@ -3978,25 +3984,29 @@
       "key_name": "iron-ore",
       "category": "mineral",
       "priority": 1,
-      "weight": 307
+      "weight": 307,
+      "max": 92100
     },
     {
       "key_name": "copper-ore",
       "category": "mineral",
       "priority": 1,
-      "weight": 123
+      "weight": 123,
+      "max": 36900
     },
     {
       "key_name": "coal",
       "category": "mineral",
       "priority": 1,
-      "weight": 141
+      "weight": 141,
+      "max": 42300
     },
     {
       "key_name": "limestone",
       "category": "mineral",
       "priority": 1,
-      "weight": 233
+      "weight": 233,
+      "max": 69900
     },
     {
       "key_name": "caterium-ore",

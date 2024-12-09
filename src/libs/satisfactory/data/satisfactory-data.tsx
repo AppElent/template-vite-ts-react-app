@@ -21,29 +21,52 @@
 // import data_v1000 from './data/v1000/data.json';
 // import SatisfactoryDataType from './SatisfactoryDataType';
 
+import {
+  SatisfactoryBuildableRecipe,
+  SatisfactoryItem,
+  SatisfactoryRecipe,
+  SatisfactoryResource,
+} from '..';
 import BaseItem from './base-item';
+import Belt from './belt';
+import Building from './building';
 import Product from './product';
+import Recipe from './recipe';
+import Resource from './resource';
+import Schematic from './schematic';
 import data_v1000 from './v1000/data.json';
-import tierlist_v1000 from './v1000/tierlist.json';
 
-type SatisfactoryDataType = {
-  items: {
-    [className: string]: {
-      slug: string;
-      name: string;
-      //tier: number;
-      [key: string]: any;
-    };
-  };
-  buildables: any;
-  recipes: any;
-  resources: any;
-  schematics: any;
-  tierList: any;
-};
+interface SatisfactoryVersionData {
+  items: SatisfactoryItem[];
+  recipes: SatisfactoryRecipe[];
+  buildableRecipes: SatisfactoryBuildableRecipe[];
+  resources: SatisfactoryResource[];
+  belts: any[];
+  buildings: any[];
+  buildables: any[];
+  generators: any[];
+  miners: any[];
+  schematics: any[];
+}
+
+// type SatisfactoryDataType = {
+//   items: {
+//     [className: string]: {
+//       slug: string;
+//       name: string;
+//       //tier: number;
+//       [key: string]: any;
+//     };
+//   };
+//   buildables: any;
+//   recipes: any;
+//   resources: any;
+//   schematics: any;
+//   tierList: any;
+// };
 
 type SatisfactoryDataObject = {
-  [key: string]: SatisfactoryDataType;
+  [key: string]: SatisfactoryVersionData;
 };
 
 const satisfactory_data: SatisfactoryDataObject = {
@@ -74,14 +97,7 @@ const satisfactory_data: SatisfactoryDataObject = {
   //     schematics: schematics_v800,
   //     tierList: tierList_v700,
   //   },
-  v1000: {
-    items: data_v1000.items,
-    buildables: data_v1000.buildings,
-    recipes: data_v1000.recipes,
-    resources: data_v1000.resources,
-    schematics: data_v1000.schematics,
-    tierList: tierlist_v1000,
-  },
+  v1000: data_v1000,
 };
 
 //   const satisfactory_data_new = {
@@ -111,22 +127,38 @@ const satisfactoryVersions = [
 ];
 
 export default class SatisfactoryData {
+  [key: string]: any;
   private currentVersion: string = 'v1000';
   public versionLabel?: string = 'Update 1.0';
   public data: any = {};
 
   // data
-  public recipes: BaseItem[] = [];
+
   public products: Product[] = [];
-  public machines: BaseItem[] = [];
-  public resources: BaseItem[] = [];
-  public schematics: BaseItem[] = [];
+  public buildings: Building[] = [];
+  public recipes: Recipe[] = [];
+  public buildableRecipes: Recipe[] = [];
+  public resources: Resource[] = [];
+  public belts: Belt[] = [];
+  public buildables: Building[] = [];
+  public generators: Building[] = [];
+  public miners: Building[] = [];
+  public schematics: Schematic[] = [];
 
   constructor(public version: string) {
     this.setVersion(version || this.currentVersion);
     this.data = satisfactory_data[this.version];
     console.log(this.data);
-    this.initProducts();
+    this.products = this.data.items.map((item: SatisfactoryItem) => new Product(item));
+    this.buildings = this.data.buildings.map((item: any) => new Building(item));
+    this.recipes = this.data.recipes.map((item: any) => new Recipe(item));
+    this.buildableRecipes = this.data.buildableRecipes.map((item: any) => new Recipe(item));
+    this.resources = this.data.resources.map((item: any) => new Resource(item));
+    this.belts = this.data.belts.map((item: any) => new Belt(item));
+    this.buildables = this.data.buildables.map((item: any) => new Building(item));
+    this.generators = this.data.generators.map((item: any) => new Building(item));
+    this.miners = this.data.miners.map((item: any) => new Building(item));
+    this.schematics = this.data.schematics.map((item: any) => new Schematic(item));
   }
 
   setVersion(version: string) {
@@ -136,32 +168,34 @@ export default class SatisfactoryData {
     }
     this.version = version;
     this.versionLabel = versionObject?.label;
-    // this.recipes = this.getDataArray('recipes', version);
-    // this.products = this.getDataArray('items', version);
-    // this.machines = this.getDataArray('buildables', version);
-    // this.resources = this.getDataArray('resources', version);
-    // this.schematics = this.getDataArray('schematics', version);
-    // this.recipesTest = new SatisfactoryDataType('recipes', this.getData('recipes', version));
   }
-
-  initProducts = () => {
-    this.products = Object.keys(this.data.items).map((itemKey: any) => {
-      //console.log(itemKey);
-      return new Product(this.data.items[itemKey]);
-    });
-  };
 
   getVersions() {
     return satisfactoryVersions;
   }
 
-  getProduct = (productClass: string) => {
-    return this.products.find((p) => p.className === productClass);
-  };
+  // Get functions
+  getProduct = (productClass: string) => this.products.find((p) => p.className === productClass);
+  getRecipe = (recipeClass: string) => this.recipes.find((r) => r.className === recipeClass);
+  getBuilding = (buildingClass: string) =>
+    this.buildings.find((b) => b.className === buildingClass);
 
-  getItem(type: BaseItem['type'], className: string) {
-    return (this[type] as BaseItem[])?.find((item) => item.className === className);
+  getItem(type: string, className: string) {
+    return (this[type as string] as BaseItem[])?.find((item) => item.className === className);
   }
+
+  // Get all products that have no recipe as input
+  getEndProducts = () => {
+    return this.products.filter(
+      (p) =>
+        !p.isEquipment &&
+        p.tier !== undefined &&
+        p.tier !== 11 && // ammo
+        !this.recipes
+          .filter((recipe) => !recipe.alternate) // also include alternates?
+          .find((r) => r.ingredients.find((i) => i.item === p.className))
+    );
+  };
 
   //   getData(type) {
   //     const keynames = Object.keys(satisfactory_data[this.version].items);
