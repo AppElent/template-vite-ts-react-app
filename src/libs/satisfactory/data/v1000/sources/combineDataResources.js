@@ -1,4 +1,6 @@
 import * as fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import data from './data-ficsmas.json' with { type: 'json' };
 import simple from './simple.json' with { type: 'json' };
 import ratings from './tierList.json' with { type: 'json' };
@@ -15,6 +17,11 @@ const getRating = (recipe) => {
   const foundRating = ratings.find((r) => r.name === recipe.name);
   return foundRating;
 };
+
+const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
+const __dirname = path.dirname(__filename); // get the name of the directory
+const parentDir = path.resolve(__dirname, '..');
+console.log(__dirname, parentDir);
 
 // products
 const items = Object.keys(data.items).map((key) => {
@@ -63,26 +70,6 @@ const recipes = Object.keys(data.recipes)
       rating: getRating(recipe),
     };
   });
-
-// const equipmentRecipes = Object.keys(data.recipes)
-//   .filter((key) => !data.recipes[key].forBuilding)
-//   .filter((r) => !r.inMachine)
-//   .map((key) => {
-//     const recipe = data.recipes[key];
-//     return {
-//       ...recipe,
-//       ingredients: recipe.ingredients.map((i) => ({
-//         ...i,
-//         name: items.find((item) => item.className === i.item).name,
-//         amountMin: (60 / recipe.time) * i.amount,
-//       })),
-//       products: recipe.products.map((p) => ({
-//         ...p,
-//         name: items.find((item) => item.className === p.item).name,
-//         amountMin: (60 / recipe.time) * p.amount,
-//       })),
-//     };
-//   });
 
 const buildings = simple.buildings.map((building) => {
   const found = Object.keys(data.buildings).find(
@@ -151,8 +138,11 @@ const belts = simple.belts.map((belt) => {
 // power generators
 const generators = Object.keys(data.generators).map((key) => {
   const generator = data.generators[key];
+  const building = data.buildings[key];
   return {
     className: generator.className,
+    name: building.name,
+    slug: building.slug,
     fuel: generator.fuel,
     powerProduction: generator.powerProduction,
   };
@@ -160,8 +150,11 @@ const generators = Object.keys(data.generators).map((key) => {
 
 const miners = Object.keys(data.miners).map((key) => {
   const miner = data.miners[key];
+  const building = data.buildings[key];
   return {
     className: miner.className,
+    name: building.name,
+    slug: building.slug,
     allowedResources: miner.allowedResources,
     extractionRate: 0, // TODO: FIX
   };
@@ -196,4 +189,4 @@ const obj = {
   schematics,
 };
 
-fs.writeFileSync(`./src/libs/satisfactory/data/v1000/data.json`, JSON.stringify(obj, null, 2));
+fs.writeFileSync(`${parentDir}/data.json`, JSON.stringify(obj, null, 2));

@@ -36120,6 +36120,8 @@
   "generators": [
     {
       "className": "Desc_GeneratorCoal_C",
+      "name": "Coal-Powered Generator",
+      "slug": "coal-powered-generator",
       "fuel": [
         "Desc_Coal_C",
         "Desc_CompactedCoal_C",
@@ -36129,6 +36131,8 @@
     },
     {
       "className": "Desc_GeneratorNuclear_C",
+      "name": "Nuclear Power Plant",
+      "slug": "nuclear-power-plant",
       "fuel": [
         "Desc_NuclearFuelRod_C",
         "Desc_PlutoniumFuelRod_C",
@@ -36138,6 +36142,8 @@
     },
     {
       "className": "Desc_GeneratorFuel_C",
+      "name": "Fuel-Powered Generator",
+      "slug": "fuel-powered-generator",
       "fuel": [
         "Desc_LiquidFuel_C",
         "Desc_LiquidTurboFuel_C",
@@ -36149,6 +36155,8 @@
     },
     {
       "className": "Desc_GeneratorBiomass_Automated_C",
+      "name": "Biomass Burner",
+      "slug": "biomass-burner",
       "fuel": [
         "Desc_Leaves_C",
         "Desc_Wood_C",
@@ -36163,6 +36171,8 @@
   "miners": [
     {
       "className": "Desc_OilPump_C",
+      "name": "Oil Extractor",
+      "slug": "oil-extractor",
       "allowedResources": [
         "Desc_LiquidOil_C"
       ],
@@ -36170,6 +36180,8 @@
     },
     {
       "className": "Desc_MinerMk2_C",
+      "name": "Miner Mk.2",
+      "slug": "miner-mk-2",
       "allowedResources": [
         "Desc_OreIron_C",
         "Desc_Coal_C",
@@ -36186,6 +36198,8 @@
     },
     {
       "className": "Desc_FrackingExtractor_C",
+      "name": "Resource Well Extractor",
+      "slug": "resource-well-extractor",
       "allowedResources": [
         "Desc_LiquidOil_C",
         "Desc_NitrogenGas_C",
@@ -36195,6 +36209,8 @@
     },
     {
       "className": "Desc_MinerMk3_C",
+      "name": "Miner Mk.3",
+      "slug": "miner-mk-3",
       "allowedResources": [
         "Desc_OreIron_C",
         "Desc_Coal_C",
@@ -36211,6 +36227,8 @@
     },
     {
       "className": "Desc_MinerMk1_C",
+      "name": "Miner Mk.1",
+      "slug": "miner-mk-1",
       "allowedResources": [
         "Desc_OreIron_C",
         "Desc_Coal_C",

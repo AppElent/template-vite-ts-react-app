@@ -18,4 +18,12 @@ export default class BaseItem implements BaseItemClass {
   public toString(): string {
     return this.name;
   }
+
+  getIcon = () => {
+    return this.className.replace('_', '-').toLowerCase() + '_64.png';
+  };
+
+  getImage = () => {
+    return this.className.replace('_', '-').toLowerCase() + '_256.png';
+  };
 }

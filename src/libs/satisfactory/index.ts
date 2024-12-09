@@ -64,6 +64,10 @@ export interface SatisfactoryBelts extends SatisfactoryBaseItem {
   rate: number;
 }
 
+export interface SatisfactoryBuildable extends SatisfactoryBaseItem {
+  description: string;
+}
+
 export interface SatisfactorySchematic extends SatisfactoryBaseItem {
   type: string;
   cost: {
@@ -74,10 +78,20 @@ export interface SatisfactorySchematic extends SatisfactoryBaseItem {
     recipes: string[];
     scannerResources: string[];
     inventorySlots: number;
-    giveItems: string[];
+    giveItems: { item: string; amount: number }[];
   };
   tier: number;
   time: number;
   mam: boolean;
   alternate: boolean;
+}
+
+export interface SatisfactoryGenerator extends SatisfactoryBaseItem {
+  fuel: string[];
+  powerProduction: number;
+}
+
+export interface SatisfactoryMiner extends SatisfactoryBaseItem {
+  allowedResources: string[];
+  extractionRate: number;
 }
