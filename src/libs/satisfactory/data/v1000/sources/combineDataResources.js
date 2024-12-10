@@ -5,6 +5,9 @@ import data from './data-ficsmas.json' with { type: 'json' };
 import simple from './simple.json' with { type: 'json' };
 import ratings from './tierList.json' with { type: 'json' };
 
+// simple.json is found on https://github.com/KirkMcDonald/satisfactory-calculator/blob/master/data/data.json
+// data.json is found on https://github.com/greeny/SatisfactoryTools/tree/master/data
+
 const isEquipment = (item) => item.className.startsWith('BP_Equipment');
 const isRadioactive = (item) => item.radioactiveDecay > 0;
 const isFuel = (item) => item.energyValue > 0;
