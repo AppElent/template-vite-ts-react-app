@@ -1,5 +1,5 @@
-import _ from 'lodash';
-import { useEffect, useMemo, useState } from 'react';
+import _, { debounce } from 'lodash';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 interface Options {
   initialPage?: number;
@@ -10,66 +10,72 @@ interface Options {
   initialFilters?: Record<string, any>;
   searchableFields?: string[] | null;
   updateInitialData?: boolean;
+  debounceTime?: number; // Add debounceTime option
 }
 
 interface UseFilterReturn {
   data: any[];
-  setData: (data: any[]) => void;
   totalFilteredItems: number;
   page: number;
-  setPage: (page: number) => void;
+  pages: number;
   rowsPerPage: number;
-  setRowsPerPage: (rowsPerPage: number) => void;
   sortField: string | null;
-  setSortField: (sortField: string | null) => void;
   sortDirection: 'asc' | 'desc';
-  setSortDirection: (sortDirection: 'asc' | 'desc') => void;
   filters: Record<string, any>;
-  addFilter: (key: string, filterFunctionOrValue: any) => void;
-  removeFilter: (key: string) => void;
   searchQuery: string;
-  setSearchQuery: (query: string) => void;
+  inputQuery: string;
+  addFilter: (key: string, filterFunctionOrValue: string | (() => void)) => void;
+  removeFilter: (key: string) => void;
+  setPage: (page: number) => void;
+  setRowsPerPage: (rowsPerPage: number) => void;
+  setSortField: (sortField: string | null) => void;
+  setSortDirection: (sortDirection: 'asc' | 'desc') => void;
+  setFilters: (filters: Record<string, any>) => void;
+  setSearchQuery: (searchQuery: string) => void;
+  setInputQuery: (inputQuery: string) => void;
+  setData: (data: any[]) => void;
 }
 
-/**
- * A custom React hook that handles data filtering, sorting, pagination, search, and rows per page setting.
- *
- * @param {Array} initialData - The initial dataset to be filtered.
- * @param {Object} options - Configuration options for filtering, sorting, and pagination.
- * @param {number} [options.initialPage=0] - Initial page number (0-based).
- * @param {number} [options.initialRowsPerPage=10] - Number of items per page initially.
- * @param {number} [options.limit=Infinity] - Maximum number of items to be shown (hard limit).
- * @param {string|null} [options.initialSortField=null] - Field to sort by initially.
- * @param {'asc'|'desc'} [options.initialSortDirection='asc'] - Sort direction, 'asc' for ascending, 'desc' for descending.
- * @param {Object} [options.initialFilters={}] - Custom filters to be applied.
- * @param {Array|null} [options.searchableFields=null] - Fields to perform text search on. If not provided, all fields will be searched.
- *
- * @returns {Object} Returns the filtered, sorted, and paginated data along with functions to update the filters, sorting, pagination, search query, and rows per page.
- */
-function useFilter(initialData: any[] = [], options: Options = {}): UseFilterReturn {
+const useFilter = (initialData: any[] = [], options: Options = {}): UseFilterReturn => {
   const {
-    initialPage = 0, // Start with page 0
-    initialRowsPerPage = 10, // Initial rows per page
-    limit = Infinity, // Hard limit for the number of items
+    initialPage = 0,
+    initialRowsPerPage = 10,
+    limit = Infinity,
     initialSortField = null,
     initialSortDirection = 'asc',
     initialFilters = {},
-    searchableFields = null, // Default to null (indicating all fields will be used)
+    searchableFields = null,
     updateInitialData = false,
+    debounceTime = 300, // Default debounce time to 300ms
   } = options;
 
-  const [data, setData] = useState<any[]>(initialData); // Holds the current dataset
-  const [page, setPage] = useState<number>(initialPage); // Tracks the current page (0-based)
-  const [rowsPerPage, setRowsPerPage] = useState<number>(initialRowsPerPage); // Number of items to show per page
-  const [sortField, setSortField] = useState<string | null>(initialSortField); // Field used for sorting
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>(initialSortDirection); // Sort direction ('asc' or 'desc')
-  const [filters, setFilters] = useState(initialFilters); // Custom filters applied to the data
-  const [searchQuery, setSearchQuery] = useState(''); // Text search query
+  const [data, setData] = useState<any[]>(initialData);
+  const [page, setPage] = useState<number>(initialPage);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(initialRowsPerPage);
+  const [sortField, setSortField] = useState<string | null>(initialSortField);
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>(initialSortDirection);
+  const [filters, setFilters] = useState(initialFilters);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [inputQuery, setInputQuery] = useState(''); // State for the input value
 
   // Respond to changes in the initial data
   useEffect(() => {
     if (updateInitialData) setData(initialData);
   }, [initialData, updateInitialData]);
+
+  // Debounced search query handler
+  const debouncedSetSearchQuery = useCallback(
+    debounce((query: string) => {
+      setSearchQuery(query);
+    }, debounceTime),
+    [debounceTime]
+  );
+
+  // Update the input query and debounce the search query
+  const handleInputQueryChange = (query: string) => {
+    setInputQuery(query);
+    debouncedSetSearchQuery(query);
+  };
 
   /**
    * Adds or updates a filter.
@@ -206,25 +212,31 @@ function useFilter(initialData: any[] = [], options: Options = {}): UseFilterRet
     setPage(0); // Reset to page 0 when changing rows per page
   };
 
+  const numberOfPages = Math.ceil(totalFilteredItems / rowsPerPage);
+
   // Return all necessary states and functions for controlling the filter, pagination, search, and sorting.
   return {
     data: filteredData,
     totalFilteredItems, // Total number of items after filters, search, and before pagination
     page,
+    pages: numberOfPages,
     rowsPerPage,
     sortField,
     sortDirection,
     filters,
     searchQuery,
+    inputQuery,
     setPage,
     setRowsPerPage: updateRowsPerPage, // This allows setting rows per page
     setSortField,
     setSortDirection,
     addFilter,
     removeFilter,
-    setSearchQuery,
+    setFilters,
+    setSearchQuery: handleInputQueryChange, // Use the handler for input changes
+    setInputQuery,
     setData,
   };
-}
+};
 
 export default useFilter;

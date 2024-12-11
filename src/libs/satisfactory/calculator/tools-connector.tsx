@@ -1,18 +1,35 @@
+import SatisfactoryData from '../data/satisfactory-data';
+
+interface ProductionItem {
+  item: string;
+  type: 'perMinute' | 'max';
+  amount: number;
+  ratio: number;
+}
+
+interface ProductionInput {
+  item: string;
+  amount: number;
+}
+
+interface ShareRequest {
+  metadata: {
+    gameVersion: string;
+    icon: string;
+    name: string;
+    schemaVersion: number;
+  };
+  request: ToolsRequest;
+}
+
 interface ToolsRequest {
   allowedAlternateRecipes: string[];
   blockedRecipes: string[];
   blockedResources: string[];
+  blockedMachines?: string[];
   sinkableResources: string[];
-  production: {
-    item: string;
-    type: string;
-    amount: number;
-    ratio: number;
-  }[];
-  input: {
-    item: string;
-    amount: number;
-  }[];
+  production: ProductionItem[];
+  input: ProductionInput[];
   resourceMax: {
     Desc_OreIron_C: number;
     Desc_OreCopper_C: number;
@@ -46,6 +63,16 @@ interface ToolsRequest {
   gameVersion: string;
 }
 
+type ToolsOutput = {
+  type: string;
+  amount: number;
+  item: string;
+}[];
+
+interface ToolsResponse {
+  [key: string]: string;
+}
+
 export default class ToolsConnector {
   private baseUrl: string = 'https://api.satisfactorytools.com';
   private resourceWeight = {
@@ -63,8 +90,9 @@ export default class ToolsConnector {
     Desc_SAM_C: 9.029411764705882,
     Desc_Water_C: 0,
   };
-  private gameVersion: string = '1.0.0';
-  private defaultRequest: ToolsRequest = {
+  private apiVersion: string = '1.0.0';
+  private guiVersion: string = '1.0';
+  private defaultSolveRequest: ToolsRequest = {
     allowedAlternateRecipes: [],
     blockedRecipes: [],
     blockedResources: [],
@@ -87,30 +115,90 @@ export default class ToolsConnector {
       Desc_Water_C: 0,
     },
     resourceWeight: this.resourceWeight,
-    gameVersion: this.gameVersion,
+    gameVersion: this.apiVersion,
   };
 
-  solver = async (request: Partial<ToolsRequest>) => {
-    return fetch(this.baseUrl + '/v2/solver', {
+  constructor(public data: SatisfactoryData) {
+    this.defaultSolveRequest.gameVersion = this.data.version.tools.api;
+    this.guiVersion = this.data.version.tools.gui;
+    const resourceMax = data.getResourceMax();
+    console.log(resourceMax);
+    this.defaultSolveRequest.resourceMax = {
+      ...this.defaultSolveRequest.resourceMax,
+      ...resourceMax,
+    };
+  }
+
+  parseToolsResponse = (response: ToolsResponse): ToolsOutput => {
+    const nodes = [];
+    const customTypes = ['Mine', 'Sink', 'Product', 'Byproduct', 'Input'];
+    for (const recipeData in response) {
+      const amount = parseFloat(response[recipeData] + '');
+      const [machineData, machineClass] = recipeData.split('#');
+      if (machineData === 'special__power') continue;
+      if (customTypes.includes(machineClass)) {
+        nodes.push({
+          type: machineClass.toLowerCase(),
+          amount,
+          item: machineData,
+        });
+      } else {
+        const [recipeClass] = machineData.split('@');
+        nodes.push({
+          type: 'recipe',
+          amount,
+          item: recipeClass,
+        });
+      }
+    }
+
+    return nodes;
+  };
+
+  solveProduction = async (request: Partial<ToolsRequest>): Promise<ToolsOutput> => {
+    const result = await fetch(this.baseUrl + '/v2/solver', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ ...this.defaultRequest, ...request }),
-    }).then((res) => res.json());
+      body: JSON.stringify({ ...this.defaultSolveRequest, ...request }),
+    });
+    const res = await result.json();
+    console.log(res);
+    return this.parseToolsResponse(res.result);
   };
 
-  share = async (request: Partial<ToolsRequest>) => {
-    return fetch(this.baseUrl + '/v2/share', {
+  saveProductionConfig = async (request: ShareRequest): Promise<string> => {
+    const result = await fetch(this.baseUrl + '/v2/share?version=' + this.guiVersion, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ ...this.defaultRequest, ...request }),
-    }).then((res) => res.json());
+      body: JSON.stringify({ ...this.defaultSolveRequest, ...request }),
+    });
+    const res = await result.json();
+    return res.link;
   };
 
-  getShared = async (id: string) => {
-    return fetch(this.baseUrl + '/v2/share/' + id).then((res) => res.json());
+  getProductionConfig = async (id: string): Promise<ShareRequest> => {
+    const result = await fetch(this.baseUrl + '/v1/share/' + id);
+    const res = await result.json();
+    const returnData = res.data;
+    if (returnData.request.blockedMachines && returnData.request.blockedMachines.length > 0) {
+      console.log(returnData.request.blockedMachines);
+      for (const machine of returnData.request.blockedMachines) {
+        console.log(machine);
+        const recipes = this.data.recipes.filter(
+          (recipe) => recipe.producedIn === machine && !recipe.alternate
+        );
+        console.log(recipes);
+        if (recipes.length > 0) {
+          const classNames = recipes.map((recipe) => recipe.className);
+          returnData.request.blockedRecipes.push(...classNames);
+        }
+      }
+      delete returnData.request.blockedMachines;
+    }
+    return returnData;
   };
 }

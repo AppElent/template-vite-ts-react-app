@@ -1,5 +1,6 @@
 import { SatisfactorySchematic } from '..';
 import BaseItem from './base-item';
+import SatisfactoryData from './satisfactory-data';
 
 // interface ProductClass extends BaseItem {
 //   liquid: boolean;
@@ -16,14 +17,17 @@ export default class Schematic extends BaseItem implements SatisfactorySchematic
   public mam: boolean;
   public alternate: boolean;
 
-  constructor(data: SatisfactorySchematic) {
-    super(data);
-    this.type = data.type;
-    this.cost = data.cost;
-    this.unlock = data.unlock;
-    this.time = data.time;
-    this.tier = data.tier;
-    this.mam = data.mam;
-    this.alternate = data.alternate;
+  constructor(
+    schematic: SatisfactorySchematic,
+    public data: SatisfactoryData
+  ) {
+    super(schematic);
+    this.type = schematic.type;
+    this.cost = schematic.cost;
+    this.unlock = schematic.unlock;
+    this.time = schematic.time;
+    this.tier = schematic.tier;
+    this.mam = schematic.mam;
+    this.alternate = schematic.alternate;
   }
 }

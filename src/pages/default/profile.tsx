@@ -6,4 +6,6 @@ const Profile = () => {
   );
 };
 
+//TODO: add or delete profile based on allowing, adds or removes firebase profiel
+
 export default Profile;

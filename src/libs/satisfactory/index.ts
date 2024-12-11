@@ -57,7 +57,11 @@ export interface SatisfactoryResource extends SatisfactoryBaseItem {
 
 export interface SatisfactoryBuilding extends SatisfactoryBaseItem {
   description: string;
-  power: number;
+  metadata: {
+    powerConsumption: number;
+    powerConsumptionExponent: number;
+    manufacturingSpeed: number;
+  };
 }
 
 export interface SatisfactoryBelts extends SatisfactoryBaseItem {
@@ -66,6 +70,11 @@ export interface SatisfactoryBelts extends SatisfactoryBaseItem {
 
 export interface SatisfactoryBuildable extends SatisfactoryBaseItem {
   description: string;
+  metadata: {
+    powerConsumption: number;
+    powerConsumptionExponent: number;
+    manufacturingSpeed: number;
+  };
 }
 
 export interface SatisfactorySchematic extends SatisfactoryBaseItem {

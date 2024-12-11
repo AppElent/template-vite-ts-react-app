@@ -13,7 +13,18 @@ import HomePage from '@/pages/home';
 import MyRecipeOverviewPage from '@/pages/recipes/my-recipe-overview';
 import RecipeDetailsPage from '@/pages/recipes/recipe-details';
 import RecipeOverviewPage from '@/pages/recipes/recipe-overview';
-import Test from '@/pages/satisfactory/test';
+import Calculator from '@/pages/satisfactory/calculator';
+import Belts from '@/pages/satisfactory/codex/belts';
+import Buildables from '@/pages/satisfactory/codex/buildables';
+import Buildings from '@/pages/satisfactory/codex/buildings';
+import Generators from '@/pages/satisfactory/codex/generators';
+import Miners from '@/pages/satisfactory/codex/miners';
+import Products from '@/pages/satisfactory/codex/products';
+import Recipes from '@/pages/satisfactory/codex/recipes';
+import Resources from '@/pages/satisfactory/codex/resources';
+import Schematics from '@/pages/satisfactory/codex/schematics';
+import Games from '@/pages/satisfactory/games';
+import RawData from '@/pages/satisfactory/raw-data';
 import { CustomRouteObject, routes as routesImport } from './routing';
 // import HomePage from '@/pages/home';
 // import MyRecipeOverviewPage from '@/pages/recipes/my-recipe-overview';
@@ -96,7 +107,19 @@ const routeElements: { [key: string]: JSX.Element } = {
   recipeDetails: <RecipeDetailsPage />,
   myRecipeDetails: <RecipeDetailsPage />,
   // Satisfactory pages
-  satisfactoryIndex: <Test />,
+  satisfactoryIndex: <>TEST</>,
+  products: <Products />,
+  recipes: <Recipes />,
+  rawData: <RawData />,
+  generators: <Generators />,
+  buildables: <Buildables />,
+  buildings: <Buildings />,
+  schematics: <Schematics />,
+  belts: <Belts />,
+  miners: <Miners />,
+  resources: <Resources />,
+  calculator: <Calculator />,
+  games: <Games />,
   // Test pages
   testDataSources: <DataSources />,
   testFileUploads: <FileUploads />,

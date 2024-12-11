@@ -37,6 +37,7 @@ import BaseItem from './base-item';
 import Belt from './belt';
 import Buildable from './buildable';
 import Building from './building';
+import Generator from './generator';
 import Miner from './miner';
 import Product from './product';
 import Recipe from './recipe';
@@ -44,7 +45,7 @@ import Resource from './resource';
 import Schematic from './schematic';
 import data_v1000 from './v1000/data.json';
 
-interface SatisfactoryVersionData {
+export interface SatisfactoryVersionData {
   items: SatisfactoryItem[];
   recipes: SatisfactoryRecipe[];
   buildableRecipes: SatisfactoryBuildableRecipe[];
@@ -68,18 +69,40 @@ const satisfactory_data: SatisfactoryDataObject = {
 const satisfactoryVersions = [
   {
     label: 'Update 1.0',
+    shortLabel: '1.0',
+    tools: {
+      api: '1.0.0',
+      gui: '1.0',
+    },
     key: 'v1000',
+  },
+  {
+    label: 'Update 1.0 (Ficsmas)',
+    shortLabel: '1.0 (F)',
+    tools: {
+      api: '1.0.0-ficsmas',
+      gui: '1.0-ficsmas',
+    },
+    key: 'v1000_F',
   },
 ];
 
 export default class SatisfactoryData {
   [key: string]: any;
   private currentVersion: string = 'v1000';
-  public versionLabel?: string = 'Update 1.0';
-  public data: any = {};
+  public version: {
+    label: string;
+    shortLabel: string;
+    tools: {
+      api: string;
+      gui: string;
+    };
+    key: string;
+  } = satisfactoryVersions.find((v) => v.key === this.currentVersion) || satisfactoryVersions[0];
+
+  public data: SatisfactoryVersionData;
 
   // data
-
   public products: Product[] = [];
   public buildings: Building[] = [];
   public recipes: Recipe[] = [];
@@ -91,20 +114,22 @@ export default class SatisfactoryData {
   public miners: Miner[] = [];
   public schematics: Schematic[] = [];
 
-  constructor(public version: string) {
-    this.setVersion(version || this.currentVersion);
-    this.data = satisfactory_data[this.version];
+  constructor(versionKey?: string) {
+    this.setVersion(versionKey || this.currentVersion);
+    this.data = satisfactory_data[this.version.key];
     console.log(this.data);
-    this.products = this.data.items.map((item: SatisfactoryItem) => new Product(item));
-    this.buildings = this.data.buildings.map((item: any) => new Building(item));
-    this.recipes = this.data.recipes.map((item: any) => new Recipe(item));
-    this.buildableRecipes = this.data.buildableRecipes.map((item: any) => new Recipe(item));
-    this.resources = this.data.resources.map((item: any) => new Resource(item));
-    this.belts = this.data.belts.map((item: any) => new Belt(item));
-    this.buildables = this.data.buildables.map((item: any) => new Building(item));
-    this.generators = this.data.generators.map((item: any) => new Building(item));
-    this.miners = this.data.miners.map((item: any) => new Building(item));
-    this.schematics = this.data.schematics.map((item: any) => new Schematic(item));
+    // Data
+    this.recipes = this.data.recipes.map((item: SatisfactoryRecipe) => new Recipe(item, this));
+    this.products = this.data.items.map((item: SatisfactoryItem) => new Product(item, this));
+    this.buildables = this.data.buildables.map((item: any) => new Buildable(item, this));
+    this.buildings = this.data.buildings.map((item: any) => new Building(item, this));
+
+    this.buildableRecipes = this.data.buildableRecipes.map((item: any) => new Recipe(item, this));
+    this.resources = this.data.resources.map((item: any) => new Resource(item, this));
+    this.belts = this.data.belts.map((item: any) => new Belt(item, this));
+    this.generators = this.data.generators.map((item: any) => new Generator(item, this));
+    this.miners = this.data.miners.map((item: any) => new Miner(item, this));
+    this.schematics = this.data.schematics.map((item: any) => new Schematic(item, this));
   }
 
   setVersion(version: string) {
@@ -112,8 +137,7 @@ export default class SatisfactoryData {
     if (!versionObject) {
       throw new Error('Version not found');
     }
-    this.version = version;
-    this.versionLabel = versionObject?.label;
+    this.version = versionObject;
   }
 
   getVersions() {
@@ -121,10 +145,20 @@ export default class SatisfactoryData {
   }
 
   // Get functions
-  getProduct = (productClass: string) => this.products.find((p) => p.className === productClass);
   getRecipe = (recipeClass: string) => this.recipes.find((r) => r.className === recipeClass);
+  getProduct = (productClass: string) => this.products.find((p) => p.className === productClass);
   getBuilding = (buildingClass: string) =>
     this.buildings.find((b) => b.className === buildingClass);
+  getResource = (resourceClass: string) =>
+    this.resources.find((r) => r.className === resourceClass);
+  getBelt = (beltClass: string) => this.belts.find((b) => b.className === beltClass);
+  getBuildable = (buildableClass: string) =>
+    this.buildables.find((b) => b.className === buildableClass);
+  getGenerator = (generatorClass: string) =>
+    this.generators.find((g) => g.className === generatorClass);
+  getMiner = (minerClass: string) => this.miners.find((m) => m.className === minerClass);
+  getSchematic = (schematicClass: string) =>
+    this.schematics.find((s) => s.className === schematicClass);
 
   getItem(type: string, className: string) {
     return (this[type as string] as BaseItem[])?.find((item) => item.className === className);
@@ -157,6 +191,13 @@ export default class SatisfactoryData {
 
   isResource(product: string) {
     return this.resources.find((r) => r.className === product);
+  }
+
+  getResourceMax() {
+    return this.resources.reduce((acc: { [key: string]: number }, resource) => {
+      acc[resource.className] = resource.max;
+      return acc;
+    }, {});
   }
 }
 

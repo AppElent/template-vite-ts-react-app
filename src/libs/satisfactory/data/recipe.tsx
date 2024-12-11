@@ -1,5 +1,6 @@
 import { SatisfactoryRecipe } from '..';
 import BaseItem from './base-item';
+import SatisfactoryData from './satisfactory-data';
 
 // interface ProductClass extends BaseItem {
 //   liquid: boolean;
@@ -21,21 +22,64 @@ export default class Recipe extends BaseItem implements SatisfactoryRecipe {
   public isVariablePower: boolean;
   public minPower: number;
   public maxPower: number;
+  public data: SatisfactoryData;
 
-  constructor(data: SatisfactoryRecipe) {
-    super(data);
-    this.alternate = data.alternate;
-    this.time = data.time;
-    this.inHand = data.inHand;
-    this.forBuilding = data.forBuilding;
-    this.inWorkshop = data.inWorkshop;
-    this.inMachine = data.inMachine;
-    this.manualTimeMultiplier = data.manualTimeMultiplier;
-    this.ingredients = data.ingredients;
-    this.products = data.products;
-    this.producedIn = data.producedIn;
-    this.isVariablePower = data.isVariablePower;
-    this.minPower = data.minPower;
-    this.maxPower = data.maxPower;
+  constructor(recipe: SatisfactoryRecipe, data: SatisfactoryData) {
+    super(recipe);
+    this.alternate = recipe.alternate;
+    this.time = recipe.time;
+    this.inHand = recipe.inHand;
+    this.forBuilding = recipe.forBuilding;
+    this.inWorkshop = recipe.inWorkshop;
+    this.inMachine = recipe.inMachine;
+    this.manualTimeMultiplier = recipe.manualTimeMultiplier;
+    this.ingredients = recipe.ingredients;
+    this.products = recipe.products;
+    this.producedIn = recipe.producedIn;
+    this.isVariablePower = recipe.isVariablePower;
+    this.minPower = recipe.minPower;
+    this.maxPower = recipe.maxPower;
+    this.data = data;
   }
+
+  getIngredients = () => {
+    return this.ingredients.map((ingredient) => {
+      const product = this.data.products.find((product) => product.className === ingredient.item);
+      return {
+        ...ingredient,
+        product,
+      };
+    });
+  };
+
+  getProducts = () => {
+    return this.products.map((p) => {
+      const product = this.data.products.find((pr) => pr.className === p.item);
+      return {
+        ...p,
+        product,
+      };
+    });
+  };
+
+  getProduct = () => {
+    const foundProduct = this.products.find((p) => p.name === this.name);
+    if (foundProduct) {
+      return foundProduct;
+    } else {
+      return this.products[0];
+    }
+  };
+
+  getIcon = () => {
+    return this.data.products
+      .find((p) => p.className === this.getProduct().item)
+      ?.getIcon() as string;
+  };
+
+  getImage = () => {
+    return this.data.products
+      .find((p) => p.className === this.getProduct().item)
+      ?.getImage() as string;
+  };
 }

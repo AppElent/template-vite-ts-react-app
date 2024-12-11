@@ -8,6 +8,7 @@ export default class BaseItem implements BaseItemClass {
   public className: string;
   public slug: string;
   public name: string;
+  private staticFilePath = '/assets/satisfactory/items/';
 
   constructor(data: BaseItemClass) {
     this.className = data.className;
@@ -20,10 +21,10 @@ export default class BaseItem implements BaseItemClass {
   }
 
   getIcon = () => {
-    return this.className.replace('_', '-').toLowerCase() + '_64.png';
+    return this.staticFilePath + this.className.replace(/_/g, '-').toLowerCase() + '_64.png';
   };
 
   getImage = () => {
-    return this.className.replace('_', '-').toLowerCase() + '_256.png';
+    return this.staticFilePath + this.className.replace(/_/g, '-').toLowerCase() + '_256.png';
   };
 }

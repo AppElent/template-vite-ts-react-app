@@ -74,11 +74,25 @@ const recipes = Object.keys(data.recipes)
     };
   });
 
-const buildings = simple.buildings.map((building) => {
-  const found = Object.keys(data.buildings).find(
-    (key) => data.buildings[key].name === building.name
-  );
-  return found ? { ...building, ...data.buildings[found] } : building;
+// Unique list of buildings by getting all producedIn from recipes and make unique
+const buildingKeys = recipes
+  .map((recipe) => recipe.producedIn)
+  .filter((building) => building)
+  .filter((building, index, self) => self.indexOf(building) === index);
+
+const buildings = buildingKeys.map((buildingKey) => {
+  // const buildingKey = Object.keys(data.buildings).find(
+  //   (key) => data.buildings[key].name === building.name
+  // );
+  const buildingData = data.buildings[buildingKey];
+  return {
+    className: buildingData.className,
+    name: buildingData.name,
+    slug: buildingData.slug,
+    description: buildingData.description,
+    metadata: buildingData.metadata,
+  };
+  //return found ? { ...building, ...data.buildings[found] } : building;
 });
 
 const buildables = Object.keys(data.buildings).map((key) => {
@@ -88,6 +102,7 @@ const buildables = Object.keys(data.buildings).map((key) => {
     name: buildable.name,
     slug: buildable.slug,
     description: buildable.description,
+    metadata: buildable.metadata,
   };
 });
 

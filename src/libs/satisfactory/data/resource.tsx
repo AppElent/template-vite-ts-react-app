@@ -1,11 +1,6 @@
-import { SatisfactoryResource } from '..';
+import { SatisfactoryItem, SatisfactoryResource } from '..';
 import BaseItem from './base-item';
-
-// interface ProductClass extends BaseItem {
-//   liquid: boolean;
-//   stackSize: number;
-//   sinkPoints: number;
-// }
+import SatisfactoryData from './satisfactory-data';
 
 export default class Resource extends BaseItem implements SatisfactoryResource {
   public pingColor: {
@@ -16,9 +11,16 @@ export default class Resource extends BaseItem implements SatisfactoryResource {
   };
   max: number;
 
-  constructor(data: SatisfactoryResource) {
-    super(data);
-    this.pingColor = data.pingColor;
-    this.max = data.max;
+  constructor(
+    resource: SatisfactoryResource,
+    public data: SatisfactoryData
+  ) {
+    super(resource);
+    this.pingColor = resource.pingColor;
+    this.max = resource.max;
   }
+
+  getProduct = () => {
+    return this.data.findItem(this.className) as SatisfactoryItem;
+  };
 }

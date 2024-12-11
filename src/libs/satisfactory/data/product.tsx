@@ -1,5 +1,6 @@
 import { SatisfactoryItem } from '..';
 import BaseItem from './base-item';
+import SatisfactoryData from './satisfactory-data';
 
 // interface ProductClass extends BaseItem {
 //   liquid: boolean;
@@ -18,18 +19,46 @@ export default class Product extends BaseItem implements SatisfactoryItem {
   public isRadioactive: boolean;
   public isFuel: boolean;
   public isResource: boolean = false;
+  private data: SatisfactoryData;
 
-  constructor(data: SatisfactoryItem) {
-    super(data);
-    this.description = data.description;
-    this.liquid = data.liquid;
-    this.stackSize = data.stackSize;
-    this.sinkPoints = data.sinkPoints;
-    this.tier = data.tier;
-    this.energyValue = data.energyValue;
-    this.isEquipment = data.isEquipment;
-    this.isRadioactive = data.isRadioactive;
-    this.isFuel = data.isFuel;
-    this.isResource = data.isResource;
+  constructor(product: SatisfactoryItem, data: SatisfactoryData) {
+    super(product);
+    this.description = product.description;
+    this.liquid = product.liquid;
+    this.stackSize = product.stackSize;
+    this.sinkPoints = product.sinkPoints;
+    this.tier = product.tier;
+    this.energyValue = product.energyValue;
+    this.isEquipment = product.isEquipment;
+    this.isRadioactive = product.isRadioactive;
+    this.isFuel = product.isFuel;
+    this.isResource = product.isResource;
+    this.data = data;
   }
+
+  getRecipes = () => {
+    return this.data.recipes.filter((recipe) =>
+      recipe.products.find((p) => p.item === this.className)
+    );
+  };
+
+  getDefaultRecipe = () => {
+    return this.getRecipes().find((recipe) => !recipe.alternate);
+  };
+
+  getProductionRate = () => {
+    const recipe = this.getDefaultRecipe();
+    const productItem = recipe?.products.find((p) => p.item === this.className);
+    return productItem?.amountMin || 0;
+  };
+
+  getAlternateRecipes = () => {
+    return this.getRecipes().filter((recipe) => recipe.alternate);
+  };
+
+  getUsedFor = () => {
+    return this.data.recipes.filter((recipe) =>
+      recipe.ingredients.find((i) => i.item === this.className)
+    );
+  };
 }
