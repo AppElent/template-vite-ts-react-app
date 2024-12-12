@@ -11,6 +11,7 @@ const Calculator = () => {
 
   const [request, setRequest] = useState<any>();
   const [result, setResult] = useState<any[]>();
+  console.log(result);
   return (
     <DefaultPage>
       <Button
@@ -35,7 +36,7 @@ const Calculator = () => {
       Result:
       <br />
       {/* <JsonEditor data={result} /> */}
-      <pre>{JSON.stringify(result, null, 2)}</pre>
+      {/* <pre>{JSON.stringify(result, null, 2)}</pre> */}
       <RecipeSelector recipes={data.recipes} />
     </DefaultPage>
   );

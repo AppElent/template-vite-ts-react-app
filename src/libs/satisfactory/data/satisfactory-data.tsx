@@ -117,7 +117,6 @@ export default class SatisfactoryData {
   constructor(versionKey?: string) {
     this.setVersion(versionKey || this.currentVersion);
     this.data = satisfactory_data[this.version.key];
-    console.log(this.data);
     // Data
     this.recipes = this.data.recipes.map((item: SatisfactoryRecipe) => new Recipe(item, this));
     this.products = this.data.items.map((item: SatisfactoryItem) => new Product(item, this));
@@ -130,6 +129,7 @@ export default class SatisfactoryData {
     this.generators = this.data.generators.map((item: any) => new Generator(item, this));
     this.miners = this.data.miners.map((item: any) => new Miner(item, this));
     this.schematics = this.data.schematics.map((item: any) => new Schematic(item, this));
+    console.log(this);
   }
 
   setVersion(version: string) {
@@ -149,6 +149,8 @@ export default class SatisfactoryData {
   getProduct = (productClass: string) => this.products.find((p) => p.className === productClass);
   getBuilding = (buildingClass: string) =>
     this.buildings.find((b) => b.className === buildingClass);
+  getBuildableRecipe = (recipeClass: string) =>
+    this.buildableRecipes.find((r) => r.className === recipeClass);
   getResource = (resourceClass: string) =>
     this.resources.find((r) => r.className === resourceClass);
   getBelt = (beltClass: string) => this.belts.find((b) => b.className === beltClass);

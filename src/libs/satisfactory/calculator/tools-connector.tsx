@@ -1,4 +1,5 @@
 import SatisfactoryData from '../data/satisfactory-data';
+import Node, { NodeType } from './node';
 
 interface ProductionItem {
   item: string;
@@ -63,12 +64,6 @@ interface ToolsRequest {
   gameVersion: string;
 }
 
-type ToolsOutput = {
-  type: string;
-  amount: number;
-  item: string;
-}[];
-
 interface ToolsResponse {
   [key: string]: string;
 }
@@ -129,33 +124,33 @@ export default class ToolsConnector {
     };
   }
 
-  parseToolsResponse = (response: ToolsResponse): ToolsOutput => {
-    const nodes = [];
+  parseToolsResponse = (response: ToolsResponse): Node[] => {
+    const nodes: Node[] = [];
     const customTypes = ['Mine', 'Sink', 'Product', 'Byproduct', 'Input'];
     for (const recipeData in response) {
       const amount = parseFloat(response[recipeData] + '');
       const [machineData, machineClass] = recipeData.split('#');
       if (machineData === 'special__power') continue;
       if (customTypes.includes(machineClass)) {
-        nodes.push({
-          type: machineClass.toLowerCase(),
-          amount,
-          item: machineData,
-        });
+        nodes.push(
+          new Node(
+            `${machineData}-${machineClass.toLowerCase()}`,
+            machineClass.toLowerCase() as NodeType,
+            machineData,
+            amount,
+            this.data
+          )
+        );
       } else {
         const [recipeClass] = machineData.split('@');
-        nodes.push({
-          type: 'recipe',
-          amount,
-          item: recipeClass,
-        });
+        nodes.push(new Node(recipeClass, 'recipe', recipeClass, amount, this.data));
       }
     }
 
     return nodes;
   };
 
-  solveProduction = async (request: Partial<ToolsRequest>): Promise<ToolsOutput> => {
+  solveProduction = async (request: Partial<ToolsRequest>): Promise<Node[]> => {
     const result = await fetch(this.baseUrl + '/v2/solver', {
       method: 'POST',
       headers: {
