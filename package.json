@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@andypf/json-viewer": "^2.1.7",
-    "@emotion/styled": "^11.13.0",
+    "@emotion/styled": "^11.14.0",
     "@faker-js/faker": "^9.3.0",
     "@hello-pangea/dnd": "^17.0.0",
     "@microlink/react-json-view": "^1.23.4",
