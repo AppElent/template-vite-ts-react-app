@@ -1,15 +1,15 @@
 {
   "projects": {
-    "default": "appelent-recipes"
+    "default": "appelent-bc868"
   },
   "targets": {
-    "appelent-recipes": {
+    "appelent": {
       "hosting": {
         "stg": [
-          "appelent-recipes-stg"
+          "appelent-stg"
         ],
         "prd": [
-          "appelent-recipes"
+          "appelent"
         ]
       }
     }
