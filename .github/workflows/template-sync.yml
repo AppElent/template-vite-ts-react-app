@@ -18,7 +18,6 @@ jobs:
       - name: actions-template-sync
         uses: AndreasAugustin/actions-template-sync@v2
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
           source_repo_path: AppElent/template-vite-ts-react-app
-          upstream_branch: ${{ github.head_ref || github.ref_name }} # defaults to main
+          upstream_branch: main
           pr_labels: template-update # optional, no default

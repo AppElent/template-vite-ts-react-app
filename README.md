@@ -132,11 +132,13 @@ Default dependencies:
   Firebase configuration:
 
 ```
-delete .firebaserc
 firebase init
 # hosting
 # public dir: dist
 
+# create sites if needed
+firebase hosting:sites:list
+firebase hosting:sites:create appelent-stg
 # Add targets
 firebase target:apply hosting stg appelent-stg
 firebase target:apply hosting prd appelent
