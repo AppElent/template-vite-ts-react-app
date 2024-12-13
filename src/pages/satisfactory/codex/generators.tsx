@@ -1,13 +1,10 @@
 import ItemCard from '@/components/satisfactory/cards/item-card';
 import BaseItem from '@/libs/satisfactory/data/base-item';
-import SatisfactoryData from '@/libs/satisfactory/data/satisfactory-data';
+import satisfactoryData from '@/libs/satisfactory/data/satisfactory-data';
 import { Grid } from '@mui/material';
-import { useMemo } from 'react';
 import DefaultPage from '../../default/DefaultPage';
 
 const Generators = () => {
-  const data = useMemo(() => new SatisfactoryData(), []);
-
   // const { data: filteredItems, ...filterOptions } = useFilter(data.generators, {
   //   initialSortField: 'name',
   //   initialSortDirection: 'asc',
@@ -35,7 +32,7 @@ const Generators = () => {
         container
         spacing={3}
       >
-        {data.generators.map((item: BaseItem) => {
+        {satisfactoryData.generators.map((item: BaseItem) => {
           return (
             <Grid
               item

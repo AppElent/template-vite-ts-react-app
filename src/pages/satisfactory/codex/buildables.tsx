@@ -2,15 +2,12 @@ import SearchBar from '@/components/default/ui/search-bar';
 import ItemCard from '@/components/satisfactory/cards/item-card';
 import useFilter from '@/hooks/use-filter';
 import BaseItem from '@/libs/satisfactory/data/base-item';
-import SatisfactoryData from '@/libs/satisfactory/data/satisfactory-data';
+import satisfactoryData from '@/libs/satisfactory/data/satisfactory-data';
 import { Box, Grid, Pagination, Stack } from '@mui/material';
-import { useMemo } from 'react';
 import DefaultPage from '../../default/DefaultPage';
 
 const Buildables = () => {
-  const data = useMemo(() => new SatisfactoryData(), []);
-
-  const { data: filteredItems, ...filterOptions } = useFilter(data.buildables, {
+  const { data: filteredItems, ...filterOptions } = useFilter(satisfactoryData.buildables, {
     initialSortField: 'name',
     initialSortDirection: 'asc',
     initialRowsPerPage: 24,

@@ -1,43 +1,35 @@
-import ToolsConnector from '@/libs/satisfactory/calculator/tools-connector';
-import SatisfactoryData from '@/libs/satisfactory/data/satisfactory-data';
-import { Button } from '@mui/material';
-import { useState } from 'react';
-import DefaultPage from '../../default/DefaultPage';
+import CalculatorClass from '@/libs/satisfactory/calculator';
+import satisfactoryData from '@/libs/satisfactory/data/satisfactory-data';
+import DefaultPage from '@/pages/default/DefaultPage';
+import { useEffect, useState } from 'react';
 import RecipeSelector from './_components/recipe-selector';
 
 const Calculator = () => {
-  const data = new SatisfactoryData();
-  const tools = new ToolsConnector(data);
+  const calculator = new CalculatorClass(satisfactoryData);
 
   const [request, setRequest] = useState<any>();
   const [result, setResult] = useState<any[]>();
-  console.log(result);
+
+  useEffect(() => {
+    const load = async () => {
+      const config = await calculator.tools.getProductionConfig('oMCaJpL6YIQrmQ6ON7Oq');
+      setRequest(config.request);
+      const result = await calculator.tools.solveProduction(config.request);
+      setResult(result);
+      console.log(result);
+    };
+    load();
+  }, []);
+
   return (
     <DefaultPage>
-      <Button
-        onClick={async () => {
-          const result = await tools.getProductionConfig('oMCaJpL6YIQrmQ6ON7Oq');
-          setRequest(result.request);
-        }}
-      >
-        Get data
-      </Button>
-      <Button
-        onClick={async () => {
-          const result = await tools.solveProduction(request);
-          setResult(result);
-        }}
-      >
-        Solve
-      </Button>
-      <br />
       Request:
       <pre>{JSON.stringify(request, null, 2)}</pre>
       Result:
       <br />
       {/* <JsonEditor data={result} /> */}
       {/* <pre>{JSON.stringify(result, null, 2)}</pre> */}
-      <RecipeSelector recipes={data.recipes} />
+      <RecipeSelector recipes={satisfactoryData.recipes} />
     </DefaultPage>
   );
 };

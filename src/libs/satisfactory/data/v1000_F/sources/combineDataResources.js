@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import data from './data.json' with { type: 'json' };
+import data from './data-ficsmas.json' with { type: 'json' };
 import simple from './simple.json' with { type: 'json' };
 import ratings from './tierList.json' with { type: 'json' };
 
@@ -107,24 +107,16 @@ const buildables = Object.keys(data.buildings).map((key) => {
   };
 });
 
-const ficsmasRecipes = Object.keys(data.recipes).filter(
-  (key) =>
-    data.recipes[key].name.toLowerCase().includes('ficsmas') ||
-    data.recipes[key].name.toLowerCase().includes('snowman') ||
-    data.recipes[key].name.toLowerCase().includes('candy cane')
-);
-
 // Recipes for buildables
 const buildableRecipes = Object.keys(data.recipes)
   .filter((key) => data.recipes[key].forBuilding || !data.recipes[key].inMachine)
-  // manually filter some ficsmas recipes
-  .filter((key) => !ficsmasRecipes.includes(key))
   .map((key) => {
     const recipe = data.recipes[key];
+
     return {
       ...recipe,
-      producedIn: recipe.producedIn[0],
       cyclesMin: 60 / recipe.time,
+      producedIn: recipe.producedIn[0],
       ingredients: recipe.ingredients.map((i) => ({
         ...i,
         name: items.find((item) => item.className === i.item).name,

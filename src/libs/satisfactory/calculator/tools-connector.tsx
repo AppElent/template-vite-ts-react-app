@@ -1,4 +1,5 @@
-import SatisfactoryData from '../data/satisfactory-data';
+import Calculator from './calculator';
+import Edge from './edge';
 import Node, { NodeType } from './node';
 
 interface ProductionItem {
@@ -113,10 +114,10 @@ export default class ToolsConnector {
     gameVersion: this.apiVersion,
   };
 
-  constructor(public data: SatisfactoryData) {
-    this.defaultSolveRequest.gameVersion = this.data.version.tools.api;
-    this.guiVersion = this.data.version.tools.gui;
-    const resourceMax = data.getResourceMax();
+  constructor(public calculator: Calculator) {
+    this.defaultSolveRequest.gameVersion = this.calculator.data.version.tools.api;
+    this.guiVersion = this.calculator.data.version.tools.gui;
+    const resourceMax = this.calculator.data.getResourceMax();
     console.log(resourceMax);
     this.defaultSolveRequest.resourceMax = {
       ...this.defaultSolveRequest.resourceMax,
@@ -124,7 +125,7 @@ export default class ToolsConnector {
     };
   }
 
-  parseToolsResponse = (response: ToolsResponse): Node[] => {
+  parseToolsResponse = (response: ToolsResponse): [Node[], Edge[]] => {
     const nodes: Node[] = [];
     const customTypes = ['Mine', 'Sink', 'Product', 'Byproduct', 'Input'];
     for (const recipeData in response) {
@@ -134,20 +135,34 @@ export default class ToolsConnector {
       if (customTypes.includes(machineClass)) {
         nodes.push(
           new Node(
-            `${machineData}-${machineClass.toLowerCase()}`,
-            machineClass.toLowerCase() as NodeType,
-            machineData,
-            amount,
-            this.data
+            // `${machineData}-${machineClass.toLowerCase()}`,
+            // machineClass.toLowerCase() as NodeType,
+            // machineData,
+            // amount,
+            {
+              type: machineClass.toLowerCase() as NodeType,
+              item: machineData,
+              amount,
+            },
+            this.calculator
           )
         );
       } else {
         const [recipeClass] = machineData.split('@');
-        nodes.push(new Node(recipeClass, 'recipe', recipeClass, amount, this.data));
+        nodes.push(
+          new Node(
+            {
+              type: 'recipe',
+              item: recipeClass,
+              amount,
+            },
+            this.calculator
+          )
+        );
       }
     }
-
-    return nodes;
+    const edges = this.calculator.generateEdges(nodes);
+    return [nodes, edges];
   };
 
   solveProduction = async (request: Partial<ToolsRequest>): Promise<Node[]> => {
@@ -183,7 +198,7 @@ export default class ToolsConnector {
       console.log(returnData.request.blockedMachines);
       for (const machine of returnData.request.blockedMachines) {
         console.log(machine);
-        const recipes = this.data.recipes.filter(
+        const recipes = this.calculator.data.recipes.filter(
           (recipe) => recipe.producedIn === machine && !recipe.alternate
         );
         console.log(recipes);

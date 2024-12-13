@@ -1,13 +1,10 @@
 import ItemCard from '@/components/satisfactory/cards/item-card';
 import BaseItem from '@/libs/satisfactory/data/base-item';
-import SatisfactoryData from '@/libs/satisfactory/data/satisfactory-data';
+import satisfactoryData from '@/libs/satisfactory/data/satisfactory-data';
 import { Grid } from '@mui/material';
-import { useMemo } from 'react';
 import DefaultPage from '../../default/DefaultPage';
 
 const Resources = () => {
-  const data = useMemo(() => new SatisfactoryData(), []);
-
   // const { data: filteredItems, ...filterOptions } = useFilter(data.resources, {
   //   initialSortField: 'name',
   //   initialSortDirection: 'asc',
@@ -35,7 +32,7 @@ const Resources = () => {
         container
         spacing={3}
       >
-        {data.resources.map((item: BaseItem) => {
+        {satisfactoryData.resources.map((item: BaseItem) => {
           return (
             <Grid
               item

@@ -1,13 +1,10 @@
 import BeltCard from '@/components/satisfactory/cards/belt-card';
 import Belt from '@/libs/satisfactory/data/belt';
-import SatisfactoryData from '@/libs/satisfactory/data/satisfactory-data';
+import satisfactoryData from '@/libs/satisfactory/data/satisfactory-data';
 import { Grid } from '@mui/material';
-import { useMemo } from 'react';
 import DefaultPage from '../../default/DefaultPage';
 
 const Belts = () => {
-  const data = useMemo(() => new SatisfactoryData(), []);
-
   // const { data: filteredItems } = useFilter(data.belts, {
   //   initialSortField: 'name',
   //   initialSortDirection: 'asc',
@@ -35,7 +32,7 @@ const Belts = () => {
         container
         spacing={3}
       >
-        {data.belts.map((item: Belt) => {
+        {satisfactoryData.belts.map((item: Belt) => {
           return (
             <Grid
               item

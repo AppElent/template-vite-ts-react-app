@@ -38,6 +38,7 @@ export interface SatisfactoryRecipe extends SatisfactoryBaseItem {
     amountMin: number;
   }[];
   producedIn: string;
+  cyclesMin: number;
   isVariablePower: boolean;
   minPower: number;
   maxPower: number;

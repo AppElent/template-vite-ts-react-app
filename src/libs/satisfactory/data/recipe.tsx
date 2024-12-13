@@ -1,6 +1,6 @@
 import { SatisfactoryRecipe } from '..';
 import BaseItem from './base-item';
-import SatisfactoryData from './satisfactory-data';
+import { SatisfactoryData } from './satisfactory-data';
 
 // interface ProductClass extends BaseItem {
 //   liquid: boolean;
@@ -22,6 +22,7 @@ export default class Recipe extends BaseItem implements SatisfactoryRecipe {
   public isVariablePower: boolean;
   public minPower: number;
   public maxPower: number;
+  public cyclesMin: number;
   public data: SatisfactoryData;
 
   constructor(recipe: SatisfactoryRecipe, data: SatisfactoryData) {
@@ -39,6 +40,7 @@ export default class Recipe extends BaseItem implements SatisfactoryRecipe {
     this.isVariablePower = recipe.isVariablePower;
     this.minPower = recipe.minPower;
     this.maxPower = recipe.maxPower;
+    this.cyclesMin = recipe.cyclesMin;
     this.data = data;
   }
 

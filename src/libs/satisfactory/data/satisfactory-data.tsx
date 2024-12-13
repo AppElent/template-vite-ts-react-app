@@ -44,6 +44,7 @@ import Recipe from './recipe';
 import Resource from './resource';
 import Schematic from './schematic';
 import data_v1000 from './v1000/data.json';
+import data_v1000_F from './v1000_F/data.json';
 
 export interface SatisfactoryVersionData {
   items: SatisfactoryItem[];
@@ -64,6 +65,7 @@ type SatisfactoryDataObject = {
 
 const satisfactory_data: SatisfactoryDataObject = {
   v1000: data_v1000,
+  v1000_F: data_v1000_F,
 };
 
 const satisfactoryVersions = [
@@ -87,18 +89,11 @@ const satisfactoryVersions = [
   },
 ];
 
-export default class SatisfactoryData {
+export class SatisfactoryData {
   [key: string]: any;
-  private currentVersion: string = 'v1000';
-  public version: {
-    label: string;
-    shortLabel: string;
-    tools: {
-      api: string;
-      gui: string;
-    };
-    key: string;
-  } = satisfactoryVersions.find((v) => v.key === this.currentVersion) || satisfactoryVersions[0];
+  private currentVersion: (typeof satisfactoryVersions)[0]['key'] = 'v1000';
+  public version: (typeof satisfactoryVersions)[0] =
+    satisfactoryVersions.find((v) => v.key === this.currentVersion) || satisfactoryVersions[0];
 
   public data: SatisfactoryVersionData;
 
@@ -115,9 +110,14 @@ export default class SatisfactoryData {
   public schematics: Schematic[] = [];
 
   constructor(versionKey?: string) {
-    this.setVersion(versionKey || this.currentVersion);
+    this.setVersion(versionKey);
     this.data = satisfactory_data[this.version.key];
+    this.initData();
+  }
+
+  initData = () => {
     // Data
+    this.data = satisfactory_data[this.version.key];
     this.recipes = this.data.recipes.map((item: SatisfactoryRecipe) => new Recipe(item, this));
     this.products = this.data.items.map((item: SatisfactoryItem) => new Product(item, this));
     this.buildables = this.data.buildables.map((item: any) => new Buildable(item, this));
@@ -130,14 +130,31 @@ export default class SatisfactoryData {
     this.miners = this.data.miners.map((item: any) => new Miner(item, this));
     this.schematics = this.data.schematics.map((item: any) => new Schematic(item, this));
     console.log(this);
-  }
+  };
 
-  setVersion(version: string) {
-    const versionObject = satisfactoryVersions.find((v) => v.key === version);
+  getSavedSatisfactoryVersion = () => {
+    const savedVersion = localStorage.getItem('satisfactory_version');
+    if (!savedVersion) {
+      return this.currentVersion;
+    }
+    return savedVersion;
+  };
+
+  setVersion(version?: string) {
+    // Get satisfactory_version from localStorage, if not set, use default
+    let satisfactoryVersionKey = this.getSavedSatisfactoryVersion();
+    // If version supplied and different from versionKey, set versionKey
+    if (version && version !== satisfactoryVersionKey) {
+      localStorage.setItem('satisfactory_version', version);
+      satisfactoryVersionKey = version;
+    }
+    const versionObject = satisfactoryVersions.find((v) => v.key === satisfactoryVersionKey);
     if (!versionObject) {
       throw new Error('Version not found');
     }
     this.version = versionObject;
+    console.log('SET NEW SATISFACTORY VERSION', versionObject);
+    this.initData();
   }
 
   getVersions() {
@@ -203,4 +220,5 @@ export default class SatisfactoryData {
   }
 }
 
-export const data = new SatisfactoryData('v1000');
+const satisfactoryData = new SatisfactoryData();
+export default satisfactoryData;

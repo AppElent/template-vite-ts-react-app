@@ -1,14 +1,11 @@
 import ItemCard from '@/components/satisfactory/cards/item-card';
 import BaseItem from '@/libs/satisfactory/data/base-item';
-import SatisfactoryData from '@/libs/satisfactory/data/satisfactory-data';
+import satisfactoryData from '@/libs/satisfactory/data/satisfactory-data';
 import { Grid } from '@mui/material';
 import _ from 'lodash';
-import { useMemo } from 'react';
 import DefaultPage from '../../default/DefaultPage';
 
 const Buildings = () => {
-  const data = useMemo(() => new SatisfactoryData(), []);
-
   // const { data: filteredItems, ...filterOptions } = useFilter(data.buildings, {
   //   initialSortField: 'name',
   //   initialSortDirection: 'asc',
@@ -36,7 +33,7 @@ const Buildings = () => {
         container
         spacing={3}
       >
-        {_.sortBy(data.buildings, 'name').map((item: BaseItem) => {
+        {_.sortBy(satisfactoryData.buildings, 'name').map((item: BaseItem) => {
           return (
             <Grid
               item

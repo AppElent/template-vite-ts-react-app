@@ -2,15 +2,12 @@ import SearchBar from '@/components/default/ui/search-bar';
 import RecipeCard from '@/components/satisfactory/cards/recipe-card';
 import useFilter from '@/hooks/use-filter';
 import Recipe from '@/libs/satisfactory/data/recipe';
-import SatisfactoryData from '@/libs/satisfactory/data/satisfactory-data';
 import { Box, Grid, Pagination, Stack } from '@mui/material';
-import { useMemo } from 'react';
 import DefaultPage from '../../default/DefaultPage';
+import satisfactoryData from '@/libs/satisfactory/data/satisfactory-data';
 
 const Recipes = () => {
-  const data = useMemo(() => new SatisfactoryData(), []);
-
-  const { data: filteredItems, ...filterOptions } = useFilter(data.recipes, {
+  const { data: filteredItems, ...filterOptions } = useFilter(satisfactoryData.recipes, {
     initialSortField: 'name',
     initialSortDirection: 'asc',
     initialRowsPerPage: 24,
