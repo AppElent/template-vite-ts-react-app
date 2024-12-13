@@ -1,6 +1,5 @@
 import LanguageSwitch from '@/components/default/layout/language-switch';
 import UserMenu from '@/components/default/layout/user-menu';
-import VersionSelector from '@/components/satisfactory/version-selector';
 import useRouter from '@/hooks/use-router';
 import { useAuth } from '@/libs/auth';
 import IssueDialog from '@/sections/default/issue-dialog';
@@ -68,9 +67,6 @@ function Header(props) {
               <VersionSelector />
             </Grid> */}
             <Grid item>
-              <VersionSelector />
-            </Grid>
-            <Grid item>
               <IssueDialog />
             </Grid>
             <Grid item>
@@ -83,50 +79,6 @@ function Header(props) {
                 </IconButton>
               </Tooltip>
             </Grid>
-            {/* <Grid item>
-              <IconButton
-                color="inherit"
-                sx={{ p: 0.5 }}
-                onClick={handleClick}
-              >
-                <Avatar
-                  src={auth?.user?.avatar || '/static/images/avatar/1.jpg'}
-                  alt={auth.user?.name || 'A'}
-                />
-              </IconButton>
-              <Menu
-                anchorEl={anchorEl}
-                open={open}
-                onClose={handleClose}
-                anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'right',
-                }}
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-              >
-                <MenuItem onClick={handleMenuItemClick('account')}>
-                  <ListItemIcon>
-                    <AccountCircleIcon fontSize="small" />
-                  </ListItemIcon>
-                  Account
-                </MenuItem>
-                <MenuItem onClick={handleMenuItemClick('profile')}>
-                  <ListItemIcon>
-                    <SettingsIcon fontSize="small" />
-                  </ListItemIcon>
-                  Profile
-                </MenuItem>
-                <MenuItem onClick={auth.signOut}>
-                  <ListItemIcon>
-                    <LogoutIcon fontSize="small" />
-                  </ListItemIcon>
-                  Logout
-                </MenuItem>
-              </Menu>
-            </Grid> */}
             <Grid item>
               <UserMenu />
             </Grid>

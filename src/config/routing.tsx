@@ -7,9 +7,7 @@
 // import RecipeOverviewPage from '@/pages/recipes/recipe-overview';
 import appRoutes from '@/routes/appRoutes';
 import { Home as HomeIcon } from '@mui/icons-material';
-import BarChartIcon from '@mui/icons-material/BarChart';
-import FlatwareIcon from '@mui/icons-material/Flatware';
-import { Outlet, RouteObject } from 'react-router-dom';
+import { RouteObject } from 'react-router-dom';
 //import { PathItem } from './paths';
 
 export type CustomRouteObject = RouteObject & {
@@ -32,160 +30,160 @@ export const routes: CustomRouteObject[] = [
         id: 'homeIndex',
         index: true,
       },
-      {
-        id: 'recipes',
-        label: 'Recipes',
-        translationKey: 'foodhub:menu.allrecipes',
-        Icon: <FlatwareIcon fontSize="inherit" />,
-        category: 'recipes',
-        path: 'recipes',
-        element: <Outlet />,
-        children: [
-          {
-            id: 'recipesIndex',
-            index: true,
-          },
-          {
-            id: 'myRecipes',
-            label: 'My recipes',
-            translationKey: 'foodhub:menu.myRecipes',
-            Icon: <FlatwareIcon fontSize="inherit" />,
-            category: 'recipes',
-            path: 'my',
-            element: <Outlet />,
-            children: [
-              {
-                id: 'myRecipesIndex',
-                index: true,
-              },
-              {
-                id: 'myRecipeDetails',
-                label: 'Recipe details',
-                Icon: <FlatwareIcon fontSize="inherit" />,
-                path: ':id',
-              },
-            ],
-          },
-          {
-            id: 'recipeDetails',
-            label: 'Recipe details',
-            Icon: <FlatwareIcon fontSize="inherit" />,
-            path: ':id',
-          },
-        ],
-      },
-      {
-        id: 'satisfactory',
-        label: 'Satisfactory',
-        Icon: <BarChartIcon fontSize="inherit" />,
-        // category: 'satisfactory',
-        path: 'satisfactory',
-        element: <Outlet />,
-        children: [
-          {
-            id: 'satisfactoryIndex',
-            index: true,
-          },
-          {
-            id: 'satisfactoryCodex',
-            label: 'Codex',
-            Icon: <BarChartIcon fontSize="inherit" />,
-            // category: 'satisfactory',
-            path: 'codex',
-            element: <Outlet />,
-            children: [
-              {
-                id: 'codexIndex',
-                index: true,
-              },
-              {
-                id: 'products',
-                label: 'Products',
-                Icon: <BarChartIcon fontSize="inherit" />,
-                path: 'products',
-                category: 'satisfactory',
-              },
-              {
-                id: 'recipes',
-                label: 'Recipes',
-                Icon: <BarChartIcon fontSize="inherit" />,
-                path: 'recipes',
-                category: 'satisfactory',
-              },
-              {
-                id: 'generators',
-                label: 'Generators',
-                Icon: <BarChartIcon fontSize="inherit" />,
-                path: 'generators',
-                category: 'satisfactory',
-              },
-              {
-                id: 'buildables',
-                label: 'Buildables',
-                Icon: <BarChartIcon fontSize="inherit" />,
-                path: 'buildables',
-                category: 'satisfactory',
-              },
-              {
-                id: 'buildings',
-                label: 'Buildings',
-                Icon: <BarChartIcon fontSize="inherit" />,
-                path: 'buildings',
-                category: 'satisfactory',
-              },
-              {
-                id: 'schematics',
-                label: 'Schematics',
-                Icon: <BarChartIcon fontSize="inherit" />,
-                path: 'schematics',
-                category: 'satisfactory',
-              },
-              {
-                id: 'belts',
-                label: 'Belts',
-                Icon: <BarChartIcon fontSize="inherit" />,
-                path: 'belts',
-                category: 'satisfactory',
-              },
-              {
-                id: 'miners',
-                label: 'Miners',
-                Icon: <BarChartIcon fontSize="inherit" />,
-                path: 'miners',
-                category: 'satisfactory',
-              },
-              {
-                id: 'resources',
-                label: 'Resources',
-                Icon: <BarChartIcon fontSize="inherit" />,
-                path: 'resources',
-                category: 'satisfactory',
-              },
-            ],
-          },
-          {
-            id: 'calculator',
-            label: 'Calculator',
-            Icon: <BarChartIcon fontSize="inherit" />,
-            path: 'calculator',
-            category: 'satisfactory',
-          },
-          {
-            id: 'games',
-            label: 'Games',
-            Icon: <BarChartIcon fontSize="inherit" />,
-            path: 'games',
-            category: 'satisfactory',
-          },
-          {
-            id: 'rawData',
-            label: 'Raw data',
-            Icon: <BarChartIcon fontSize="inherit" />,
-            path: 'raw-data',
-            category: 'satisfactory',
-          },
-        ],
-      },
+      // {
+      //   id: 'recipes',
+      //   label: 'Recipes',
+      //   translationKey: 'foodhub:menu.allrecipes',
+      //   Icon: <FlatwareIcon fontSize="inherit" />,
+      //   category: 'recipes',
+      //   path: 'recipes',
+      //   element: <Outlet />,
+      //   children: [
+      //     {
+      //       id: 'recipesIndex',
+      //       index: true,
+      //     },
+      //     {
+      //       id: 'myRecipes',
+      //       label: 'My recipes',
+      //       translationKey: 'foodhub:menu.myRecipes',
+      //       Icon: <FlatwareIcon fontSize="inherit" />,
+      //       category: 'recipes',
+      //       path: 'my',
+      //       element: <Outlet />,
+      //       children: [
+      //         {
+      //           id: 'myRecipesIndex',
+      //           index: true,
+      //         },
+      //         {
+      //           id: 'myRecipeDetails',
+      //           label: 'Recipe details',
+      //           Icon: <FlatwareIcon fontSize="inherit" />,
+      //           path: ':id',
+      //         },
+      //       ],
+      //     },
+      //     {
+      //       id: 'recipeDetails',
+      //       label: 'Recipe details',
+      //       Icon: <FlatwareIcon fontSize="inherit" />,
+      //       path: ':id',
+      //     },
+      //   ],
+      // },
+      // {
+      //   id: 'satisfactory',
+      //   label: 'Satisfactory',
+      //   Icon: <BarChartIcon fontSize="inherit" />,
+      //   // category: 'satisfactory',
+      //   path: 'satisfactory',
+      //   element: <Outlet />,
+      //   children: [
+      //     {
+      //       id: 'satisfactoryIndex',
+      //       index: true,
+      //     },
+      //     {
+      //       id: 'satisfactoryCodex',
+      //       label: 'Codex',
+      //       Icon: <BarChartIcon fontSize="inherit" />,
+      //       // category: 'satisfactory',
+      //       path: 'codex',
+      //       element: <Outlet />,
+      //       children: [
+      //         {
+      //           id: 'codexIndex',
+      //           index: true,
+      //         },
+      //         {
+      //           id: 'products',
+      //           label: 'Products',
+      //           Icon: <BarChartIcon fontSize="inherit" />,
+      //           path: 'products',
+      //           category: 'satisfactory',
+      //         },
+      //         {
+      //           id: 'recipes',
+      //           label: 'Recipes',
+      //           Icon: <BarChartIcon fontSize="inherit" />,
+      //           path: 'recipes',
+      //           category: 'satisfactory',
+      //         },
+      //         {
+      //           id: 'generators',
+      //           label: 'Generators',
+      //           Icon: <BarChartIcon fontSize="inherit" />,
+      //           path: 'generators',
+      //           category: 'satisfactory',
+      //         },
+      //         {
+      //           id: 'buildables',
+      //           label: 'Buildables',
+      //           Icon: <BarChartIcon fontSize="inherit" />,
+      //           path: 'buildables',
+      //           category: 'satisfactory',
+      //         },
+      //         {
+      //           id: 'buildings',
+      //           label: 'Buildings',
+      //           Icon: <BarChartIcon fontSize="inherit" />,
+      //           path: 'buildings',
+      //           category: 'satisfactory',
+      //         },
+      //         {
+      //           id: 'schematics',
+      //           label: 'Schematics',
+      //           Icon: <BarChartIcon fontSize="inherit" />,
+      //           path: 'schematics',
+      //           category: 'satisfactory',
+      //         },
+      //         {
+      //           id: 'belts',
+      //           label: 'Belts',
+      //           Icon: <BarChartIcon fontSize="inherit" />,
+      //           path: 'belts',
+      //           category: 'satisfactory',
+      //         },
+      //         {
+      //           id: 'miners',
+      //           label: 'Miners',
+      //           Icon: <BarChartIcon fontSize="inherit" />,
+      //           path: 'miners',
+      //           category: 'satisfactory',
+      //         },
+      //         {
+      //           id: 'resources',
+      //           label: 'Resources',
+      //           Icon: <BarChartIcon fontSize="inherit" />,
+      //           path: 'resources',
+      //           category: 'satisfactory',
+      //         },
+      //       ],
+      //     },
+      //     {
+      //       id: 'calculator',
+      //       label: 'Calculator',
+      //       Icon: <BarChartIcon fontSize="inherit" />,
+      //       path: 'calculator',
+      //       category: 'satisfactory',
+      //     },
+      //     {
+      //       id: 'games',
+      //       label: 'Games',
+      //       Icon: <BarChartIcon fontSize="inherit" />,
+      //       path: 'games',
+      //       category: 'satisfactory',
+      //     },
+      //     {
+      //       id: 'rawData',
+      //       label: 'Raw data',
+      //       Icon: <BarChartIcon fontSize="inherit" />,
+      //       path: 'raw-data',
+      //       category: 'satisfactory',
+      //     },
+      //   ],
+      // },
       // {
       //   path: 'recipes/:id',
       //   element: <RecipeDetailsPage />,

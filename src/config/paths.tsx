@@ -21,11 +21,11 @@ interface MenuCategory {
 }
 
 const menuCategories: MenuCategory[] = [
-  {
-    id: 'recipes',
-    label: 'Recipes',
-    translationKey: 'foodhub:menu.recipes',
-  },
+  // {
+  //   id: 'recipes',
+  //   label: 'Recipes',
+  //   translationKey: 'foodhub:menu.recipes',
+  // },
   {
     id: 'settings',
     label: 'Settings',
@@ -36,107 +36,11 @@ const menuCategories: MenuCategory[] = [
     label: 'Test pages',
     showInMenu: debug,
   },
-  {
-    id: 'satisfactory',
-    label: 'Satisfactory',
-  },
+  // {
+  //   id: 'satisfactory',
+  //   label: 'Satisfactory',
+  // },
 ];
-
-console.log(paths);
-
-// export const paths2: PathItem[] = [
-//   {
-//     id: 'home',
-//     label: 'Home',
-//     to: '/app',
-//     Icon: <HomeIcon fontSize="inherit" />,
-//   },
-//   {
-//     id: 'recipes',
-//     label: 'Recipes',
-//     translationKey: 'foodhub:menu.recipes',
-//     to: '/app/recipes',
-//     Icon: <FlatwareIcon fontSize="inherit" />,
-//     category: 'recipes',
-//   },
-//   {
-//     id: 'myrecipes',
-//     label: 'My Recipes',
-//     translationKey: 'foodhub:menu.myRecipes',
-//     to: '/app/recipes/my',
-//     Icon: <FlatwareIcon fontSize="inherit" />,
-//     category: 'recipes',
-//   },
-//   {
-//     id: 'recipe-details',
-//     label: 'Recipe Details',
-//     to: '/app/recipes/:id',
-//     Icon: <FlatwareIcon fontSize="inherit" />,
-//   },
-//   {
-//     id: 'account',
-//     label: 'Account',
-//     to: '/app/account',
-//     Icon: <PeopleIcon fontSize="inherit" />,
-//     category: 'settings',
-//   },
-//   {
-//     id: 'test-pages',
-//     label: 'Test pages',
-//     Icon: <QuizIcon />,
-//     to: '/app/test',
-//   },
-//   {
-//     id: 'test-data-sources',
-//     label: 'Test data-sources',
-//     Icon: <QuizIcon />,
-//     to: '/app/test/data-sources',
-//     category: 'test',
-//   },
-//   {
-//     id: 'file-uploads',
-//     label: 'File uploads',
-//     Icon: <QuizIcon />,
-//     to: '/app/test/file-uploads',
-//     category: 'test',
-//   },
-//   {
-//     id: 'auth-providers',
-//     label: 'Auth providers',
-//     Icon: <QuizIcon />,
-//     to: '/app/test/auth-providers',
-//     category: 'test',
-//   },
-//   {
-//     id: 'forms',
-//     label: 'Forms',
-//     Icon: <QuizIcon />,
-//     to: '/app/test/forms',
-//     category: 'test',
-//   },
-//   {
-//     id: 'login',
-//     label: 'Login',
-//     Icon: <QuizIcon />,
-//     to: '/app/login',
-//   },
-//   {
-//     id: 'signup',
-//     label: 'Signup',
-//     Icon: <QuizIcon />,
-//     to: '/app/signup',
-//   },
-//   {
-//     id: '404',
-//     label: '404',
-//     Icon: <QuizIcon />,
-//     to: '/404',
-//   },
-// ];
-
-// console.log(paths);
-// const routeobject = generateRouteObjects(routes);
-// console.log(routeobject);
 
 export const getPath = (id: string) => paths.find((path) => path.id === id);
 

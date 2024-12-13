@@ -9,87 +9,7 @@ import DataSources from '@/pages/default/test/data-sources/index';
 import FileUploads from '@/pages/default/test/file-uploads';
 import Forms from '@/pages/default/test/forms';
 import Translations from '@/pages/default/test/translations';
-import HomePage from '@/pages/home';
-import MyRecipeOverviewPage from '@/pages/recipes/my-recipe-overview';
-import RecipeDetailsPage from '@/pages/recipes/recipe-details';
-import RecipeOverviewPage from '@/pages/recipes/recipe-overview';
-import Calculator from '@/pages/satisfactory/calculator';
-import Belts from '@/pages/satisfactory/codex/belts';
-import Buildables from '@/pages/satisfactory/codex/buildables';
-import Buildings from '@/pages/satisfactory/codex/buildings';
-import Generators from '@/pages/satisfactory/codex/generators';
-import Miners from '@/pages/satisfactory/codex/miners';
-import Products from '@/pages/satisfactory/codex/products';
-import Recipes from '@/pages/satisfactory/codex/recipes';
-import Resources from '@/pages/satisfactory/codex/resources';
-import Schematics from '@/pages/satisfactory/codex/schematics';
-import Games from '@/pages/satisfactory/games';
-import RawData from '@/pages/satisfactory/raw-data';
 import { CustomRouteObject, routes as routesImport } from './routing';
-// import HomePage from '@/pages/home';
-// import MyRecipeOverviewPage from '@/pages/recipes/my-recipe-overview';
-// import RecipeDetailsPage from '@/pages/recipes/recipe-details';
-// import RecipeOverviewPage from '@/pages/recipes/recipe-overview';
-// import appRoutes from '@/routes/appRoutes';
-// import defaultRoutes from '@/routes/defaultRoutes';
-//import { PathItem } from './paths';
-
-// export type CustomRouteObject = RouteObject & {
-//   id: string;
-//   label: string;
-//   Icon: JSX.Element;
-//   translationKey?: string;
-//   category?: string;
-//   children?: CustomRouteObject[];
-// };
-
-// const routes: CustomRouteObject[] = [
-//   {
-//     id: 'home',
-//     label: 'Home',
-//     Icon: <HomeIcon fontSize="inherit" />,
-//     path: 'app',
-//     // element: (
-//     //   // <AuthGuard options={{ shouldBeAuthenticated: true, login: '/login' }}>
-//     //   <PaperbaseLayout settings={LayoutSettings}>
-//     //     <Suspense>
-//     //       <Outlet />
-//     //     </Suspense>
-//     //   </PaperbaseLayout>
-//     //   // </AuthGuard>
-//     // ),
-//     children: [
-//       {
-//         index: true,
-//         element: <HomePage />,
-//       },
-//       {
-//         path: 'recipes',
-//         element: <Outlet />,
-//         children: [
-//           {
-//             index: true,
-//             element: <RecipeOverviewPage />,
-//           },
-//           {
-//             path: 'my',
-//             element: <MyRecipeOverviewPage />,
-//           },
-//           {
-//             path: ':id',
-//             element: <RecipeDetailsPage />,
-//           },
-//         ],
-//       },
-//       // {
-//       //   path: 'recipes/:id',
-//       //   element: <RecipeDetailsPage />,
-//       // },
-//       ...appRoutes,
-//     ],
-//   },
-//   ...defaultRoutes,
-// ];
 
 const routeElements: { [key: string]: JSX.Element } = {
   home: (
@@ -99,27 +19,28 @@ const routeElements: { [key: string]: JSX.Element } = {
       </Suspense>
     </PaperbaseLayout>
   ),
+  homeIndex: <>Home</>,
   // Recipe pages
-  homeIndex: <HomePage />,
-  recipesIndex: <RecipeOverviewPage />,
-  myRecipes: <MyRecipeOverviewPage />,
-  myRecipesIndex: <MyRecipeOverviewPage />,
-  recipeDetails: <RecipeDetailsPage />,
-  myRecipeDetails: <RecipeDetailsPage />,
+  // homeIndex: <HomePage />,
+  // recipesIndex: <RecipeOverviewPage />,
+  // myRecipes: <MyRecipeOverviewPage />,
+  // myRecipesIndex: <MyRecipeOverviewPage />,
+  // recipeDetails: <RecipeDetailsPage />,
+  // myRecipeDetails: <RecipeDetailsPage />,
   // Satisfactory pages
-  satisfactoryIndex: <>TEST</>,
-  products: <Products />,
-  recipes: <Recipes />,
-  rawData: <RawData />,
-  generators: <Generators />,
-  buildables: <Buildables />,
-  buildings: <Buildings />,
-  schematics: <Schematics />,
-  belts: <Belts />,
-  miners: <Miners />,
-  resources: <Resources />,
-  calculator: <Calculator />,
-  games: <Games />,
+  // satisfactoryIndex: <>TEST</>,
+  // products: <Products />,
+  // recipes: <Recipes />,
+  // rawData: <RawData />,
+  // generators: <Generators />,
+  // buildables: <Buildables />,
+  // buildings: <Buildings />,
+  // schematics: <Schematics />,
+  // belts: <Belts />,
+  // miners: <Miners />,
+  // resources: <Resources />,
+  // calculator: <Calculator />,
+  // games: <Games />,
   // Test pages
   testDataSources: <DataSources />,
   testFileUploads: <FileUploads />,
