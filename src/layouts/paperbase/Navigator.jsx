@@ -1,3 +1,4 @@
+import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import DnsRoundedIcon from '@mui/icons-material/DnsRounded';
 import HomeIcon from '@mui/icons-material/Home';
 import PeopleIcon from '@mui/icons-material/People';
@@ -21,6 +22,8 @@ import ListItemText from '@mui/material/ListItemText';
 import config from '@/config';
 import { getPath, menu } from '@/config/paths';
 import useRouter from '@/hooks/use-router';
+import { Collapse } from '@mui/material';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const categories = [
@@ -68,9 +71,18 @@ const itemCategory = {
 };
 
 export default function Navigator(props) {
+  const handleClick = (id) => {
+    setOpen((prevOpen) => ({ ...prevOpen, [id]: !prevOpen[id] }));
+  };
   const { closeDrawer, ...other } = props;
   const router = useRouter();
   const mainItems = menu || categories;
+  // default value in mainItems[].collapsed
+  const [open, setOpen] = useState(
+    mainItems.reduce((acc, { id, collapsed }) => ({ ...acc, [id]: collapsed ?? false }), {})
+  );
+
+  console.log(open);
   const title = config?.meta?.title;
   const { t } = useTranslation();
 
@@ -102,43 +114,54 @@ export default function Navigator(props) {
             <ListItemText>Home</ListItemText>
           </ListItemButton>
         </ListItem>
-        {mainItems.map(({ id, label, translationKey, children }) => (
+        {mainItems.map(({ id, label, translationKey, children, collapsed }) => (
           <Box
             key={id}
             sx={{ bgcolor: '#101F33' }}
           >
-            <ListItem sx={{ py: 2, px: 3 }}>
+            <ListItem
+              sx={{ py: 2, px: 3 }}
+              button
+              onClick={() => handleClick(id)}
+            >
               <ListItemText sx={{ color: '#fff' }}>
                 {translationKey ? t(translationKey, { defaultValue: label }) : label}
               </ListItemText>
+              {open[id] ? <ExpandLess color="primary" /> : <ExpandMore color="primary" />}
             </ListItem>
-            {children.map(
-              ({
-                id: childId,
-                label: childLabel,
-                translationKey: childTranslationKey,
-                to,
-                Icon,
-              }) => (
-                <ListItem
-                  disablePadding
-                  key={childId}
-                >
-                  <ListItemButton
-                    selected={to === window.location.pathname}
-                    onClick={() => onLinkClick(to || '/')}
-                    sx={item}
+            <Collapse
+              in={!open[id]}
+              timeout="auto"
+              unmountOnExit
+            >
+              {children.map(
+                ({
+                  id: childId,
+                  label: childLabel,
+                  translationKey: childTranslationKey,
+                  to,
+                  Icon,
+                }) => (
+                  <ListItem
+                    disablePadding
+                    key={childId}
                   >
-                    <ListItemIcon>{Icon}</ListItemIcon>
-                    <ListItemText>
-                      {childTranslationKey
-                        ? t(childTranslationKey, { defaultValue: childLabel })
-                        : childLabel}
-                    </ListItemText>
-                  </ListItemButton>
-                </ListItem>
-              )
-            )}
+                    <ListItemButton
+                      selected={to === window.location.pathname}
+                      onClick={() => onLinkClick(to || '/')}
+                      sx={item}
+                    >
+                      <ListItemIcon>{Icon}</ListItemIcon>
+                      <ListItemText>
+                        {childTranslationKey
+                          ? t(childTranslationKey, { defaultValue: childLabel })
+                          : childLabel}
+                      </ListItemText>
+                    </ListItemButton>
+                  </ListItem>
+                )
+              )}
+            </Collapse>
             <Divider sx={{ mt: 2 }} />
           </Box>
         ))}
