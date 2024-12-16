@@ -4,6 +4,7 @@ import {
   deleteDoc,
   doc,
   DocumentSnapshot,
+  Firestore,
   getDoc,
   getDocs,
   limit,
@@ -12,6 +13,7 @@ import {
   QueryDocumentSnapshot,
   QuerySnapshot,
   setDoc,
+  SnapshotOptions,
   UpdateData,
   updateDoc,
   where,
@@ -20,13 +22,27 @@ import { DataSourceInitOptions, FilterObject, FilterReturn } from '..';
 import BaseDataSource from './BaseDataSource';
 
 interface FirestoreDataSourceProviderConfig {
-  db: any;
+  db: Firestore;
   clearUndefinedValues?: boolean;
+  converter?: {
+    fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions) => any;
+    toFirestore: (data: any) => any;
+  };
 }
 
+// TODO: getDocFromCache implement
+
 export class FirestoreDataSource<T> extends BaseDataSource<T> {
-  firestore: any;
-  ref: any;
+  public firestore: Firestore;
+  public ref: any;
+  private defaultConverter: {
+    fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions) => any;
+    toFirestore: (data: any) => any;
+  } = {
+    fromFirestore: (snapshot: QueryDocumentSnapshot) => ({ id: snapshot.id, ...snapshot.data() }),
+    toFirestore: (data: T) => data,
+  };
+  public converter = this.defaultConverter;
 
   constructor(
     options: DataSourceInitOptions<T>,
@@ -36,21 +52,19 @@ export class FirestoreDataSource<T> extends BaseDataSource<T> {
 
     this.provider = 'Firestore';
     this.firestore = providerConfig.db;
+    if (providerConfig.converter) {
+      this.converter = providerConfig.converter;
+    }
     if (this.options.targetMode === 'collection') {
-      this.ref = collection(this.firestore, this.options.target);
+      this.ref = collection(this.firestore, this.options.target).withConverter(this.converter);
     } else if (this.options.targetMode === 'document') {
-      this.ref = doc(this.firestore, this.options.target);
+      this.ref = doc(this.firestore, this.options.target).withConverter(this.converter);
     }
   }
 
-  // #tryCatch = async (fn: () => any) => {
-  //   try {
-  //     return await fn();
-  //   } catch (error) {
-  //     console.error('Error:', error);
-  //     throw error;
-  //   }
-  // };
+  // #getDoc = () => {
+  //   return this.ref;
+  // }
 
   // Get document reference
   #getRef = (id?: string) => {
@@ -107,6 +121,7 @@ export class FirestoreDataSource<T> extends BaseDataSource<T> {
   // Parses filter and returns an object for provider specific filterand and the generic js filtering
   #parseFilters = (filterObject: FilterObject<T>): FilterReturn<T> => {
     let q = this.ref;
+    console.log(this.ref);
 
     // Apply filters
     if (filterObject.filters) {
@@ -151,6 +166,7 @@ export class FirestoreDataSource<T> extends BaseDataSource<T> {
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         const data = docSnap.data();
+        console.log(data);
         return { id: docSnap.id, ...(data ? data : {}) } as T;
       } else {
         return this._getDefaultValue();
@@ -257,17 +273,20 @@ export class FirestoreDataSource<T> extends BaseDataSource<T> {
       this.options?.targetMode === 'document'
         ? onSnapshot(provider, (snapshot: DocumentSnapshot) => {
             const data = snapshot.data();
+            console.log(data);
             if (data) {
-              callback({ id: snapshot.id, ...snapshot.data() });
+              callback(data);
             } else {
               callback(null);
             }
           })
         : onSnapshot(provider, (snapshot: QuerySnapshot) => {
-            const documents: T[] = [];
-            snapshot.forEach((doc: QueryDocumentSnapshot) => {
-              documents.push({ id: doc.id, ...doc.data() } as T);
-            });
+            // const documents: T[] = [];
+            // snapshot.forEach((doc: QueryDocumentSnapshot) => {
+            //   documents.push({ ...doc.data() } as T);
+            // });
+            const documents: T[] = snapshot.docs.map((doc) => doc.data() as T);
+            console.log('documents', documents);
             callback(this._applyPostFilters(documents, postFilter));
           });
 
