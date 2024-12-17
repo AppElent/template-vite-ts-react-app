@@ -8,7 +8,7 @@ src/config
 .github/workflows
 
 index.html
+src/App.tsx
 package.json
-src/layouts/paperbase/Header.jsx
 tsconfig.app.tsbuildinfo
 tsconfig.node.tsbuildinfo
