@@ -82,7 +82,6 @@ export default function Navigator(props) {
     mainItems.reduce((acc, { id, collapsed }) => ({ ...acc, [id]: collapsed ?? false }), {})
   );
 
-  console.log(open);
   const title = config?.meta?.title;
   const { t } = useTranslation();
 
@@ -119,16 +118,16 @@ export default function Navigator(props) {
             key={id}
             sx={{ bgcolor: '#101F33' }}
           >
-            <ListItem
+            <ListItemButton
               sx={{ py: 2, px: 3 }}
-              button
+              // button
               onClick={() => handleClick(id)}
             >
               <ListItemText sx={{ color: '#fff' }}>
                 {translationKey ? t(translationKey, { defaultValue: label }) : label}
               </ListItemText>
               {open[id] ? <ExpandLess color="primary" /> : <ExpandMore color="primary" />}
-            </ListItem>
+            </ListItemButton>
             <Collapse
               in={!open[id]}
               timeout="auto"
