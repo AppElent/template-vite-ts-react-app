@@ -190,11 +190,12 @@ export class FirestoreDataSource<T> extends BaseDataSource<T> {
       console.log(query, postFilter);
 
       const querySnapshot = await getDocs(query);
-      let documents: any[] = [];
-      querySnapshot.forEach((doc) => {
-        documents.push({ id: doc.id, ...(doc.data() as object) });
-      });
-      documents = this._applyPostFilters(documents, postFilter);
+      // let documents: any[] = [];
+      // querySnapshot.forEach((doc) => {
+      //   documents.push({ id: doc.id, ...(doc.data() as object) });
+      // });
+      let documents = querySnapshot.docs.map((doc) => doc.data() as T);
+      documents = this._applyPostFilters(documents, postFilter) as T[];
       return documents as T[];
     } catch (error) {
       console.error('Error getting documents:', error);
