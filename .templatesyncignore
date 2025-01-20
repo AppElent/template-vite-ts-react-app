@@ -3,5 +3,7 @@ firebase.json
 readme.md
 package-lock.json
 
+.github/workflows
+
 tsconfig.app.tsbuildinfo
 tsconfig.node.tsbuildinfo
