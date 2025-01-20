@@ -1,14 +1,14 @@
 import generateTestData from '@/utils/generate-test-data';
 import { faker } from '@faker-js/faker';
 import * as Yup from 'yup';
-import { Schema } from '.';
-export const dummySchema: Schema = {
-  name: {
-    type: 'string',
-    required: true,
-    minLength: 3,
-  },
-};
+// import { Schema } from '.';
+// export const dummySchema: Schema = {
+//   name: {
+//     type: 'string',
+//     required: true,
+//     minLength: 3,
+//   },
+// };
 
 export const dummyYupSchema = Yup.object().shape({
   name: Yup.string().required('Name is required').min(3, 'Minimum 3 characters'),

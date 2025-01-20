@@ -1,6 +1,7 @@
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import DnsRoundedIcon from '@mui/icons-material/DnsRounded';
 import HomeIcon from '@mui/icons-material/Home';
+import LockIcon from '@mui/icons-material/Lock';
 import PeopleIcon from '@mui/icons-material/People';
 import PhonelinkSetupIcon from '@mui/icons-material/PhonelinkSetup';
 import PermMediaOutlinedIcon from '@mui/icons-material/PhotoSizeSelectActual';
@@ -22,6 +23,7 @@ import ListItemText from '@mui/material/ListItemText';
 import config from '@/config';
 import { getPath, menu } from '@/config/paths';
 import useRouter from '@/hooks/use-router';
+import { useAuth } from '@/libs/auth';
 import { Collapse } from '@mui/material';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -71,6 +73,8 @@ const itemCategory = {
 };
 
 export default function Navigator(props) {
+  const auth = useAuth();
+  console.log(auth);
   const handleClick = (id) => {
     setOpen((prevOpen) => ({ ...prevOpen, [id]: !prevOpen[id] }));
   };
@@ -139,6 +143,7 @@ export default function Navigator(props) {
                   label: childLabel,
                   translationKey: childTranslationKey,
                   to,
+                  loginRequired,
                   Icon,
                 }) => (
                   <ListItem
@@ -156,6 +161,9 @@ export default function Navigator(props) {
                           ? t(childTranslationKey, { defaultValue: childLabel })
                           : childLabel}
                       </ListItemText>
+                      {loginRequired && !auth.isAuthenticated && (
+                        <LockIcon sx={{ color: '#bbb', fontSize: 18, ml: 1 }} />
+                      )}
                     </ListItemButton>
                   </ListItem>
                 )

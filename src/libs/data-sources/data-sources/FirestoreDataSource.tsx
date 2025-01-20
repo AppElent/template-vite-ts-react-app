@@ -121,7 +121,6 @@ export class FirestoreDataSource<T> extends BaseDataSource<T> {
   // Parses filter and returns an object for provider specific filterand and the generic js filtering
   #parseFilters = (filterObject: FilterObject<T>): FilterReturn<T> => {
     let q = this.ref;
-    console.log(this.ref);
 
     // Apply filters
     if (filterObject.filters) {
@@ -166,7 +165,6 @@ export class FirestoreDataSource<T> extends BaseDataSource<T> {
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         const data = docSnap.data();
-        console.log(data);
         return { id: docSnap.id, ...(data ? data : {}) } as T;
       } else {
         return this._getDefaultValue();
@@ -187,15 +185,13 @@ export class FirestoreDataSource<T> extends BaseDataSource<T> {
       const filterObject = filter || this.options.targetFilter || {};
       //console.log(filterObject, filter, this.options.targetFilter);
       const { provider: query, postFilter } = this.#parseFilters(filterObject);
-      console.log(query, postFilter);
 
       const querySnapshot = await getDocs(query);
-      // let documents: any[] = [];
-      // querySnapshot.forEach((doc) => {
-      //   documents.push({ id: doc.id, ...(doc.data() as object) });
-      // });
-      let documents = querySnapshot.docs.map((doc) => doc.data() as T);
-      documents = this._applyPostFilters(documents, postFilter) as T[];
+      let documents: any[] = [];
+      querySnapshot.forEach((doc) => {
+        documents.push({ id: doc.id, ...(doc.data() as object) });
+      });
+      documents = this._applyPostFilters(documents, postFilter);
       return documents as T[];
     } catch (error) {
       console.error('Error getting documents:', error);
@@ -210,7 +206,7 @@ export class FirestoreDataSource<T> extends BaseDataSource<T> {
         throw new Error('add() can only be used with collections');
       // Validate new data
       item = this.#clearUndefinedValues(item);
-      this.validate(item, { full: false });
+      this.validate(item);
       const docRef = await addDoc(this.ref, item);
       const newDoc = await getDoc(docRef);
       return { id: docRef.id, ...newDoc.data() } as T;
@@ -228,7 +224,11 @@ export class FirestoreDataSource<T> extends BaseDataSource<T> {
       }
       const docRef = this.#getRef(id);
       data = this.#clearUndefinedValues(data);
-      this.validate(data);
+      const validateResult = await this.validate(data, { strict: false });
+      if (!validateResult.valid) {
+        throw new Error('Validation failed');
+      }
+      console.log(docRef, data, id);
       await updateDoc(docRef, data as UpdateData<Partial<T>>);
     } catch (error) {
       console.error('Error updating document:', error);
@@ -244,7 +244,7 @@ export class FirestoreDataSource<T> extends BaseDataSource<T> {
         throw new Error('set() requires an ID when using collections');
       }
       data = this.#clearUndefinedValues(data);
-      this.validate(data);
+      this.validate(data); // TODO: fix validation everywhere
       const docRef = this.#getRef(id);
       await setDoc(docRef, data);
     } catch (error) {
@@ -287,7 +287,6 @@ export class FirestoreDataSource<T> extends BaseDataSource<T> {
             //   documents.push({ ...doc.data() } as T);
             // });
             const documents: T[] = snapshot.docs.map((doc) => doc.data() as T);
-            console.log('documents', documents);
             callback(this._applyPostFilters(documents, postFilter));
           });
 

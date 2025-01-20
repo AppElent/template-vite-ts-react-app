@@ -5,6 +5,8 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App.tsx';
 import './index.css';
 
+// const router = createBrowserRouter(routes);
+
 createRoot(document.getElementById('root')!).render(
   // <StrictMode>
   <HelmetProvider>
@@ -16,6 +18,8 @@ createRoot(document.getElementById('root')!).render(
     >
       <App />
     </BrowserRouter>
+    {/* <RouterProvider router={router} /> */}
+    {/* <App /> */}
   </HelmetProvider>
   // </StrictMode>,
 );
