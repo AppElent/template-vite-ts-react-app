@@ -24,7 +24,7 @@
     "@faker-js/faker": "^9.3.0",
     "@hello-pangea/dnd": "^17.0.0",
     "@microlink/react-json-view": "^1.23.4",
-    "@mui/icons-material": "^6.1.7",
+    "@mui/icons-material": "^6.4.0",
     "@mui/material": "^6.1.7",
     "firebase": "^11.0.1",
     "formik": "^2.4.6",
