@@ -1,7 +1,5 @@
-// @ts-nocheck
-
 import { AppConfig, setLogLevel } from '@/config';
-import { useAuth } from '@/libs/auth';
+import useAuth from '@/libs/auth/use-auth';
 import useCustomFormik from '@/libs/forms/use-custom-formik';
 import { Button, Card, CardContent, CardHeader, Grid } from '@mui/material';
 import DefaultPage from '../DefaultPage';

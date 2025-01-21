@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { useContext } from 'react';
 import * as Yup from 'yup';
 import DataProvider, { DataContext } from './DataProvider';

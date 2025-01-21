@@ -105,7 +105,7 @@ export const createDefaultSchema = <T>(
     getCustomFieldDefinitions: () => {
       return {};
     },
-    generateTestData,
+    generateTestData: () => generateTestData(schema),
     generateObjectName: () => {
       return faker.word.noun();
     },

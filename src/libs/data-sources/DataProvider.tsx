@@ -18,6 +18,7 @@ import { DataSource, DataSourceObject } from '.';
 // } // TODO: implement?
 
 // Create a context for the data
+// eslint-disable-next-line react-refresh/only-export-components
 export const DataContext = createContext<any>(undefined);
 
 interface DataProviderProps {
@@ -154,6 +155,7 @@ const DataProvider: React.FC<DataProviderProps> = ({ dataSources, children }) =>
     return () => {
       Object.values(subscriptions).forEach((unsubscribe) => unsubscribe());
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

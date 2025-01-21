@@ -1,7 +1,6 @@
 import ScrollToTop from '@/components/default/scroll-to-top';
 import '@/config/firebase';
 import routes from '@/config/routes';
-import { FirebaseAuthProvider } from '@/libs/auth';
 import LocalStorageDataSource from '@/libs/data-sources/data-sources/LocalStorageDataSource';
 
 import theme from '@/theme/paperbase/theme';
@@ -9,6 +8,7 @@ import './App.css';
 import config from './config';
 import { getPath } from './config/paths';
 import Dashboard from './Dashboard';
+import FirebaseAuthProvider from './libs/auth/auth-providers/FirebaseAuthProvider';
 
 const firebaseProvider = new FirebaseAuthProvider({
   login: getPath('login').to,

@@ -1,6 +1,7 @@
 import useTabs, { TabOptions } from '@/hooks/use-tabs';
 import { Box, BoxProps, TabsProps as DTabsProps, TabProps, useTheme } from '@mui/material';
-import { CurrentTabContext, TabData } from '.';
+import { TabData } from '.';
+import { CurrentTabContext } from './context';
 import TabPanel from './tab-panel';
 import TabsHeader from './tabs-header';
 

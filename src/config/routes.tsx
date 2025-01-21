@@ -7,6 +7,7 @@ import SignIn from '@/pages/default/SignIn';
 import TestAuthProviders from '@/pages/default/test/auth-providers';
 import DataSources from '@/pages/default/test/data-sources/index';
 import FileUploads from '@/pages/default/test/file-uploads';
+import FiltersPage from '@/pages/default/test/filters-page';
 import Forms from '@/pages/default/test/forms';
 import Translations from '@/pages/default/test/translations';
 import { CustomRouteObject, routes as routesImport } from './routing';
@@ -20,33 +21,12 @@ const routeElements: { [key: string]: JSX.Element } = {
     </PaperbaseLayout>
   ),
   homeIndex: <>Home</>,
-  // Recipe pages
-  // homeIndex: <HomePage />,
-  // recipesIndex: <RecipeOverviewPage />,
-  // myRecipes: <MyRecipeOverviewPage />,
-  // myRecipesIndex: <MyRecipeOverviewPage />,
-  // recipeDetails: <RecipeDetailsPage />,
-  // myRecipeDetails: <RecipeDetailsPage />,
-  // Satisfactory pages
-  // satisfactoryIndex: <>TEST</>,
-  // products: <Products />,
-  // recipes: <Recipes />,
-  // rawData: <RawData />,
-  // generators: <Generators />,
-  // buildables: <Buildables />,
-  // buildings: <Buildings />,
-  // schematics: <Schematics />,
-  // belts: <Belts />,
-  // miners: <Miners />,
-  // resources: <Resources />,
-  // calculator: <Calculator />,
-  // games: <Games />,
-  // Test pages
   testDataSources: <DataSources />,
   testFileUploads: <FileUploads />,
   testAuthProviders: <TestAuthProviders />,
   testForms: <Forms />,
   testTranslations: <Translations />,
+  testFilters: <FiltersPage />,
   // Default pages
   login: <SignIn mode="signin" />,
   signup: <SignIn mode="signup" />,
