@@ -19,22 +19,6 @@ npm create vite@latest
 - vite.config:
   - @-root
 - prettier.config - add
-- Packages:
-  - react-router-dom
-  - prop-types
-  - @mui/material
-  - @mui/icons-material
-  - @emotion/styled
-  - react-helmet-async
-  - firebase
-  - formik
-  - yup
-  - @andypf/json-viewer
-  - material-ui-confirm
-  - use-query-params
-  - react-easy-crop
-- Devpackages:
-  - prettier
 
 3. main.tsx: HelmerProvider & BrowserRouter
 4. App: Dashboard
