@@ -37,7 +37,7 @@ const Account = () => {
         >
           <ProfileCard
             profile={auth?.user}
-            setProfile={async (values) => await auth.updateProfile(values)}
+            setProfile={async (values) => await auth.updateProfile?.(values)}
           />
         </Grid>
         <Grid
@@ -48,7 +48,7 @@ const Account = () => {
           <PasswordCard
             setPassword={async (oldPassword, newPassword) => {
               console.log(oldPassword, newPassword);
-              await auth.updatePassword(oldPassword, newPassword);
+              await auth.updatePassword?.(oldPassword, newPassword);
             }}
           />
         </Grid>

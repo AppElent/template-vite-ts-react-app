@@ -16,7 +16,11 @@ const firebaseProvider = new FirebaseAuthProvider({
 });
 
 const dataSources = {
-  settings: new LocalStorageDataSource({ target: 'settings', targetMode: 'document' }),
+  settings: new LocalStorageDataSource({
+    target: 'settings',
+    targetMode: 'document',
+    subscribe: true,
+  }),
 };
 
 function App() {

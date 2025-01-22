@@ -1,9 +1,9 @@
-import generateTestData from '@/utils/generate-test-data';
 import { faker } from '@faker-js/faker';
 import * as Yup from 'yup';
 import { createDefaultSchema } from '.';
 
 export const dummyYupSchema = Yup.object().shape({
+  id: Yup.string().required('ID is required').min(3, 'Minimum 3 characters'),
   name: Yup.string().required('Name is required').min(3, 'Minimum 3 characters'),
   string: Yup.string().optional(),
   number: Yup.number().optional(),
@@ -26,6 +26,13 @@ export type Dummy = Yup.InferType<typeof dummyYupSchema>;
 
 export const createDummySchema = () => {
   const defaultSchema = createDefaultSchema<Dummy>(dummyYupSchema);
+  const generateTestData = () => {
+    return {
+      ...defaultSchema.generateTestData(dummyYupSchema),
+      name: faker.word.verb() + ' ' + faker.word.noun(),
+      id: defaultSchema.generateNanoId(),
+    };
+  };
   return {
     ...defaultSchema,
     getTemplate: () => {
@@ -34,11 +41,15 @@ export const createDummySchema = () => {
         name: faker.word.verb() + ' ' + faker.word.noun(),
       };
     },
-    generateTestData: () => {
-      return {
-        ...generateTestData(dummyYupSchema),
-        name: faker.word.verb() + ' ' + faker.word.noun(),
-      };
+    generateTestData,
+    getTestData: (count: number): Dummy[] => {
+      if (count > 1) {
+        return Array.from({ length: count }, () => {
+          return generateTestData();
+        });
+      } else {
+        throw new Error('Count must be greater than 0');
+      }
     },
   };
 };

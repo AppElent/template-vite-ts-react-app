@@ -1,5 +1,5 @@
+import DataTable from '@/components/default/data-table';
 import { createDummySchema, Dummy } from '@/schemas/dummy';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import { useMemo } from 'react';
 import DefaultPage from '../DefaultPage';
 
@@ -21,8 +21,12 @@ const FiltersPage = () => {
 
   return (
     <DefaultPage>
-      <pre>{JSON.stringify(data, null, 2)}</pre>
-      <TableContainer>
+      {/* <pre>{JSON.stringify(data, null, 2)}</pre> */}
+      <DataTable
+        columns={columns}
+        data={data}
+      />
+      {/* <TableContainer>
         <Table>
           <TableHead>
             <TableRow>
@@ -41,7 +45,7 @@ const FiltersPage = () => {
             ))}
           </TableBody>
         </Table>
-      </TableContainer>
+      </TableContainer> */}
     </DefaultPage>
   );
 };
