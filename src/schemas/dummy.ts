@@ -20,6 +20,22 @@ export const dummyYupSchema = Yup.object().shape({
       booleanKey: Yup.boolean().required('Key is required').default(false),
     })
     .optional(),
+  email: Yup.string().email().optional(),
+  url: Yup.string().url().optional(),
+  uuid: Yup.string().uuid().optional(),
+  uppercase: Yup.string().uppercase().optional(),
+  lowercase: Yup.string().lowercase().optional(),
+  min: Yup.string().min(3).optional(),
+  max: Yup.string().max(20).optional(),
+  oneOf: Yup.number().oneOf([1, 2, 3]).optional(),
+  minNumber: Yup.number().min(0).optional(),
+  maxNumber: Yup.number().max(100).optional(),
+  oneOfNumber: Yup.number().oneOf([1, 2, 3]).optional(),
+  minDate: Yup.date().min(new Date()).optional(),
+  maxDate: Yup.date().max(new Date()).optional(),
+  oneOfDate: Yup.date().oneOf([new Date()]).optional(),
+  minArray: Yup.array().of(Yup.string().required()).min(1).optional(),
+  maxArray: Yup.array().of(Yup.string().required()).max(3).optional(),
 });
 
 export type Dummy = Yup.InferType<typeof dummyYupSchema>;

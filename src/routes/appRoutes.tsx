@@ -85,6 +85,13 @@ const appRoutes: CustomRouteObject[] = [
         category: 'test',
         path: 'filters',
       },
+      {
+        id: 'testSchemas',
+        label: 'Schemas',
+        Icon: <QuizIcon />,
+        category: 'test',
+        path: 'schemas',
+      },
     ],
   },
   {

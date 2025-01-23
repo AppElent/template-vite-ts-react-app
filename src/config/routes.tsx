@@ -9,6 +9,7 @@ import DataSources from '@/pages/default/test/data-sources/index';
 import FileUploads from '@/pages/default/test/file-uploads';
 import FiltersPage from '@/pages/default/test/filters-page';
 import Forms from '@/pages/default/test/forms';
+import SchemaPage from '@/pages/default/test/schema-page';
 import Translations from '@/pages/default/test/translations';
 import { CustomRouteObject, routes as routesImport } from './routing';
 
@@ -27,6 +28,7 @@ const routeElements: { [key: string]: JSX.Element } = {
   testForms: <Forms />,
   testTranslations: <Translations />,
   testFilters: <FiltersPage />,
+  testSchemas: <SchemaPage />,
   // Default pages
   login: <SignIn mode="signin" />,
   signup: <SignIn mode="signup" />,

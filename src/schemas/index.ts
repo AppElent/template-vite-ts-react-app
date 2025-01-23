@@ -2,6 +2,7 @@ import { FieldConfig } from '@/libs/forms';
 import { faker } from '@faker-js/faker';
 import _ from 'lodash';
 import * as Yup from 'yup';
+import { createMockDataGenerator } from './mock-data-generator';
 
 // export interface Schema {
 //   [key: string]: {
@@ -24,6 +25,8 @@ interface ValidationResult<T> {
 export interface DefaultSchemaReturn<T> {
   schema: Yup.ObjectSchema<any>;
   getCustomFieldDefinitions: () => { [key: string]: Partial<FieldConfig> };
+  generateMockData: <T extends Yup.AnyObject>(yupSchema?: YupSchema<T>) => T;
+  getMockData: <T extends Yup.AnyObject>(count: number) => T[];
   generateTestData: <T extends Yup.AnyObject>(schema: YupSchema<T>) => T;
   generateObjectName: () => string;
   generateName: () => string;
@@ -36,13 +39,16 @@ export interface DefaultSchemaReturn<T> {
   getFieldDefinitions: () => { [key: string]: FieldConfig };
   validate: (data: T) => Promise<ValidationResult<T>>;
   clean: (data: T) => T;
+  toDatabase: (data: T) => any;
+  fromDatabase: (data: any) => T;
 }
 
-export const createDefaultSchema = <T>(
+export const createDefaultSchema = <T extends Yup.AnyObject>(
   yupSchema: Yup.ObjectSchema<any>,
   customFieldDefinitions?: { [key: string]: Partial<FieldConfig> }
 ): DefaultSchemaReturn<T> => {
   const schema = yupSchema;
+  const mockDataGenerator = createMockDataGenerator<T>(yupSchema);
   //const getCustomFieldDefinitions: () => { [key: string]: Partial<FieldConfig> } = () => ({});
 
   const removeUndefined = (obj: any) => {
@@ -102,6 +108,9 @@ export const createDefaultSchema = <T>(
 
   return {
     schema,
+    generateMockData: mockDataGenerator.generateMockData,
+    getMockData: <T extends Yup.AnyObject>(count: number) =>
+      mockDataGenerator.getMockData(count) as unknown as T[],
     getCustomFieldDefinitions: () => {
       return {};
     },
@@ -224,6 +233,12 @@ export const createDefaultSchema = <T>(
     },
     clean: (data: T) => {
       return removeUndefined(data);
+    },
+    toDatabase: (data: T): any => {
+      return data;
+    },
+    fromDatabase: (data: any): T => {
+      return data;
     },
   };
 };
