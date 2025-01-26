@@ -1,17 +1,15 @@
 import { Box, Button, Paper } from '@mui/material';
 // import { useState } from 'react';
 import { useData } from '@/libs/data-sources';
-import { Dummy } from '@/schemas/dummy';
 import DefaultPaperbasePage from './DefaultPaperbasePage';
 
-interface ISettings {
+interface Settings {
   test: string;
 }
 
 const Settings = () => {
-  const settings = useData<ISettings>('settings');
-  const dummy = useData<Dummy>('calculator_configs');
-  console.log(settings, dummy.data.push);
+  const settings = useData<Settings, Settings>('settings');
+  console.log(settings);
 
   return (
     <DefaultPaperbasePage title="Settings">

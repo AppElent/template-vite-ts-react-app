@@ -61,20 +61,4 @@ function generateRouteObjects(routes: CustomRouteObject[]): RouteObject[] {
 
 const routes = generateRouteObjects(routesImport);
 
-// export const paths = getAllPaths(routes);
-// console.log(paths);
-
-// Function to create a flat list of all paths with custom properties
-// export function getAllPaths(routes: CustomRouteObject[], parentPath: string = ''): any[] {
-//   return routes.flatMap((route) => {
-//     const currentPath = route.path
-//       ? `${parentPath}/${route.path}`.replace(/\/+/g, '/')
-//       : parentPath;
-//     const { children, ...routeInfo } = route;
-//     const currentRoute = { ...routeInfo, to: currentPath };
-//     const childrenPaths = children ? getAllPaths(children, currentPath) : [];
-//     return [currentRoute, ...childrenPaths];
-//   });
-// }
-
 export default routes;
