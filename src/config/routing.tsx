@@ -1,5 +1,6 @@
 import appRoutes from '@/routes/appRoutes';
 import { Home as HomeIcon } from '@mui/icons-material';
+import { JSX } from 'react';
 import { RouteObject } from 'react-router-dom';
 
 export type CustomRouteObject = RouteObject & {

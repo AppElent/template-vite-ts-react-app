@@ -1,4 +1,4 @@
-import { Suspense } from 'react';
+import { JSX, Suspense } from 'react';
 import { Outlet, RouteObject } from 'react-router-dom';
 
 import PaperbaseLayout from '@/layouts/paperbase/Layout';
