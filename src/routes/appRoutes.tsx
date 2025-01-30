@@ -15,6 +15,7 @@ const appRoutes: CustomRouteObject[] = [
     Icon: <PeopleIcon fontSize="inherit" />,
     category: 'settings',
     path: 'account',
+    loginRequired: true,
     element: <Account />,
   },
   {
@@ -23,6 +24,7 @@ const appRoutes: CustomRouteObject[] = [
     Icon: <PeopleIcon fontSize="inherit" />,
     category: 'settings',
     path: 'profile',
+    loginRequired: true,
     element: <div>Profile</div>,
   },
   {

@@ -34,7 +34,9 @@ export const RECIPE_FIELDS: {
   // },
   cuisine: {
     custom: {
-      suggestions: RECIPE_CATEGORIES,
+      autocompleteChipList: {
+        suggestions: RECIPE_CATEGORIES,
+      },
     },
   },
   // ingredients: {
@@ -43,7 +45,9 @@ export const RECIPE_FIELDS: {
   // },
   instructions: {
     custom: {
-      reorderable: true,
+      list: {
+        reorderable: true,
+      },
     },
   },
   'time.prep': {
@@ -117,7 +121,9 @@ export const RECIPE_FIELDS: {
   },
   keywords: {
     custom: {
-      suggestions: RECIPE_KEYWORDS,
+      autocompleteChipList: {
+        suggestions: RECIPE_KEYWORDS,
+      },
     },
   },
   // calories: {

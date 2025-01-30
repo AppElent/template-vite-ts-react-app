@@ -3,16 +3,7 @@ import useFormField from '@/libs/forms/use-form-field';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import CropIcon from '@mui/icons-material/Crop';
 import DeleteIcon from '@mui/icons-material/Delete';
-import {
-  Box,
-  Button,
-  Card,
-  CardActions,
-  CardMedia,
-  IconButton,
-  Tooltip,
-  Typography,
-} from '@mui/material';
+import { Box, Button, Card, CardMedia, IconButton, Tooltip, Typography } from '@mui/material';
 import _ from 'lodash';
 import { useState } from 'react';
 import ImageCropper from '../../../components/default/images/image-cropper';
@@ -101,24 +92,24 @@ const Image = ({ name, field: fieldConfig, deleteImage, cropImage, ...props }: I
             image={image ? image : '/app/Image_not_available.png'}
             alt="Uploaded Image"
           />
-          <CardActions style={{ justifyContent: 'flex-end' }}>
+          {/* <CardActions style={{ justifyContent: 'flex-end' }}>
             {/* Crop image */}
-            {!!cropImage && (
-              <Tooltip
-                title="Crop Image"
-                placement="top"
+          {!!cropImage && (
+            <Tooltip
+              title="Crop Image"
+              placement="top"
+            >
+              <IconButton
+                color="primary"
+                onClick={() => setCropperUrl(image)}
+                // disabled={image.isDefault}
               >
-                <IconButton
-                  color="primary"
-                  onClick={() => setCropperUrl(image)}
-                  // disabled={image.isDefault}
-                >
-                  <CropIcon />
-                </IconButton>
-              </Tooltip>
-            )}
+                <CropIcon />
+              </IconButton>
+            </Tooltip>
+          )}
 
-            {/* Set Favorite
+          {/* Set Favorite
             {getFavorite && (
               <Tooltip
                 title="Set as Favorite"
@@ -138,22 +129,22 @@ const Image = ({ name, field: fieldConfig, deleteImage, cropImage, ...props }: I
               </Tooltip>
             )} */}
 
-            {/* Delete */}
-            {deleteImage && (
-              <Tooltip
-                title="Delete"
-                placement="top"
+          {/* Delete */}
+          {deleteImage && (
+            <Tooltip
+              title="Delete"
+              placement="top"
+            >
+              <IconButton
+                color="error"
+                onClick={() => handleDelete(image)}
+                // disabled={image.isDefault}
               >
-                <IconButton
-                  color="error"
-                  onClick={() => handleDelete(image)}
-                  // disabled={image.isDefault}
-                >
-                  <DeleteIcon />
-                </IconButton>
-              </Tooltip>
-            )}
-          </CardActions>
+                <DeleteIcon />
+              </IconButton>
+            </Tooltip>
+          )}
+          {/* </CardActions>  */}
         </Card>
       </Box>
       {cropperUrl && (

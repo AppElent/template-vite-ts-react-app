@@ -45,7 +45,6 @@
         "haveAccount": "Have an account?"
       }
     },
-
     "updatePassword": {
       "title": "Update password",
       "fields": {
@@ -156,7 +155,9 @@
     "submitError": "Error when submitting {{resource}} (status code: {{statusCode}})",
     "importProgress": "Importing: {{processed}}/{{total}}",
     "savedSuccess": "Saved Successfully",
-    "savedError": "Error saving"
+    "savedError": "Error saving",
+    "updatedSuccess": "{{resource}} updated successfully",
+    "updatedError": "Updating {{resource}} failed"
   },
   "loading": "Loading",
   "posts": {

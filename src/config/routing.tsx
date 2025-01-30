@@ -9,6 +9,7 @@ export type CustomRouteObject = RouteObject & {
   Icon: JSX.Element;
   translationKey?: string;
   category?: string;
+  loginRequired?: boolean;
   children?: CustomRouteObject[] | any;
 };
 
