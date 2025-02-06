@@ -95,5 +95,9 @@
     "updatedError": "{{resource}} update mislukt"
   },
   "loading": "Laden",
-  "buttons": {}
+  "buttons": {},
+  "menu": {
+    "settings": "Instellingen",
+    "profile": "Profiel"
+  }
 }

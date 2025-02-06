@@ -157,7 +157,7 @@
     "savedSuccess": "Saved Successfully",
     "savedError": "Error saving",
     "updatedSuccess": "{{resource}} updated successfully",
-    "updatedError": "Updating {{resource}} failed"
+    "updatedError": "Error updating {{resource}}"
   },
   "loading": "Loading",
   "posts": {
@@ -194,6 +194,7 @@
     "languageChanged": "Language changed"
   },
   "menu": {
-    "settings": "Settings"
+    "settings": "Settings",
+    "profile": "Profile"
   }
 }

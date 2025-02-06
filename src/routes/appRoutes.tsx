@@ -24,6 +24,7 @@ const appRoutes: CustomRouteObject[] = [
     Icon: <PeopleIcon fontSize="inherit" />,
     category: 'settings',
     path: 'profile',
+    translationKey: 'common:menu.profile',
     loginRequired: true,
     element: <div>Profile</div>,
   },
