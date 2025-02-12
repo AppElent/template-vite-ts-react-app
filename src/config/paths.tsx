@@ -1,5 +1,4 @@
 import { useParams } from 'react-router-dom';
-// import config from '.';
 import { paths } from './routing';
 
 export interface PathItem {

@@ -1,4 +1,4 @@
-import { Seo, setPageTitleSuffix } from '@/components/default/seo';
+import { setPageTitleSuffix } from '@/components/default/seo';
 import { SplashScreen } from '@/components/default/splash-screen';
 import config from '@/config';
 import { dataSources } from '@/config/datasources';
@@ -19,7 +19,7 @@ import ErrorBoundary from './components/default/error-boundary';
 import { queryClient } from './config/datasources';
 import useRouter from './hooks/use-router';
 import { AuthConsumer, AuthProvider } from './libs/auth/context';
-import DataProviderNew from './libs/data-sources/DataProvider';
+import DataProvider from './libs/data-sources/DataProvider';
 
 interface DashboardProps {
   theme: Theme;
@@ -62,10 +62,9 @@ const Dashboard: FC<DashboardProps> = ({ theme, routes, authProvider }) => {
                         initialIsOpen={false}
                         buttonPosition="bottom-left"
                       />
-                      <DataProviderNew dataSources={dataSources || {}}>
+                      <DataProvider dataSources={dataSources || {}}>
                         <QueryParamProvider adapter={ReactRouter6Adapter}>
                           <ConfirmProvider>
-                            <Seo />
                             <ToastContainer
                               position="top-right"
                               autoClose={2500}
@@ -82,7 +81,7 @@ const Dashboard: FC<DashboardProps> = ({ theme, routes, authProvider }) => {
                             {element}
                           </ConfirmProvider>
                         </QueryParamProvider>
-                      </DataProviderNew>
+                      </DataProvider>
                     </QueryClientProvider>
                   </>
                 );

@@ -3,7 +3,6 @@ import { faker } from '@faker-js/faker';
 import _ from 'lodash';
 import * as Yup from 'yup';
 import { createMockDataGenerator } from './mock-data-generator';
-import createYupSchemaGenerator from './yup-schema-generator';
 
 type YupSchema<T extends Yup.AnyObject> = Yup.ObjectSchema<T>;
 
@@ -17,7 +16,7 @@ interface ValidationResult<T> {
 
 export interface DefaultSchemaProps {
   customFieldDefinitions?: { [key: string]: Partial<FieldConfig> };
-  translate?: (key: string) => string;
+  translate?: (key: string) => string | undefined;
 }
 
 export interface DefaultSchemaReturn<T> {
@@ -46,7 +45,8 @@ export const createDefaultSchema = <T>(
   yupSchema: Yup.ObjectSchema<any>,
   options: DefaultSchemaProps = {}
 ): DefaultSchemaReturn<T> => {
-  const schema = createYupSchemaGenerator({ yupSchema, translate: options.translate }).generate();
+  // const schema = createYupSchemaGenerator({ yupSchema, translate: options.translate }).generate();
+  const schema = yupSchema;
   const mockDataGenerator = createMockDataGenerator<T>(yupSchema);
 
   const removeUndefined = (obj: any) => {
@@ -107,13 +107,16 @@ export const createDefaultSchema = <T>(
           const newKey = basePath ? `${basePath}.${key}` : key;
           const field = fields[key];
           const description = field.describe();
-          const label = 'label' in description ? description.label : key;
+          //const label = 'label' in description ? description.label : key;
+          const originalLabel =
+            'label' in description && description.label !== undefined ? description.label : key;
+          const newLabel = options.translate?.(key) || originalLabel;
           const defaultValue = 'default' in description ? description.default : undefined;
           const meta = 'meta' in description ? description.meta : {};
           const newField: FieldConfig = {
             name: newKey,
             id: key,
-            label,
+            label: newLabel,
             type: description.type,
             default: defaultValue,
             ...meta,

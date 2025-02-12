@@ -3,7 +3,7 @@ import * as Yup from 'yup';
 
 interface YupSchemaGeneratorProps {
   yupSchema: Yup.ObjectSchema<any>;
-  translate?: (key: string) => string;
+  translate?: (key: string) => string | undefined;
 }
 
 const createYupSchemaGenerator = (props: YupSchemaGeneratorProps) => {

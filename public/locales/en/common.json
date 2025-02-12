@@ -139,8 +139,14 @@
     "fieldLengthArray": "{{field}} must have {{length}} items"
   },
   "fields": {
+    "id": "ID",
+    "owner": "Owner",
     "name": "Name",
-    "description": "Description"
+    "description": "Description",
+    "image": "Image",
+    "images": "Images",
+    "createdAt": "Created At",
+    "updatedAt": "Updated At"
   },
   "warnWhenUnsavedChanges": "Are you sure you want to leave? You have unsaved changes.",
   "notifications": {
@@ -166,38 +172,9 @@
     "updateError": "Error updating {{resource}} (status code: {{statusCode}})"
   },
   "loading": "Loading",
-  "posts": {
-    "posts": "Posts",
-    "fields": {
-      "id": "Id",
-      "title": "Title",
-      "category": "Category",
-      "status": {
-        "title": "Status",
-        "published": "Published",
-        "draft": "Draft",
-        "rejected": "Rejected"
-      },
-      "content": "Content",
-      "createdAt": "Created At"
-    },
-    "titles": {
-      "create": "Create Post",
-      "edit": "Edit Post",
-      "list": "Posts",
-      "show": "Show Post"
-    }
-  },
-  "table": {
-    "actions": "Actions"
-  },
   "words": {
     "no": "No",
     "yes": "Yes"
-  },
-  "labels": {
-    "image": "Image",
-    "images": "Images"
   },
   "misc": {
     "noImageAvailable": "No image available",

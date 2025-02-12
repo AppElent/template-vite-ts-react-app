@@ -56,7 +56,6 @@ const ListItem = ({ name, index, remove, ...props }: CustomListItemProps) => {
           fullWidth
           // margin="dense"
           {...field}
-          {...props}
           value={field.value || ''}
           error={meta.touched && Boolean(meta.error)}
           helperText={meta.touched && meta.error}
@@ -133,7 +132,7 @@ const List = ({ name, field: fieldConfig, ...props }: CustomListProps) => {
                   >
                     <MUIList
                       dense
-                      {...newProps}
+                      {...newProps.muiListProps}
                     >
                       {field.value?.map((_item: any, index: number) => (
                         <Draggable

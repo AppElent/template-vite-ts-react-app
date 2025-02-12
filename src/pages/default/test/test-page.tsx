@@ -1,6 +1,6 @@
 import usePathRouter from '@/hooks/use-path-router';
 import AuthTestPage from '@/libs/auth/auth-test-page';
-import DataSources from '@/libs/data-sources/datasource-test-page';
+import DataSourcesTestPage from '@/libs/data-sources/datasource-test-page';
 import FiltersPage from '@/libs/filters/test-page';
 import FormsTestPage from '@/libs/forms/forms-test-page';
 import {
@@ -20,12 +20,6 @@ import SchemaPage from './tests/schema-page';
 import TranslationTestPage from './tests/translation-test-page';
 
 const tests = [
-  {
-    id: 'data-sources-new',
-    title: 'Data Sources New',
-    description: 'New datasources library',
-    component: <DataSources />,
-  },
   {
     id: 'schemas',
     title: 'Schemas',
@@ -55,6 +49,12 @@ const tests = [
     title: 'Auth Providers',
     description: 'Auth Providers library',
     component: <AuthTestPage />,
+  },
+  {
+    id: 'data-sources',
+    title: 'Data Sources',
+    description: 'Data Sources library',
+    component: <DataSourcesTestPage />,
   },
   {
     id: 'file-uploads',
