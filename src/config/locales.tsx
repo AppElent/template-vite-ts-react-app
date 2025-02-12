@@ -117,4 +117,4 @@ export const localeSettings: LocaleObject = {
   // },
 };
 
-export const namespaces = ['foodhub'];
+export const namespaces = [];

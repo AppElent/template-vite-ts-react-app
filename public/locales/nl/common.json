@@ -84,6 +84,10 @@
     "success": "Succesvol",
     "error": "Fout (statuscode: {{statusCode}})",
     "undoable": "Je hebt {{seconds}} seconden om ongedaan te maken",
+    "addSuccess": "{{resource}} succesvol toegevoegd",
+    "addError": "Fout bij toevoegen van {{resource}} (status code: {{statusCode}})",
+    "setSuccess": "{{resource}} succesvol opgeslagen",
+    "setError": "Fout bij opslaan van {{resource}} (status code: {{statusCode}})",
     "createSuccess": "Succesvol gemaakte {{resource}}",
     "createError": "Er is een fout opgetreden bij het maken van {{resource}} (statuscode: {{statusCode}})",
     "deleteSuccess": "{{resource}} is verwijderd",
@@ -91,8 +95,8 @@
     "editSuccess": "Succesvol bewerkte {{resource}}",
     "editError": "Fout bij het bewerken van {{resource}} (statuscode: {{statusCode}})",
     "importProgress": "Importeren: {{processed}}/{{total}}",
-    "updatedSuccess": "{{resource}} succesvol geupdate",
-    "updatedError": "{{resource}} update mislukt"
+    "updateSuccess": "{{resource}} succesvol geupdate",
+    "updateError": "{{resource}} update mislukt (status code: {{statusCode}})"
   },
   "loading": "Laden",
   "buttons": {},

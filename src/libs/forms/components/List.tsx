@@ -86,7 +86,7 @@ const List = ({ name, field: fieldConfig, ...props }: CustomListProps) => {
     throw new Error('Either name or field must be provided');
   }
   const fieldName = name || fieldConfig?.name;
-  const data = useFormField(fieldName as string);
+  const data = useFormField(fieldName as string, fieldConfig);
   const { options, field, helpers } = data;
 
   const newProps = _.merge({}, options, props);
@@ -105,7 +105,6 @@ const List = ({ name, field: fieldConfig, ...props }: CustomListProps) => {
 
     helpers.setValue(items);
   };
-
   return (
     <FieldArray name={fieldName as string}>
       {({ remove, push }) => (

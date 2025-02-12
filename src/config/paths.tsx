@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import config from '.';
+// import config from '.';
 import { paths } from './routing';
 
 export interface PathItem {
@@ -11,8 +11,6 @@ export interface PathItem {
   loginRequired?: boolean;
   category?: string;
 }
-
-const debug = config.settings?.logLevel === 'debug';
 
 // TODO: fix
 interface MenuCategory {
@@ -28,12 +26,6 @@ const menuCategories: MenuCategory[] = [
     id: 'settings',
     label: 'Settings',
     translationKey: 'common:menu.settings',
-  },
-  {
-    id: 'test',
-    label: 'Test pages',
-    collapsed: true,
-    showInMenu: debug,
   },
 ];
 

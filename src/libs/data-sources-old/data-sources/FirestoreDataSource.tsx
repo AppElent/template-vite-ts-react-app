@@ -45,7 +45,7 @@ export class FirestoreDataSource<T, Z = T[]> extends BaseDataSource<T, Z> {
   //public converter = this.defaultConverter;
 
   constructor(
-    options: DataSourceInitOptions<T>,
+    options: DataSourceInitOptions<T, Z>,
     providerConfig: FirestoreDataSourceProviderConfig
   ) {
     super(options, providerConfig);
@@ -111,13 +111,16 @@ export class FirestoreDataSource<T, Z = T[]> extends BaseDataSource<T, Z> {
   get = async (id?: string): Promise<T | null> => {
     try {
       await super.get(id);
+      // if (!id && this.options.targetMode !== 'document') {
+      //   throw new Error('get() requires an ID when using collections');
+      // }
       const docRef = this.#getRef(id);
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         const data = docSnap.data();
         return { id: docSnap.id, ...(data ? data : {}) } as T;
       } else {
-        return this.defaultValue as T;
+        return this.defaultValue;
       }
     } catch (error) {
       console.error('Error getting document:', error);
@@ -167,11 +170,17 @@ export class FirestoreDataSource<T, Z = T[]> extends BaseDataSource<T, Z> {
   };
 
   // Update an existing document by ID
-  update = async (data: Partial<T>): Promise<void> => {
+  update = async (data: Partial<T>, id?: string): Promise<void> => {
     try {
-      const id = data[this.options.idField as keyof T];
-      await super.update(data);
-      const docRef = this.#getRef(id as string | undefined);
+      await super.update(data, id);
+      // if (!id && this.options.targetMode !== 'document') {
+      //   throw new Error('update() requires an ID when using collections');
+      // }
+      const docRef = this.#getRef(id);
+      // const validateResult = await this.validate(data, { strict: false });
+      // if (!validateResult.valid) {
+      //   throw new Error('Validation failed');
+      // }
       await updateDoc(docRef, data as UpdateData<Partial<T>>);
     } catch (error) {
       console.error('Error updating document:', error);
@@ -180,16 +189,15 @@ export class FirestoreDataSource<T, Z = T[]> extends BaseDataSource<T, Z> {
   };
 
   // Update an existing document by ID
-  set = async (data: T): Promise<void> => {
+  set = async (data: T, id?: string): Promise<void> => {
     try {
-      const id = data[this.options.idField as keyof T];
-      await super.set(data);
+      await super.set(data, id);
       // Validate updated data
       // if (!id && this.options.targetMode !== 'document') {
       //   throw new Error('set() requires an ID when using collections');
       // }
       // this.validate(data); // TODO: fix validation everywhere
-      const docRef = this.#getRef(id as string | undefined);
+      const docRef = this.#getRef(id);
       await setDoc(docRef, data);
     } catch (error) {
       console.error('Error setting document:', error);
@@ -201,6 +209,9 @@ export class FirestoreDataSource<T, Z = T[]> extends BaseDataSource<T, Z> {
   delete = async (id?: string): Promise<void> => {
     try {
       await super.delete(id);
+      // if (!id && this.options.targetMode !== 'document') {
+      //   throw new Error('get() requires an ID when using collections');
+      // }
       const docRef = this.#getRef(id);
       await deleteDoc(docRef);
     } catch (error) {

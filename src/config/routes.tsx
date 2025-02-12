@@ -4,13 +4,7 @@ import { Outlet, RouteObject } from 'react-router-dom';
 import PaperbaseLayout from '@/layouts/paperbase/Layout';
 import NotFound from '@/pages/default/404';
 import SignIn from '@/pages/default/SignIn';
-import TestAuthProviders from '@/pages/default/test/auth-providers';
-import DataSources from '@/pages/default/test/data-sources/index';
-import FileUploads from '@/pages/default/test/file-uploads';
-import FiltersPage from '@/pages/default/test/filters-page';
-import Forms from '@/pages/default/test/forms';
-import SchemaPage from '@/pages/default/test/schema-page';
-import Translations from '@/pages/default/test/translations';
+import TestPage from '@/pages/default/test/test-page';
 import { CustomRouteObject, routes as routesImport } from './routing';
 
 const routeElements: { [key: string]: JSX.Element } = {
@@ -22,13 +16,9 @@ const routeElements: { [key: string]: JSX.Element } = {
     </PaperbaseLayout>
   ),
   homeIndex: <>Home</>,
-  testDataSources: <DataSources />,
-  testFileUploads: <FileUploads />,
-  testAuthProviders: <TestAuthProviders />,
-  testForms: <Forms />,
-  testTranslations: <Translations />,
-  testFilters: <FiltersPage />,
-  testSchemas: <SchemaPage />,
+  testsIndex: <TestPage />,
+  testsDetail: <TestPage />,
+
   // Default pages
   login: <SignIn mode="signin" />,
   signup: <SignIn mode="signup" />,

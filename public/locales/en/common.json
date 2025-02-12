@@ -86,7 +86,9 @@
     "import": "Import",
     "clone": "Clone",
     "notAccessTitle": "You don't have permission to access",
-    "dismiss": "Dismiss"
+    "dismiss": "Dismiss",
+    "uploadImage": "Upload image",
+    "uploadImages": "Upload Images"
   },
   "errors": {
     "title_one": "Error",
@@ -145,6 +147,10 @@
     "success": "Success",
     "error": "Error (status code: {{statusCode}})",
     "undoable": "You have {{seconds}} seconds to undo",
+    "addSuccess": "Successfully added {{resource}}",
+    "addError": "There was an error adding {{resource}} (status code: {{statusCode}})",
+    "setSuccess": "Successfully set {{resource}}",
+    "setError": "There was an error setting {{resource}} (status code: {{statusCode}})",
     "createSuccess": "Successfully created {{resource}}",
     "createError": "There was an error creating {{resource}} (status code: {{statusCode}})",
     "deleteSuccess": "Successfully deleted {{resource}}",
@@ -156,8 +162,8 @@
     "importProgress": "Importing: {{processed}}/{{total}}",
     "savedSuccess": "Saved Successfully",
     "savedError": "Error saving",
-    "updatedSuccess": "{{resource}} updated successfully",
-    "updatedError": "Error updating {{resource}}"
+    "updateSuccess": "{{resource}} updated successfully",
+    "updateError": "Error updating {{resource}} (status code: {{statusCode}})"
   },
   "loading": "Loading",
   "posts": {
@@ -188,6 +194,10 @@
   "words": {
     "no": "No",
     "yes": "Yes"
+  },
+  "labels": {
+    "image": "Image",
+    "images": "Images"
   },
   "misc": {
     "noImageAvailable": "No image available",

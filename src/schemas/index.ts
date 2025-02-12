@@ -3,6 +3,7 @@ import { faker } from '@faker-js/faker';
 import _ from 'lodash';
 import * as Yup from 'yup';
 import { createMockDataGenerator } from './mock-data-generator';
+import createYupSchemaGenerator from './yup-schema-generator';
 
 type YupSchema<T extends Yup.AnyObject> = Yup.ObjectSchema<T>;
 
@@ -16,10 +17,12 @@ interface ValidationResult<T> {
 
 export interface DefaultSchemaProps {
   customFieldDefinitions?: { [key: string]: Partial<FieldConfig> };
+  translate?: (key: string) => string;
 }
 
 export interface DefaultSchemaReturn<T> {
   schema: Yup.ObjectSchema<any>;
+  originalSchema: Yup.ObjectSchema<any>;
   // getCustomFieldDefinitions: () => { [key: string]: Partial<FieldConfig> };
   generateMockData: (yupSchema?: YupSchema<any>) => T;
   getMockData: (count: number) => T[];
@@ -43,7 +46,7 @@ export const createDefaultSchema = <T>(
   yupSchema: Yup.ObjectSchema<any>,
   options: DefaultSchemaProps = {}
 ): DefaultSchemaReturn<T> => {
-  const schema = yupSchema;
+  const schema = createYupSchemaGenerator({ yupSchema, translate: options.translate }).generate();
   const mockDataGenerator = createMockDataGenerator<T>(yupSchema);
 
   const removeUndefined = (obj: any) => {
@@ -57,6 +60,7 @@ export const createDefaultSchema = <T>(
 
   return {
     schema,
+    originalSchema: yupSchema,
     generateMockData: mockDataGenerator.generateMockData,
     getMockData: (count: number) => mockDataGenerator.getMockData(count) as unknown as T[],
     // generateTestData: () => generateTestData(schema),
@@ -85,7 +89,7 @@ export const createDefaultSchema = <T>(
       // Return all non undefined values
       return Object.keys(defaultValues).reduce((acc: any, key) => {
         if (defaultValues[key] !== undefined) {
-          acc[key as keyof T] = defaultValues[key as keyof T];
+          acc[key as keyof T] = (defaultValues as T)[key as keyof T];
         }
         return acc;
       }, {});

@@ -1,7 +1,6 @@
 import ScrollToTop from '@/components/default/scroll-to-top';
 import '@/config/firebase';
 import routes from '@/config/routes';
-import LocalStorageDataSource from '@/libs/data-sources/data-sources/LocalStorageDataSource';
 
 import theme from '@/theme/paperbase/theme';
 import './App.css';
@@ -15,16 +14,8 @@ const firebaseProvider = new FirebaseAuthProvider({
   logout: '/logout',
 });
 
-const dataSources = {
-  settings: new LocalStorageDataSource({
-    target: 'settings',
-    targetMode: 'document',
-    subscribe: true,
-  }),
-};
-
 function App() {
-  console.log('App config', firebaseProvider, dataSources, routes, config);
+  console.log('App config', firebaseProvider, routes, config);
   return (
     <>
       <ScrollToTop />
@@ -33,7 +24,6 @@ function App() {
         theme={theme}
         authProvider={firebaseProvider}
         routes={routes}
-        dataSources={dataSources}
       />
     </>
   );

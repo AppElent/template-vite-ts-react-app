@@ -1,0 +1,10 @@
+[
+  {
+    "version": "0.0.3",
+    "description": "Introducing versions"
+  },
+  {
+    "version": "0.0.4",
+    "description": "New datasources library"
+  }
+]
